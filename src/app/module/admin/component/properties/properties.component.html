@@ -1,0 +1,128 @@
+<div class="w-full bg-gray-200 dark:bg-dark-background">
+  <div *ngIf="currentComponent && (propPanelCurrentSize > propPanelOpenWidth / 2)"
+       class="w-full grid grid-cols-12 ml-1 mt-2 mr-2 items-baseline dark:text-white">
+
+    <p class="col-span-4">Ид компонента</p>
+    <input class="col-span-8 w-[90%] text-center rounded-md dark:bg-slate-700" type="text"
+           [value]="currentComponent.componentID" [readOnly]="true">
+    <p class="col-span-4">Имя компонента</p>
+    <input class="col-span-8 w-[90%] text-center rounded-md dark:bg-slate-700" type="text"
+           [(ngModel)]="currentComponent.componentName">
+    <p class="col-span-4">Тип компонента</p>
+    <input class="col-span-8 w-[90%] text-center rounded-md dark:bg-slate-700" type="text"
+           [value]="currentComponent.componentType" [readOnly]="true">
+
+    <p *ngIf="currentComponent.componentType === 'input'" class="col-span-4">Тип ввода</p>
+    <select *ngIf="currentComponent.componentType === 'input'"
+            class="col-span-8 w-[90%] text-center rounded-md dark:bg-slate-700"
+            [(ngModel)]="currentComponent.inputType">
+      <option selected value="text">текст</option>
+      <option value="number">число</option>
+      <option value="datetime-local">дата время</option>
+      <option value="date">дата</option>
+      <option value="time">время</option>
+      <option value="week">неделя</option>
+      <option value="month">месяц</option>
+      <option value="checkbox">check</option>
+      <option value="radio">radio</option>
+      <option value="color">цвет</option>
+    </select>
+
+    <div *ngIf="currentComponent.inputType === 'text' || currentComponent.componentType === 'area'"
+         class="col-span-12 w-[95%] rounded-md border border-primary-light relative">
+      <p class=" -mt-4 text-center">Ограничения текста</p>
+      <div class="w-full grid grid-cols-12 ml-1 mt-1 mr-2 items-baseline dark:text-white">
+        <p class="col-span-8">Минимальная длинная:</p>
+        <input class="col-span-4 w-[90%] text-center rounded-md dark:bg-slate-700" type="number"
+               [(ngModel)]="currentComponent.minLength">
+        <p class="col-span-8">Максимальная длинна:</p>
+        <input class="col-span-4 w-[90%] text-center rounded-md dark:bg-slate-700" type="number"
+               [(ngModel)]="currentComponent.maxLength">
+        <p class="col-span-8">Маска ввода значения:</p>
+        <textarea [(ngModel)]="currentComponent.regExp"
+                  placeholder="Сюда можно вставить маску ввода см. ng-mask"
+                  class="col-span-12 w-[98%]  rounded-md dark:bg-slate-700">
+        </textarea>
+      </div>
+    </div>
+
+    <div *ngIf="currentComponent.inputType === 'number'"
+         class="col-span-12 w-[95%] rounded-md border border-primary-light relative">
+      <p class=" -mt-4 text-center">Ограничения значения</p>
+      <div class="w-full grid grid-cols-12 ml-1 mt-1 mr-2 items-baseline dark:text-white">
+        <p class="col-span-8">Минимальное значение</p>
+        <input class="col-span-4 w-[90%] text-center rounded-md dark:bg-slate-700" type="number"
+               [(ngModel)]="currentComponent.minVal">
+        <p class="col-span-8">Максимальное значение</p>
+        <input class="col-span-4 w-[90%] text-center rounded-md dark:bg-slate-700" type="number"
+               [(ngModel)]="currentComponent.maxVal">
+      </div>
+    </div>
+
+    <div class="col-span-12 mt-4 grid grid-cols-12">
+      <div class="col-span-5">Добавить рамку</div>
+      <input class="col-span-1 h-4 w-4 text-center" type="checkbox" [(ngModel)]="addFrame">
+      <input class="col-span-6 w-[90%] -mt-2" type="color" *ngIf="addFrame" [(ngModel)]="currentComponent.frameColor">
+    </div>
+
+
+    <p *ngIf="currentComponent.componentType === 'input'
+    || currentComponent.componentType === 'area'
+    || currentComponent.componentType === 'table'"
+       class="col-span-10 mt-4">Обязательно для заполнения
+    </p>
+    <input *ngIf="currentComponent.componentType === 'input'
+    || currentComponent.componentType === 'area'
+    || currentComponent.componentType === 'table'"
+           class="col-span-2 w-[90%] text-center rounded-md dark:bg-slate-700" type="checkbox"
+           [(ngModel)]="currentComponent.required">
+
+    <span *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'" class="col-span-12 text-center">Текст компонента</span>
+    <textarea *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'"
+              [(ngModel)]="currentComponent.placeHolder"
+              class="col-span-12 w-[95%] rounded-md dark:bg-slate-700"></textarea>
+
+    <div *ngIf="currentComponent.componentType === 'text'"
+         class="col-span-12 w-[95%] text-center rounded-md dark:bg-slate-700 border border-primary-light relative">
+      <p class=" -mt-4 ">Расположение текста компонента</p>
+      <mat-button-toggle-group [(ngModel)]="currentComponent.textPosition.horizontal">
+        <mat-button-toggle value="left">
+          <mat-icon>format_align_left</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="center">
+          <mat-icon>format_align_center</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="right">
+          <mat-icon>format_align_right</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="justify">
+          <mat-icon>format_align_justify</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+      <mat-button-toggle-group [(ngModel)]="currentComponent.textPosition.vertical">
+        <mat-button-toggle value="top">
+          <mat-icon class="rotate-90">format_align_left</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="center">
+          <mat-icon class="rotate-90">format_align_center</mat-icon>
+        </mat-button-toggle>
+        <mat-button-toggle value="bottom">
+          <mat-icon class="rotate-90">format_align_right</mat-icon>
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+
+
+
+    <span *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'" class="col-span-12 text-center">Текст подсказки</span>
+    <textarea *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'"
+              [(ngModel)]="currentComponent.notification"
+              class="col-span-12 w-[95%] rounded-md dark:bg-slate-700"></textarea>
+
+    <button class="mt-4 col-span-12 w-[95%] border border-primary-light rounded-lg py-2 mat-elevation-z5" (click)="openMasterControlDialog()">
+      <mat-icon >sync</mat-icon>
+      <p>Управление компонентом</p>
+    </button>
+
+  </div>
+</div>

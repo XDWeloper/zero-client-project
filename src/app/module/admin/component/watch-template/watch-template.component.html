@@ -1,0 +1,31 @@
+<div class="flex justify-center items-center">
+  <h2 class="">Просмотр</h2>
+  <mat-icon class="absolute right-1 top-1 text-red-700" (click)="close()">cancel</mat-icon>
+</div>
+
+<div class="flex justify-between w-full overflow-auto  bg-gray-200 pb-20" #watch_mainContainer>
+  <!--    это поле элементов-->
+  <div class=" w-[75%] m-auto mt-2 boundary overflow-auto" >
+    <ng-template #watch_field></ng-template>
+    <div class="w-full grid grid-cols-12 overflow-auto">
+      <div *ngFor="let item of cellRowList; let outCell = index " class="flex">
+        <app-cell class="flex-auto" *ngFor="let i of cellInnerList; let innerCell = index"
+                  [cellType]="cellType"
+                  [index]="outCell * cellColl + innerCell"></app-cell>
+      </div>
+    </div>
+  </div>
+<div class="w-[20%] ml-1 overflow-auto border-l border-l-white pl-4">
+  <div *ngFor="let step of currentDocument.docStep "
+       class="flex justify-start items-center w-full mt-3 cursor-pointer"
+       (click)="setCurrentStep(step.stepNum)">
+    <div class="text-white rounded-full w-5 h-5 text-center duration-300"
+         [ngClass]="currentStepIndex === step.stepNum ? 'bg-primary-dark' : 'bg-gray-500'">{{ step.stepNum }}</div>
+    <div class="ml-1" >{{ step.stepName }}</div>
+  </div>
+</div>
+</div>
+
+
+
+

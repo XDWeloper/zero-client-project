@@ -1,0 +1,62 @@
+<div class="z-1000 h-[80%]">
+  <mat-icon class="absolute right-1 top-1 text-white bg-primary-light cursor-pointer" (click)="close()">close</mat-icon>
+  <p class="dark:text-gray-200 text-center text-lg mt-2">Настройка управления свойствами компонента</p>
+
+  <div class="h-full overflow-y-auto m-4"> <!--тело таблицы-->
+
+    <div class="grid grid-cols-3 w-full border-border-red-500">
+      <div class="text-center border dark:text-gray-200" >Управляющий компонент</div>
+      <div class="text-center border dark:text-gray-200" >Управляющее значение</div>
+      <div class="text-center border dark:text-gray-200" >Изменяемое свойство</div>
+    </div>
+
+
+    <div *ngFor="let row of currentComponent.masterControlList" class="grid grid-cols-3">
+
+      <mat-form-field>
+        <mat-label>Управляющий компонент</mat-label>
+        <mat-select [(ngModel)]="row.componentID" (valueChange)="select($event)">
+          <mat-option>-- None --</mat-option>
+          <mat-optgroup *ngFor="let step of componentStepList" [label]="step.stepName">
+            <mat-option *ngFor="let component of step.component" [value]="component.componentID">
+              {{component.componentID}}/{{component.componentName}}/{{component.componentType}}
+            </mat-option>
+          </mat-optgroup>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field >
+        <mat-label>Управляющее значение</mat-label>
+        <mat-select [(ngModel)]="row.componentValue" [disabled]="row.componentID === undefined">
+          <mat-option *ngFor="let val of controlValue" [value]="val.value" >
+            {{val.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field>
+        <mat-label>Изменяемое свойство</mat-label>
+        <mat-select [(ngModel)]="row.controlProp">
+          <mat-option *ngFor="let val of controlProp" [value]="val.value">
+            {{val.name}}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+        </div>
+      </div>
+
+
+</div>
+
+<div class="absolute bottom-4 left-0 mx-4 w-[98%]">
+  <!--  Кнопки управления-->
+  <div class="flex justify-start items-center border bg-primary-light/50 " >
+    <mat-icon class="text-green-500 cursor-pointer" matTooltip="Добавить строку" (click)="addRow()">add</mat-icon>
+    <mat-icon class="text-red-500 cursor-pointer" matTooltip="Удалить строку" (click)="removeRow()">remove</mat-icon>
+    <mat-icon class="text-red-500 cursor-pointer" matTooltip="Очистить таблицу" (click)="clearTable()">close</mat-icon>
+  </div>
+
+  <button mat-stroked-button class="float-right mt-2" (click)="close()">Ок</button>
+</div>
+

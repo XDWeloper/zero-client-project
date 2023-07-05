@@ -1,0 +1,15 @@
+<div class="mt-16 border-primary-base border-2 h-96 relative ">
+  <span class="absolute ml-1 -mt-4 z-10 bg-gray-50 dark:bg-dark-background dark:text-gray-50 font-mono tracking-[1px]"> &nbsp;Введите адрес &nbsp;</span>
+  <div class="flex items-center mt-6 px-2 ">
+    <div class="relative w-full group">
+      <input id="region" type="search" list="regions" class="select-style" required
+             (input)="inputRegion($event)" [(ngModel)]="region" >
+      <label *ngIf="!region" for="region" class="placeholder-style ">Выберите регион ...</label>
+      <datalist id="regions">
+        <option *ngFor="let item of addressService.getAllRegion()" [ngValue]="item">
+          {{ item.regionCode}} - {{ item.name }}
+      </datalist>
+      <div *ngIf="regionError" class="error-text">Не верно указан регион</div>
+    </div>
+  </div>
+</div>

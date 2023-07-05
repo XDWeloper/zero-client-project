@@ -1,0 +1,49 @@
+<!--[ngClass]="{'border':frameColor}"-->
+<div class="absolute z-10"
+     [ngStyle]="{'height.px':height,'width.px':width}"
+     [style.top.px]="top" [style.left.px]="left" [style.border-color]="frameColor">
+
+  <p class="font-semibold dark:text-gray-200">Сведения об участниках общества, размерах их долей в уставном капитале и их оплате
+    <span class="font-normal text-sm italic">(акционерными обществами данный пункт не заполняется в связи с представлением в Банк реестра акционеров)</span>
+  </p>
+
+  <div class="h-full overflow-y-auto"> <!--тело таблицы-->
+
+    <div class="grid grid-cols-5 ">
+      <div class="text-center font-semibold border dark:text-gray-200" [style.border-color]="frameColor">Сведения об участнике общества (Ф.И.О, дата и место рождения (организационно-правовая форма и наименование юридического лица)</div>
+      <div class="text-center font-semibold border dark:text-gray-200" [style.border-color]="frameColor">Вид, номер, серия, дата и место выдачи документа, удостоверяющего личность, орган, выдавший документ (номер гос. регистрации, наименование органа, осуществившего регистрацию, дата регистрации)</div>
+      <div class="text-center font-semibold border dark:text-gray-200" [style.border-color]="frameColor">Адрес места регистрации (место нахождения)</div>
+      <div class="text-center font-semibold border dark:text-gray-200" [style.border-color]="frameColor">Размер доли в уставном капитале общества </div>
+      <div class="text-center font-semibold border dark:text-gray-200" [style.border-color]="frameColor">Сведения об оплате доли </div>
+    </div>
+    <div class="grid grid-cols-5 ">
+      <div class="text-center italic border dark:text-gray-200" [style.border-color]="frameColor">1</div>
+      <div class="text-center italic border dark:text-gray-200" [style.border-color]="frameColor">2</div>
+      <div class="text-center italic border dark:text-gray-200" [style.border-color]="frameColor">3</div>
+      <div class="text-center italic border dark:text-gray-200" [style.border-color]="frameColor">4</div>
+      <div class="text-center italic border dark:text-gray-200" [style.border-color]="frameColor">5</div>
+    </div>
+
+
+    <div *ngFor="let row of tableData" class="grid grid-cols-5">
+      <textarea class="border dark:text-gray-200 dark:bg-slate-700" [style.border-color]="frameColor" type="text" [(ngModel)]="row.field1" (change)="setValue()"></textarea>
+      <textarea class="border dark:text-gray-200 dark:bg-slate-700" [style.border-color]="frameColor" type="text" [(ngModel)]="row.field2" (change)="setValue()"></textarea>
+      <textarea class="border dark:text-gray-200 dark:bg-slate-700" [style.border-color]="frameColor" type="text" [(ngModel)]="row.field3" (change)="setValue()"></textarea>
+      <textarea class="border dark:text-gray-200 dark:bg-slate-700" [style.border-color]="frameColor" type="text" [(ngModel)]="row.field4" (change)="setValue()"></textarea>
+      <textarea class="border dark:text-gray-200 dark:bg-slate-700" [style.border-color]="frameColor" type="text" [(ngModel)]="row.field5" (change)="setValue()"></textarea>
+    </div>
+  </div>
+
+  <!--  Кнопки управления-->
+  <div class="flex justify-start items-center border bg-primary-light/50" [style.border-color]="frameColor">
+    <mat-icon class="text-green-500 cursor-pointer" matTooltip="Добавить строку" (click)="addRow()">add</mat-icon>
+    <mat-icon class="text-red-500 cursor-pointer" matTooltip="Удалить строку" (click)="removeRow()">remove</mat-icon>
+    <mat-icon class="text-red-500 cursor-pointer" matTooltip="Очистить таблицу" (click)="clearTable()">close</mat-icon>
+  </div>
+
+
+  <span *ngIf="required" class="absolute flex h-2 w-2 top-0 right-0 z-20">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-300 opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+    </span>
+</div>

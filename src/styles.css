@@ -1,0 +1,50 @@
+@import "../node_modules/@angular/material/prebuilt-themes/indigo-pink.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.cell-border-style{
+@apply border border-dashed border-t-0 border-l-0 border-b-gray-500 border-r-gray-700 opacity-50
+}
+
+.component-panel-button-style{
+  @apply cursor-pointer hover:scale-125 duration-300 shadow-lg rounded-md
+}
+
+.toolBar-button-style{
+  @apply ml-2 border border-white duration-300 bg-primary-base rounded-md w-16 h-[90%] flex justify-center items-center px-2 text-white hover:bg-primary-dark dark:bg-dark-background dark:hover:bg-primary-light
+}
+.placeholder-style{
+  @apply transform transition-all absolute top-0 left-2 h-full flex items-center pl-2 text-sm group-focus-within:text-xs peer-valid:text-xs group-focus-within:h-1/2 peer-valid:h-1/2 group-focus-within:-translate-y-full peer-valid:-translate-y-full group-focus-within:pl-0 peer-valid:pl-0 dark:text-gray-300 font-mono tracking-[1px]
+}
+
+
+.button-login-style {
+  @apply border-2 border-white bg-primary-dark dark:bg-primary-base text-white font-mono text-[18px] dark:text-white py-1 w-full rounded-md hover:dark:bg-dark-background hover:bg-primary-base tracking-[1px] ;
+}
+
+.select-style {
+  @apply bg-gray-50 border border-primary-light text-gray-900 text-sm rounded-lg block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white mt-1;
+}
+.error-text {
+  @apply text-red-700 dark:text-red-500 ml-2 text-sm mt-1 font-mono tracking-[1px]
+}
+
+@layer utilities {
+  .anim-line {
+    @apply font-mono tracking-[1px]
+  }
+  .anim-line::after {
+    @apply content-[''] dark:bg-emerald-400 bg-pink-400 h-[1px] w-[0%] left-0 -bottom-[5px] rounded-xl absolute duration-300
+  }
+  .anim-line:hover::after {
+    @apply w-[100%]
+  }
+
+}
+
+
+
+html, body { height: 100%; }
+body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

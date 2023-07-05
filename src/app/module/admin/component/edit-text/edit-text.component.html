@@ -1,0 +1,21 @@
+<div >
+  <h1 mat-dialog-title>Редактировать текст</h1>
+  <div mat-dialog-content >
+<!--    <angular-editor id="editor"  [config]="editorConfig" >-->
+    <angular-editor [placeholder]="'Введите текст...'" [(ngModel)]="htmlContent" [config]="editorConfig" >
+<!--    <angular-editor id="editor" formControlName="htmlContent" [config]="editorConfig" >-->
+      <ng-template #customButtons let-executeCommandFn="executeCommandFn">
+        <ae-toolbar-set class="h-full">
+          <ae-button iconClass="fa fa-html5" title="Angular editor logo">
+          </ae-button>
+        </ae-toolbar-set>
+      </ng-template>
+    </angular-editor>
+
+<!--    <div>{{ htmlContent }}</div>-->
+  </div>
+  <div class="w-full flex justify-end items-center">
+    <button mat-button mat-dialog-close class="mr-2" (click)="htmlContent = startValue">Отменить</button>
+    <button mat-button mat-dialog-close class="mr-2" cdkFocusInitial>Принять</button>
+  </div>
+</div>

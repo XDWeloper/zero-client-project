@@ -1,0 +1,18 @@
+<div  [ngStyle]="{'height.px':height,'width.px':width}"
+      [style.top.px]="top" [style.left.px]="left" [style.border-color]="frameColor"
+      class="absolute z-10 flex dark:text-white overflow-auto"
+      [ngClass] = "{
+      'border':frameColor,
+      'justify-start': textPosition.horizontal === 'left',
+      'justify-center': textPosition.horizontal === 'center',
+      'justify-end': textPosition.horizontal === 'right',
+      'justify-self-stretch': textPosition.horizontal === 'justify',
+      'items-start' : textPosition.vertical === 'top',
+      'items-end': textPosition.vertical === 'bottom',
+      'items-center': textPosition.vertical === 'center'}"
+       *ngIf="visible">
+<div
+  [innerHTML]="sanitizer.bypassSecurityTrustHtml(value)">
+  </div>
+
+</div>

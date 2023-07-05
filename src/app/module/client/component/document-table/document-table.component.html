@@ -1,0 +1,109 @@
+<div class="mat-elevation-z8 w-[98%] m-auto rounded-t-lg mt-4 flex items-center justify-start">
+  <mat-icon class="absolute top-7 left-5 scale-100 cursor-pointer z-[1000] hover:scale-125 duration-300" (click)="refreshData()">refresh</mat-icon>
+
+  <mat-expansion-panel [(expanded)]="filterExpanded"  hideToggle class="w-full">
+    <mat-expansion-panel-header>
+      <mat-panel-title>
+        <mat-icon class="ml-2 scale-100 cursor-pointer z-[1000] hover:scale-125 duration-300" [ngClass]="filterExpanded ? 'rotate-180': 'rotate-0'">filter_list</mat-icon>
+      </mat-panel-title>
+    </mat-expansion-panel-header>
+
+    <div class="w-full m-auto" >
+      <table class="w-full">
+        <tbody>
+          <tr>
+            <td class="w-[5%]"> <input type="text" disabled class="w-full text-sm border border-gray-500 bg-gray-200"></td>
+            <td class="w-[30%]"><input [(ngModel)]="docName" type="text" class="w-full text-sm border border-gray-500 hover:border-primary-light" placeholder="Наименование"></td>
+            <td class="w-[10%]"><input [(ngModel)]="createDate" type="date" class="w-full text-sm border border-gray-500 hover:border-primary-light" placeholder="Дата"></td>
+
+            <td class="w-[20%]">
+              <select class="w-full text-sm border border-gray-500 bg-white hover:border-primary-light cursor-pointer" [(ngModel)]="docStatus">
+                <option selected value="NONE"></option>
+                <option value="DRAFT">Черновик</option>
+                <option value="PREPARED">Подготовлен к отправке</option>
+                <option value="SENDING">Отправлен в банк</option>
+                <option value="PROCESSING">На рассмотрении</option>
+                <option value="INCORRECT">Требует корректировки</option>
+                <option value="ACCEPTED">Принят</option>
+                <option value="REJECTED">Отвергнут</option>
+              </select>
+            </td>
+
+            <td class="w-[10%]"><input type="text" disabled class="w-full text-sm border border-gray-500 bg-gray-200"></td>
+            <td class="w-[20%]"><input type="text" disabled class="w-full text-sm border border-gray-500 bg-gray-200"></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+
+    <mat-action-row>
+      <button mat-button color="primary" (click)="applyFilter()">Применить</button>
+    </mat-action-row>
+  </mat-expansion-panel>
+</div>
+
+<div class="h-2"></div>
+
+<div class="mat-elevation-z8 w-[98%] m-auto overflow-auto border border-b-gray-400">
+  <table mat-table [dataSource]="data"  matSort matSortActive="id" matSortDisableClear matSortDirection="desc">
+
+    <ng-container matColumnDef="id">
+      <th class="w-[5%]" mat-header-cell *matHeaderCellDef>Ид</th>
+      <td class="w-[5%]" mat-cell *matCellDef="let row">{{row.id}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="docName">
+      <th class="w-[30%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Документ</th>
+      <td class="w-[30%]" mat-cell *matCellDef="let row">{{row.docName}}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="createDate">
+      <th class="w-[10%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Дата создания</th>
+      <td class="w-[10%]" mat-cell *matCellDef="let row">{{row.createDate | date: 'dd.MM.yyyy' }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="status">
+      <th class="w-[20%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Статус</th>
+      <td class="w-[20%]" mat-cell *matCellDef="let row">
+        <div class="flex justify-start items-center">
+          {{row.status | docStatus }}
+          <mat-icon *ngIf="row.statusText" (click)="onInfoClick(row.statusText)" class="text-yellow-300 ml-2">info</mat-icon>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="document">
+      <th class="w-[10%]" mat-header-cell *matHeaderCellDef>
+        <div class=" w-full h-full text-center">Документ</div>
+      </th>
+
+      <td class="w-[10%] " mat-cell *matCellDef="let row">
+        <div *ngIf="row.responseDocReference" class=" w-full h-full flex justify-center">
+          <mat-icon class="text-primary-light cursor-pointer" matTooltip="Просмотр документа">assignment_returned
+          </mat-icon>
+        </div>
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="operation">
+      <th class="w-[20%]" mat-header-cell *matHeaderCellDef>
+        <div class=" w-full h-full text-center">Операции</div>
+      </th>
+      <td class="w-[20%]" mat-cell *matCellDef="let row">
+        <div *ngIf="row.status === 'DRAFT' || row.status === 'INCORRECT'" class=" w-full h-full flex justify-center">
+          <mat-icon class="text-green-500 cursor-pointer" matTooltip="Редактировать" (click)="editDoc(row)">edit</mat-icon>
+          <mat-icon class="text-red-500 ml-4 cursor-pointer" matTooltip="Удалить" (click)="removeDoc(row.id)">delete</mat-icon>
+        </div>
+      </td>
+    </ng-container>
+
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+        class="example-element-row"></tr>
+
+  </table>
+  <mat-paginator [length]="length"
+                 [pageSize]="pageSize"
+                 [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+</div>

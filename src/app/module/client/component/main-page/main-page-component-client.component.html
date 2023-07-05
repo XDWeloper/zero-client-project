@@ -1,0 +1,26 @@
+<div class="w-screen h-screen bg-gray-200 dark:bg-slate-700">
+  <div class="container h-screen overflow-auto dark:bg-dark-background">
+    <div class="w-full bg-primary-base dark:bg-dark-background flex items-center relative h-16 dark:border-b rounded-lg mt-1 border border-white">
+      <div class="absolute text-lg text-center text-gray-200 w-full">Личный кабинет клиента ({{user ? user.name : ""}}) </div>
+      <!--    <img src="https://www.cmrbank.ru/i/logo.png" alt="" class="bg-transparent/60 p-2">-->
+    </div>
+
+    <mat-tab-group [(selectedIndex)]="currentTabNum" (animationDone)="tabChangeDone()">
+          <mat-tab >
+            <ng-template mat-tab-label >
+              <mat-icon >assignment</mat-icon>
+              Документы пользователя
+            </ng-template>
+            <app-document-table (openDocId)="openDoc($event)"></app-document-table>
+          </mat-tab>
+
+      <mat-tab>
+        <ng-template mat-tab-label>
+          <mat-icon>border_color</mat-icon>
+          Создать документ
+        </ng-template>
+        <app-document-editor [currentDocument]="openedComponent"></app-document-editor>
+      </mat-tab>
+    </mat-tab-group>
+  </div>
+</div>

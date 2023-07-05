@@ -1,0 +1,6 @@
+<div class="text-center text-base font-semibold"> Выберите тип таблицы</div>
+<div class="p-6">
+  <p class="hover:bg-primary-light hover:text-white cursor-pointer py-1 m-0"
+     (click)="changeTable(table.num)"
+    *ngFor="let table of tableList">{{table.num}}. {{table.text}}</p>
+</div>

@@ -1,0 +1,78 @@
+<div #watch_mainContainer>
+  <div
+    class="w-full mt-2 border-t border-b border-white flex items-center h-10 p-1 bg-primary-base dark:bg-dark-background rounded-lg border border-white" >
+    <button matTooltip="Очистить" class="toolBar-button-style">
+      <mat-icon class="text-red-300 font-bold">clear</mat-icon>
+    </button>
+    <button matTooltip="Сохранить как черновик" (click)="saveDoc('DRAFT', 1)" class="toolBar-button-style">
+      <mat-icon class="text-sky-300 font-bold">hourglass_empty</mat-icon>
+    </button>
+    <button *ngIf="isRequiredFieldNotEmpty" (click)="saveDoc('SENDING', 1)" matTooltip="Отправить на рассмотрение" class="toolBar-button-style">
+      <mat-icon class="text-yellow-300 font-bold">check_circle_outline</mat-icon>
+    </button>
+    <button (click)="currentDocument = undefined" matTooltip="Другой документ" class="toolBar-button-style">
+      <mat-icon class="text-emerald-300 font-bold">sort</mat-icon>
+    </button>
+  </div>
+
+  <div class="flex justify-between w-full">
+
+
+    <!--    это поле элементов-->
+    <div class=" w-[80%]  mt-2 boundary ">
+
+      <!--это страницы-->
+      <div class="border-t border-b border-white ml-10">
+        <mat-tab-group  [(selectedIndex)]="currentStepIndex">
+          <mat-tab class="font-mono" [label]="tab.stepName" *ngFor="let tab of steps" >
+            <p *ngIf="this.currentDocument.docStep[tab.stepNum - 1].checkedText != undefined" class="text-red-600 mt-4">
+              {{ this.currentDocument.docStep[tab.stepNum - 1].checkedText }}
+            </p>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+      <div class="h-10 w-full"></div>
+
+      <ng-template #watch_field></ng-template>
+      <div class="w-full grid grid-cols-12 overflow-auto">
+        <div *ngFor="let item of cellRowList; let outCell = index " class="flex">
+          <app-cell class="flex-auto" *ngFor="let i of cellInnerList; let innerCell = index"
+                    [cellType]="cellType"
+                    [index]="outCell * cellColl + innerCell"></app-cell>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="w-[20%] ml-6 overflow-auto border-l border-white px-4 pt-2">
+      <p class="text-gray-600 dark:text-gray-300 overflow-auto border-b border-b-white" >{{ commentText }}</p>
+
+      <div class="text-red-500 text-xs dark:text-red-300 overflow-auto" *ngFor="let item of validationText">
+        <span class="text-black">&bull;</span>{{ item }}</div>
+      <div *ngIf="currentDocument"  class="absolute bottom-0 w-fill border-t border-white pt-4 flex flex-wrap">
+        <span>Поля отмеченные</span>
+        <span class="relative flex h-3 w-3 ml-1 mt-1">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-300 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-3 w-3 bg-red-500"></span>
+        </span>
+        <span class="ml-1">являются</span> <span>обязательными&nbsp;</span> <span>для&nbsp;</span> <span>заполнения!</span>
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+<div *ngIf="!currentDocument" class=" absolute top-0 left-0 w-full h-full flex justify-center items-center">
+  <app-maket-list (selectedMaket)="loadDocMaket($event)" class="mat-elevation-z8"></app-maket-list>
+</div>
+
+<!--<ng-template #buttonTemplate>-->
+<!--  <div class="flex items-center mt-4">-->
+<!--    <button [disabled]="currentStepIndex === 1" (click)="currentStepIndex = (currentStepIndex - 2)">&lt; Назад</button>-->
+<!--    <button class="ml-4" [disabled]="currentStepIndex === currentDocument.docStep.length" (click)="currentStepIndex = currentStepIndex">Далее &gt;</button>-->
+<!--  </div>-->
+<!--</ng-template>-->
+
+
+

@@ -1,0 +1,35 @@
+<div #component cdkDrag cdkDragBoundary=".boundary"
+     [cdkDragFreeDragPosition]="dragPosition"
+     [ngStyle]="{'height.px':height,'width.px':width}"
+     [cdkDragDisabled]="isResized"
+     class="absolute border border-primary-light bg-white dark:bg-dark-background dark:text-white overflow-hidden cursor-move z-10 flex"
+     [ngClass] = "{
+      'border-red-500 border-2 z-0' : isSelected && isDragged,
+      'z-10': !(isSelected && isDragged),
+      'justify-start': textPosition.horizontal === 'left',
+      'justify-center': (textPosition.horizontal === 'center'  || componentType === 'upload'),
+      'justify-end': textPosition.horizontal === 'right',
+      'justify-self-stretch': textPosition.horizontal === 'justify',
+      'items-start' : textPosition.vertical === 'top',
+      'items-end': textPosition.vertical === 'bottom',
+      'items-center': (textPosition.vertical === 'center' || componentType === 'upload')
+     }"
+
+     (click)="selected($event)"
+     (mouseleave)="isSelected = false"
+     (contextmenu)="rightClick($event)"
+     (cdkDragStarted)="selected($event)"
+     (cdkDragMoved)="selected($event)">
+  <div
+    [innerHTML]="sanitizer.bypassSecurityTrustHtml(value ? value : placeHolder + (inputType ? ' ' + inputType : ''))">
+
+  </div>
+
+  <mat-icon *ngIf="isResizable"
+            (mousedown)="mouseDown($event)"
+            class="text-red-800 scale-50 absolute right-0 bottom-0 translate-x-2 translate-y-2 cursor-nw-resize z-1000">
+    network_cell
+  </mat-icon>
+  <mat-icon *ngIf="componentType === 'upload'" class="text-blue-500 scale-[2.0]">cloud_upload</mat-icon>
+
+</div>

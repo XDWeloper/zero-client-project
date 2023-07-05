@@ -1,0 +1,108 @@
+<div class="w-screen h-screen">
+
+  <mat-toolbar class="bg-primary-base dark:bg-dark-background">
+    <span
+      class="w-full text-center bg-primary-base dark:bg-dark-background text-white">Консоль администратора ({{user ? user.name : ""}}
+      )</span>
+  </mat-toolbar>
+
+  <div class="w-[100%] h-[90%] mt-2">
+
+    <as-split id="split" class="bg-gray-200 dark:bg-dark-background" direction="horizontal"
+              (dragEnd)="docPanelResize($event)">
+      <as-split-area class="bg-gray-200 dark:bg-dark-background duration-300"
+                     [size]="docPanelCurrentSize"
+                     [minSize]="docPanelCloseWidth"
+                     [maxSize]="docPanelOpenWidth"
+                     (transitionend)="transEnd()">
+        <!--панель документов-->
+        <app-document [docPanelCurrentSize]="docPanelCurrentSize"
+                      [docPanelOpenWidth]="docPanelOpenWidth"
+                      (openPanel)="openDocPanel()"
+                      (currentDocAndStep)="setCurrentDocAndStep($event)"
+        ></app-document>
+
+
+      </as-split-area>
+      <as-split-area [size]="100 - docPanelCurrentSize - propPanelCurrentSize"
+                     class="bg-gray-200 dark:bg-dark-background duration-300">
+        <app-admin-tool-bar [ngClass]="currentDoc && currentStep ? 'visible' : 'invisible'"
+                            (clickButton)="toolBarButtonClick($event)"></app-admin-tool-bar>
+        <div class="h-8">
+          <div *ngIf="currentDoc && currentStep"
+               class=" text-center text-black dark:text-white font-mono text-lg">{{currentDoc.name }}
+            - {{ currentStep.name}}</div>
+        </div>
+
+        <div class="w-full flex ">
+          <div class="w-10 text-center" [ngClass]="currentDoc && currentStep ? 'visible' : 'invisible'">
+            <mat-icon class="component-panel-button-style text-indigo-500" matTooltip="Текстовое поле"
+                      [matTooltipPosition]="'right'" (click)="createComponent('text')">text_fields
+            </mat-icon>
+            <mat-icon class="component-panel-button-style text-primary-dark" matTooltip="Поле ввода"
+                      [matTooltipPosition]="'right'" (click)="createComponent('input')">create
+            </mat-icon>
+            <mat-icon class="component-panel-button-style text-gray-500" matTooltip="Область ввода"
+                      [matTooltipPosition]="'right'" (click)="createComponent('area')">crop_din
+            </mat-icon>
+            <mat-icon class="component-panel-button-style text-red-500" matTooltip="Таблица"
+                      [matTooltipPosition]="'right'" (click)="createComponent('table')">view_comfy
+            </mat-icon>
+            <mat-icon class="component-panel-button-style text-cyan-500" matTooltip="Выбор"
+                      [matTooltipPosition]="'right'" (click)="createComponent('select')">view_list
+            </mat-icon>
+            <mat-icon class="component-panel-button-style text-green-500" matTooltip="Адрес"
+                      [matTooltipPosition]="'right'" (click)="createComponent('place')">place
+            </mat-icon>
+            <mat-icon class="component-panel-button-style text-blue-500" matTooltip="Вложение"
+                      [matTooltipPosition]="'right'" (click)="createComponent('upload')">cloud_upload
+            </mat-icon>
+          </div>
+
+          <!--            это поле элементов-->
+          <div class="border border-primary-base w-[90%] m-auto mt-0 boundary overflow-hidden" #splitMainContainer
+               id="mainContainer">
+            <ng-template #field></ng-template>
+            <div class="w-full grid grid-cols-12 overflow-hidden">
+              <div *ngFor="let item of cellRowList; let outCell = index " class="flex">
+                <app-cell class="flex-auto" *ngFor="let i of cellInnerList; let innerCell = index"
+                          [cellType]="cellType"
+                          [index]="outCell * cellColl + innerCell"></app-cell>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <app-right-click-menu *ngIf="!isMenuHidden"
+                              [x]="xPosTabMenu"
+                              [y]="yPosTabMenu"
+                              (type)="selectMenu($event)"
+                              [CompType]="currCompType"
+                              (mouseleave)="isMenuHidden = true">
+
+        </app-right-click-menu>
+      </as-split-area>
+      <as-split-area class="bg-gray-200 dark:bg-dark-background duration-300"
+                     [size]="propPanelCurrentSize"
+                     [minSize]="propPanelCloseWidth"
+                     [maxSize]="propPanelOpenWidth "
+                     (transitionend)="transEnd()">
+        <div
+          class="relative w-full h-10 bg-primary-base dark:bg-dark-background text-center text-white text-lg border border-primary-base">
+          <p *ngIf="propPanelCurrentSize > propPanelOpenWidth / 2"
+             class="inline-block bg-primary-base dark:bg-dark-background">панель свойств</p>
+          <mat-icon class="mt-1 absolute text-white left-0.5" (click)="openPropPanel()">menu</mat-icon>
+        </div>
+        <!--свойства компонентов -->
+        <app-properties [propPanelCurrentSize]="propPanelCurrentSize"
+                        [propPanelOpenWidth]="propPanelOpenWidth"
+                        [currentDocId]="currentDoc ? currentDoc.id : undefined">
+        </app-properties>
+
+      </as-split-area>
+    </as-split>
+  </div>
+</div>
+
+
+

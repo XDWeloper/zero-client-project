@@ -1,0 +1,8 @@
+/*td, th {*/
+/*  width: 25%;*/
+/*}*/
+
+
+tr.example-element-row:hover {
+  background: whitesmoke;
+}

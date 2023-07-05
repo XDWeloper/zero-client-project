@@ -1,0 +1,35 @@
+<div class="absolute z-10 rounded-lg"
+     [ngStyle]="{'height.px':height,'width.px':width}"
+     [style.top.px]="top" [style.left.px]="left" [style.border-color]="frameColor"
+     [ngClass]="{'border':frameColor}">
+
+    <div class="w-full grid grid-cols-6 gap-1 h-[40%] border-b border-b-white">
+      <input id="fileDropRef" class="absolute top-0 left-0 opacity-0 w-full h-[40%]" type="file" multiple (change)="getFile($event)">
+      <div class="col-start-3 col-span-2 w-full flex justify-center item-center">
+        <mat-icon class="text-blue-500 scale-[2.0] mt-2 opacity-50 ">cloud_upload</mat-icon>
+      </div>
+      <label class="w-full text-center col-start-3 col-span-2">Перетащите</label>
+      <label class="w-full text-center col-start-3 col-span-2">или</label>
+      <label
+        class="z-50 bg-primary-base rounded-lg text-white col-start-3 col-span-2 text-center cursor-pointer hover:shadow-2xl"
+        for="fileDropRef">Выбрать</label>
+    </div>
+    <div class="w-full h-[48%] overflow-auto mt-2">
+      <div *ngFor="let file of files; let i = index" class="flex justify-between w-full">
+        <div class="flex justify-start item-center">
+          <mat-icon class="-mt-1" [ngClass]="{'text-yellow-300' : file.id === undefined, 'text-green-300': file.id != undefined}">insert_drive_file</mat-icon>
+          <p class="ml-4">&nbsp;{{ file.name }} </p>
+        </div>
+        <mat-icon *ngIf="file.id != undefined" class="text-gray-300 hover:text-red-500 duration-300 cursor-pointer mr-4" (click)="deleteFile(i)">delete_forever</mat-icon>
+      </div>
+  </div>
+
+    <div class="absolute bottom-0 left-2 w-[98%] border-t border-t-primary-base h-[8%] text-gray-900">
+      Общий размер файлов: {{ sumSize }} кб.
+    </div>
+
+  <span *ngIf="required" class="absolute flex h-2 w-2 top-0 right-0 z-20">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-300 opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+    </span>
+</div>

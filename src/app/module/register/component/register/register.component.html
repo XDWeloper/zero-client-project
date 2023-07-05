@@ -1,0 +1,43 @@
+<div class="w-screen h-screen bg-gray-200 flex justify-center items-center dark:bg-dark-background ">
+  <div *ngIf="pinResult === undefined"
+       class="bg-white dark:bg-slate-900 border p-2 w-[30%] rounded-lg shadow-gray-500 shadow-2xl min-w-fit">
+    <p class="text-center text-lg font-semibold dark:text-white">Нулевой клиент регистрация</p>
+
+      <app-ice-input  label="Телефон" (value)="phone = $event" [inputType]="'phone'" [errorText]="phone_error"
+                      [toolTip]="loginPasswordProperties ? loginPasswordProperties.loginValidatorHint : ''"></app-ice-input>
+      <app-ice-input  label="Имя" (value)="name  = $event" [inputType]="'text'" [errorText]="name_error"
+                      toolTip='Имя пользователя'></app-ice-input>
+      <app-ice-input  label="Фамилия" (value)="lastName = $event" [inputType]="'text'" [errorText]="lastName_error"
+                      toolTip='Фамилия пользователя'></app-ice-input>
+      <app-ice-input  label="Электронная почта" (value)="eMail = $event" [inputType]="'email'" [errorText]="eMail_error"
+                      toolTip='Адрес электронной почты'></app-ice-input>
+      <app-ice-input  label="Пароль" (value)="password = $event" [inputType]="'password'" [errorText]="password_error"
+                      [toolTip]="loginPasswordProperties ? loginPasswordProperties.passwordValidatorHint : ''"></app-ice-input>
+      <app-ice-input  label="Подтверждение пароля" (value)="dPassword = $event" [inputType]="'password'" [errorText]="dPassword_error"
+                      [toolTip]="loginPasswordProperties ? loginPasswordProperties.passwordValidatorHint : ''"></app-ice-input>
+
+
+    <button (click)="register()" [disabled]="isFieldsInvalid"
+            class="mt-4 middle none center w-full rounded-lg bg-primary-base py-3 px-6 font-sans text-xs font-bold uppercase text-white
+        shadow-md shadow-gray-500 transition-all hover:shadow-lg hover:shadow-gray-400 focus:opacity-[0.85] focus:shadow-none
+        active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            data-ripple-light="true">
+      Регистрация
+    </button>
+  </div>
+
+  <div *ngIf="pinResult != undefined"
+       class="bg-white dark:bg-slate-900 border p-2 w-[30%] rounded-lg shadow-gray-500 shadow-2xl">
+    <p class="text-center text-lg ">Введите пин-код</p>
+    <app-ice-input label="Пин-код" (value)="pinCode  = $event" type="'text'"></app-ice-input>
+    <button (click)="confirm()"
+            class="mt-4 middle none center w-full rounded-lg bg-primary-base py-3 px-6 font-sans text-xs font-bold uppercase text-white
+        shadow-md shadow-gray-500 transition-all hover:shadow-lg hover:shadow-gray-400 focus:opacity-[0.85] focus:shadow-none
+        active:opacity-[0.85] active:shadow-none disabled:pointer-events-none disabled:opacity-50 disabled:shadow-none"
+            data-ripple-light="true">
+      Подтвердить
+    </button>
+  </div>
+
+
+</div>

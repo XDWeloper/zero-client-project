@@ -1,0 +1,26 @@
+<div *ngIf="isShow" class="absolute h-screen w-screen flex justify-center items-center ">
+  <div class=" bg-white rounded-2xl  border z-50 dark:bg-slate-700 relative px-6"
+       [ngClass]="{'border-primary-base': message.dialogType === 'INFO','border-red-600': message.dialogType === 'ERROR'}">
+    <div *ngIf="message.dialogType === 'ERROR'" class="text-center text-red-600 mt-2 text-xl">Извините что-то пошло не так попробуйте позже... </div>
+    <div *ngIf="message.dialogType === 'INFO'" class="text-center text-primary-dark mt-2 text-xl">Информация</div>
+
+    <mat-accordion>
+      <mat-expansion-panel>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <div class="text-center mt-4">{{ message.message }}</div>
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+        <p>{{ message.hideMessage}}</p>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+    <div class="w-full flex justify-end mt-10">
+      <button *ngIf="findButton('CLOSE')" class="border rounded-lg p-1 mb-1 w-20 ml-1" (click)="close('CLOSE')">Закрыть</button>
+      <button *ngIf="findButton('YES')" class="border rounded-lg p-1 mb-1 w-20 ml-1" (click)="close('YES')">Да</button>
+      <button *ngIf="findButton('NO')" class="border rounded-lg p-1 mb-1 w-20 ml-1" (click)="close('NO')">Нет</button>
+      <button *ngIf="findButton('CANCEL')" class="border rounded-lg p-1 mb-1 w-20 ml-1" (click)="close('CANCEL')">Отменить</button>
+    </div>
+  </div>
+
+</div>
