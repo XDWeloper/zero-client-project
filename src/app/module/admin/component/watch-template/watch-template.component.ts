@@ -15,6 +15,7 @@ import {
   InformationCompanyParticipantsTableComponent
 } from "../../../../component/dinamicComponent/tables/information-company-participants-table/information-company-participants-table.component";
 import {UploadComponent} from "../../../../component/dinamicComponent/upload/upload.component";
+import {AddressComponent} from "../../../../component/dinamicComponent/adress/address.component";
 
 @Component({
   selector: 'app-watch-template',
@@ -81,6 +82,8 @@ export class WatchTemplateComponent implements OnInit,AfterViewInit {
     let stepComponentList = this.currentDocument.docStep.find(p => p.stepNum === stepNum).componentMaket
 
     stepComponentList.forEach(comp => {
+      if (comp.componentType === IceComponentType.PLACE)
+        this.componentRef = this.itemsField.createComponent(AddressComponent);
       if (comp.componentType === IceComponentType.TEXT)
         this.componentRef = this.itemsField.createComponent(TextComponent);
       if (comp.componentType === IceComponentType.INPUT)

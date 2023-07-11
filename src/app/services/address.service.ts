@@ -1,28 +1,36 @@
 import {Injectable, OnInit} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {Region} from "../interfaces/interfaces";
+import {Observable} from "rxjs";
+import {HttpMethod, Operation} from "../model/RequestBFF";
+import {environment} from "../../environments/environment";
+import {map} from "rxjs/operators";
+import {PlaceObject} from "../interfaces/interfaces";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AddressService implements OnInit{
-  private region: Array<Region> = [
-    {id:1,name: "Адыгея",regionCode: "01"},
-    {id:1,name: "Республика Башкортостан",regionCode: "02"},
-    {id:1,name: "Республика Бурятия",regionCode: "03"},
-    {id:1,name: "Республика Алтай",regionCode: "04"}
-  ]
 
-  constructor(private httpClient: HttpClient) { }
+  public regionList$:Observable<any>
+
+  constructor(private httpClient: HttpClient) {
+
+  }
 
   ngOnInit(): void {
     }
 
+  getAllRegion(): Observable<PlaceObject[]>{
+    if(this.regionList$) return this.regionList$.pipe(
+      map(data => data === null ? [] : data.content)
+    )
 
-
-
-
-  getAllRegion(){
-    return this.region
+    const operation = new Operation();
+    operation.url = environment.resourceServerURL + "/fias/addrobj?sort=regionCode,asc&page=0&size=100"
+    operation.httpMethod = HttpMethod.GET;
+    this.regionList$ = this.httpClient.post(environment.bffURI + '/operation', operation)
+    return this.regionList$.pipe(
+      map(data => data === null ? [] : data.content)
+    )
   }
 }

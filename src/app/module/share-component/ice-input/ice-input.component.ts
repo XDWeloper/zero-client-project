@@ -1,6 +1,7 @@
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import {NgxMaskDirective} from "ngx-mask";
 import {FormsModule} from "@angular/forms";
+import {NgIf} from "@angular/common";
 
 @Component({
   standalone: true,
@@ -8,7 +9,8 @@ import {FormsModule} from "@angular/forms";
   templateUrl: './ice-input.component.html',
   imports: [
     NgxMaskDirective,
-    FormsModule
+    FormsModule,
+    NgIf
   ]
 })
 export class IceInputComponent {

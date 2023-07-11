@@ -52,12 +52,6 @@ export interface ComponentChangeValue{
   value: any
 }
 
-export interface Region{
-  id: number,
-  name: string,
-  regionCode: string
-}
-
 export interface IceDocument{
   id?: number,
   maketId: number
@@ -214,4 +208,16 @@ export enum ControlPropType{
   VISIBLE = "Видимый",
   INVISIBLE = "Не видимый",
   VALUE = "Значение"
+}
+
+export interface PlaceObject{
+  id: number,
+  regionCode: number,
+  code: string,
+  name: string,
+  typeName: string,
+  objectId: number,
+  parentObjId: number,
+  objectGuid: string,
+  clevel: number
 }
