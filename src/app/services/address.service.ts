@@ -4,14 +4,12 @@ import {Observable} from "rxjs";
 import {HttpMethod, Operation} from "../model/RequestBFF";
 import {environment} from "../../environments/environment";
 import {map} from "rxjs/operators";
-import {PlaceObject} from "../interfaces/interfaces";
+import {Pageable, PlaceObject} from "../interfaces/interfaces";
 
 @Injectable({
   providedIn: 'root'
 })
 export class AddressService implements OnInit{
-
-  public regionList$:Observable<any>
 
   constructor(private httpClient: HttpClient) {
 
@@ -20,17 +18,18 @@ export class AddressService implements OnInit{
   ngOnInit(): void {
     }
 
-  getAllRegion(): Observable<PlaceObject[]>{
-    if(this.regionList$) return this.regionList$.pipe(
-      map(data => data === null ? [] : data.content)
-    )
+    searchRegionForName(name: string){
+      const operation = new Operation();
+      operation.url = environment.resourceServerURL + "/fias/addrobj?sort=regionCode,asc&page=0&size=20&name=" + name
+      operation.httpMethod = HttpMethod.GET;
+      return  this.httpClient.post<any>(environment.bffURI + '/operation', operation).pipe(map(data => data === null ? [] : data.content))
+    }
 
+  getAllRegion(page: number): Observable<Pageable>{
     const operation = new Operation();
-    operation.url = environment.resourceServerURL + "/fias/addrobj?sort=regionCode,asc&page=0&size=100"
+    operation.url = environment.resourceServerURL + "/fias/addrobj?sort=regionCode,asc&size=20&page=" + page
     operation.httpMethod = HttpMethod.GET;
-    this.regionList$ = this.httpClient.post(environment.bffURI + '/operation', operation)
-    return this.regionList$.pipe(
-      map(data => data === null ? [] : data.content)
-    )
+    //return  this.httpClient.post<any>(environment.bffURI + '/operation', operation).pipe(map(data => data === null ? [] : data.content)
+    return  this.httpClient.post<any>(environment.bffURI + '/operation', operation)
   }
 }

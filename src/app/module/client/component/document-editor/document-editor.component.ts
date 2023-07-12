@@ -43,6 +43,7 @@ import {BackendService} from "../../../../services/backend.service";
 import {MessageService} from "../../../../services/message.service";
 import {TabService} from "../../../../services/tab.service";
 import {UploadComponent} from "../../../../component/dinamicComponent/upload/upload.component";
+import {AddressComponent} from "../../../../component/dinamicComponent/adress/address.component";
 
 @Component({
   selector: 'app-document-editor',
@@ -201,6 +202,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     let stepComponentList = this.currentDocument.docStep.find(p => p.stepNum === stepNum).componentMaket
 
     stepComponentList.forEach(comp => {
+      if (comp.componentType === IceComponentType.PLACE)
+        this.componentRef = this.itemsField.createComponent(AddressComponent);
       if (comp.componentType === IceComponentType.TEXT)
         this.componentRef = this.itemsField.createComponent(TextComponent);
       if (comp.componentType === IceComponentType.UPLOAD) {

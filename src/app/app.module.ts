@@ -6,7 +6,7 @@ import {AppComponent} from './app.component';
 import {MainScreenComponent} from './component/main-screen/main-screen.component';
 import {AddressComponent} from './component/dinamicComponent/adress/address.component';
 import {HTTP_INTERCEPTORS, HttpClientModule} from "@angular/common/http";
-import {FormsModule} from "@angular/forms";
+import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {MatFormFieldModule} from "@angular/material/form-field";
 import {MatIconModule} from "@angular/material/icon";
@@ -34,6 +34,9 @@ import {MatExpansionModule} from "@angular/material/expansion";
 import {NgxMaskDirective, provideEnvironmentNgxMask} from "ngx-mask";
 import { UploadComponent } from './component/dinamicComponent/upload/upload.component';
 import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
+import {MatSelectModule} from "@angular/material/select";
+import {NgxMatSelectSearchModule} from "ngx-mat-select-search";
+import {MatSelectInfiniteScrollModule} from "ng-mat-select-infinite-scroll";
 
 
 @NgModule({
@@ -51,23 +54,27 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
     MessageDialogComponent,
     UploadComponent,
   ],
-  imports: [
-    BrowserModule,
-    AppRoutingModule,
-    HttpClientModule,
-    FormsModule,
-    BrowserAnimationsModule,
-    MatFormFieldModule,
-    MatIconModule,
-    MatInputModule,
-    AngularSplitModule,
-    DragDropModule,
-    MatStepperModule,
-    ClientModule,
-    MatExpansionModule,
-    MatProgressSpinnerModule,
-    NgxMaskDirective
-  ],
+    imports: [
+        BrowserModule,
+        AppRoutingModule,
+        HttpClientModule,
+        FormsModule,
+        BrowserAnimationsModule,
+        MatFormFieldModule,
+        MatIconModule,
+        MatInputModule,
+        AngularSplitModule,
+        DragDropModule,
+        MatStepperModule,
+        ClientModule,
+        MatExpansionModule,
+        MatProgressSpinnerModule,
+        NgxMaskDirective,
+        MatSelectModule,
+        NgxMatSelectSearchModule,
+        ReactiveFormsModule,
+        MatSelectInfiniteScrollModule
+    ],
   providers: [
     provideEnvironmentNgxMask(),
     {provide: MAT_DIALOG_DEFAULT_OPTIONS, useValue: {hasBackdrop: false}},
