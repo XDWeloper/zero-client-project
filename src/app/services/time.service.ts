@@ -31,7 +31,7 @@ export class TimeService {
 
     this.inter = interval(10_000).subscribe((r) => {
       let newTime = new Date().getTime()
-        console.log(fiveMin - (newTime - this.lastRequestTime))
+        //console.log(fiveMin - (newTime - this.lastRequestTime))
       if (newTime - this.lastRequestTime > fiveMin) {
         this.keyCloakService.logoutAction().subscribe({
           next: value => {},

@@ -1,4 +1,4 @@
-import {ChangeDetectionStrategy, Component, OnDestroy} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy} from '@angular/core';
 import {AddressService} from "../../../services/address.service";
 import {
   ComponentBound,
@@ -13,8 +13,19 @@ import {ComponentService} from "../../../services/component.service";
 import {IceComponentType} from "../../../constants";
 import {debounceTime, filter, ReplaySubject, Subject, Subscription, switchMap, takeUntil} from "rxjs";
 import {tap} from "rxjs/operators";
-import {FormControl, FormGroup} from "@angular/forms";
+import {FormControl } from "@angular/forms";
 
+interface LevelClass {
+  "levelNum": number,
+  "levelPlaceHolder": string,
+  "levelSorting": string,
+  "placeLevel":FormControl<PlaceObject>
+  "levelFiltering":FormControl<string>
+  "filteredLevel": ReplaySubject<PlaceObject[]>
+  "levelList": Array<PlaceObject>,
+  "levelData": Pageable
+  "levelValue": PlaceObject
+}
 
 @Component({
   selector: 'app-address',
@@ -22,7 +33,7 @@ import {FormControl, FormGroup} from "@angular/forms";
   styleUrls: ['./address.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class AddressComponent implements IceComponent, OnDestroy{
+export class AddressComponent implements IceComponent, OnDestroy {
 
   cellNumber: number;
   componentBound: ComponentBound;
@@ -43,7 +54,7 @@ export class AddressComponent implements IceComponent, OnDestroy{
   required: boolean;
   stepNum: number;
   textPosition: TextPosition;
-  private _value: any;
+  value: any;
   private _frameColor: string;
 
   height: any;
@@ -57,53 +68,63 @@ export class AddressComponent implements IceComponent, OnDestroy{
 
   private changeValue$: Subscription
 
-  level1List:PlaceObject[] = []
+  placeClassList: LevelClass[] = []
 
-  placeFormGroup: FormGroup
-  //public placeServerSideCtrl: FormControl<PlaceObject> = new FormControl<PlaceObject>(null);
-  //public level1Filtering: FormControl<string> = new FormControl<string>('');
-  public searching = false;
-  public  filteredLevel1: ReplaySubject<PlaceObject[]> = new ReplaySubject<PlaceObject[]>(1);
-  public  filteredLevel2: ReplaySubject<PlaceObject[]> = new ReplaySubject<PlaceObject[]>(1);
   protected _onDestroy = new Subject<void>();
-  loadComplete = true;
-  level1Data: Pageable
-  level1LoadPage = 0
-  level1SearchText = ""
+  public searching = false;
+  selectedObject: PlaceObject
 
-  constructor(public addressService: AddressService,private cellService: CellService, private componentService: ComponentService) {
-    this.loadData();
 
-    this.placeFormGroup = new FormGroup({
-      placeLevel1 : new FormControl<PlaceObject>(null),
-      level1Filtering: new FormControl<string>(''),
-      placeLevel2 : new FormControl<PlaceObject>(null),
-      level2Filtering: new FormControl<string>(''),
-
-    })
+  constructor(public addressService: AddressService, private cellService: CellService, private componentService: ComponentService) {
   }
 
-  private loadData() {
-    this.addressService.getAllRegion(this.level1LoadPage).subscribe({
+  private loadData(page: number, levelClass: LevelClass) {
+    this.addressService.getAllRegion(page, levelClass.levelNum,levelClass.levelSorting).subscribe({
       next: rez => {
-        this.level1Data = rez
-          rez.content.forEach(item => {
-            this.level1List.push(item)
-          })
-        this.filteredLevel1.next(this.level1List);
-        this.loadComplete= true
+        levelClass.levelData = rez
+        rez.content.forEach(item => {
+          levelClass.levelList.push(item)
+        })
+        console.log(this.selectedObject)
+        if(this.selectedObject) {
+          // let res = levelClass.levelList.find(item => item.id === this.selectedObject.id)
+          // if (!res)
+            levelClass.levelList.push(this.selectedObject)
+          this.selectedObject = null
+        }
+        levelClass.filteredLevel.next(levelClass.levelList);
+        console.log(levelClass.levelList)
       }
     })
   }
 
-  get value(): any {
-    //console.log("get avlue: ", this._value)
-    return this._value;
-  }
-
-  set value(value: any) {
-    //console.log("set value: ", value)
-    this._value = value;
+  private loadFilteringData(levelClass: LevelClass) {
+    levelClass.levelFiltering.valueChanges
+      .pipe(
+        tap(v => {
+          if (v.length < 1) {
+            levelClass.levelList.splice(0, levelClass.levelList.length)
+            this.loadData(0,levelClass);
+          }
+        }),
+        filter(search => !!search),
+        filter(search => search.length > 2),
+        tap((v) => this.searching = true),
+        debounceTime(300),
+        switchMap(search => {
+          return this.addressService.searchRegionForName(search)
+        }),
+        takeUntil(this._onDestroy),
+      ).subscribe({
+      next: (rez) => {
+        this.searching = false
+        levelClass.levelData = rez
+        levelClass.filteredLevel.next(rez.content)
+      },
+      error: error => {
+        console.log(error)
+      }
+    })
   }
 
   ngOnInit(): void {
@@ -111,45 +132,28 @@ export class AddressComponent implements IceComponent, OnDestroy{
     this.width = this.cellService.getClientCellWidth() * this.componentBound.widthScale
     this.left = this.cellService.getClientCellBound(this.cellNumber).x - this.correctX
     this.top = this.cellService.getClientCellBound(this.cellNumber).y - this.correctY
-
     this.propControl()
 
-    this.placeFormGroup.valueChanges.pipe(
-    ).subscribe({
-      next: val => {
-      }
+    this.placeClassList.push({
+      "levelNum": 1,
+      "levelPlaceHolder": "Выберите регион ...",
+      "levelSorting": "regionCode,asc",
+      "placeLevel": new FormControl<PlaceObject>(null),
+      "levelFiltering": new FormControl<string>(''),
+      "filteredLevel": new ReplaySubject<PlaceObject[]>(1),
+      "levelList": new Array<PlaceObject>(),
+      "levelData": null,
+      "levelValue": null,
     })
-    this.placeFormGroup.get("level1Filtering").valueChanges
-      .pipe(
-        tap(v => {
-          if(v.length < 1)
-            this.loadData();
-        }),
-        filter(search => search.length > 2),
-        filter(search => !!search),
-        tap((v) => {
-          this.searching = true
-          this.level1SearchText = v
-        }),
-        takeUntil(this._onDestroy),
-        debounceTime(800),
-        switchMap(search => {
-          console.log("Load data...")
-          return this.addressService.searchRegionForName(search)
-        }),
-        takeUntil(this._onDestroy)
-      ).subscribe({
-        next: (filteredPlaces) => {
-          this.searching = false;
-          this.filteredLevel1.next(filteredPlaces);
-        },
-        error: error =>{console.log(error)}
-  });
-   }
+
+    this.loadData(0, this.placeClassList[0]);
+    this.loadFilteringData(this.placeClassList[0]);
+
+  }
 
   private propControl() {
     this.changeValue$ = this.componentService.changeValue$.subscribe(item => {
-      console.log("area:",item)
+      console.log("area:", item)
       let componentId = item.componentId
       let value = item.value
       if (componentId === this.componentID || value === undefined) return
@@ -178,7 +182,7 @@ export class AddressComponent implements IceComponent, OnDestroy{
   }
 
   ngOnDestroy(): void {
-    if(this.changeValue$)
+    if (this.changeValue$)
       this.changeValue$.unsubscribe()
 
     this._onDestroy.next();
@@ -195,14 +199,14 @@ export class AddressComponent implements IceComponent, OnDestroy{
     this.localBorderColor = this._frameColor
   }
 
-  getNextBatch() {
-    if(this.level1SearchText.length > 1) return;
-    console.log("getNextBatch")
-    this.loadComplete= false
-    if(this.level1Data.last)
-      return
-    this.level1LoadPage = this.level1Data.number + 1
-    this.loadData();
+  getNextBatch(levelClass: LevelClass) {
+    if (!levelClass.levelData.last) {
+      this.loadData(levelClass.levelData.number + 1,levelClass);
+    }
   }
 
+  changeValue(placeObject: PlaceObject) {
+    console.log("changeValue",placeObject)
+    this.selectedObject = placeObject
+  }
 }

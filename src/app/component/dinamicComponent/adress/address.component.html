@@ -1,28 +1,26 @@
+
 <div class="absolute z-10"
      [ngStyle]="{'height.px':height,'width.px':width}"
      [style.top.px]="top" [style.left.px]="left" [style.border-color]="localBorderColor"
      [ngClass]="{'border':localBorderColor}">
 
-  <form [formGroup]="placeFormGroup"  class="w-full">
-    <mat-form-field class="w-full" >
-      <mat-select msInfiniteScroll (infiniteScroll)="getNextBatch()" [complete]="!loadComplete"
-                  formControlName="placeLevel1" placeholder="Выберите регион ..." [(ngModel)]="value" >
+    <mat-form-field class="w-full" *ngFor="let level of placeClassList">
+      <mat-select msInfiniteScroll (infiniteScroll)="getNextBatch(level)" (valueChange)="changeValue($event)"
+                  [formControl]="level.placeLevel" [placeholder]="level.levelPlaceHolder" [(ngModel)]="level.levelValue">
         <mat-option>
-          <ngx-mat-select-search formControlName="level1Filtering" [searching]="searching"
+          <ngx-mat-select-search [formControl]="level.levelFiltering" [searching]="searching"
                                  noEntriesFoundLabel="Вариантов не найдено"
                                  placeholderLabel="Введите название..."
           ></ngx-mat-select-search>
         </mat-option>
-        <mat-option *ngFor="let place of filteredLevel1 | async" [value]="place">
-          {{place.name}} {{ place.typeName}}
+        <mat-option *ngFor="let place of level.filteredLevel | async" [value]="place">
+          {{ place.regionCode }} - {{place.name}} {{ place.typeName}}
         </mat-option>
       </mat-select>
     </mat-form-field>
 
 
 
-
-  </form>
 
 
 </div>

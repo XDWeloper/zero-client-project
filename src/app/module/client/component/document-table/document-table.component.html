@@ -68,7 +68,7 @@
       <td class="w-[20%]" mat-cell *matCellDef="let row">
         <div class="flex justify-start items-center">
           {{row.status | docStatus }}
-          <mat-icon *ngIf="row.statusText" (click)="onInfoClick(row.statusText)" class="text-yellow-300 ml-2">info</mat-icon>
+          <mat-icon *ngIf="row.statusText" (click)="onInfoClick(row.statusText)" class="text-yellow-300 ml-2 cursor-pointer">info</mat-icon>
         </div>
       </td>
     </ng-container>
