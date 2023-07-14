@@ -37,6 +37,7 @@ import {MatProgressSpinnerModule} from "@angular/material/progress-spinner";
 import {MatSelectModule} from "@angular/material/select";
 import {NgxMatSelectSearchModule} from "ngx-mat-select-search";
 import {MatSelectInfiniteScrollModule} from "ng-mat-select-infinite-scroll";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 
 @NgModule({
@@ -73,7 +74,8 @@ import {MatSelectInfiniteScrollModule} from "ng-mat-select-infinite-scroll";
         MatSelectModule,
         NgxMatSelectSearchModule,
         ReactiveFormsModule,
-        MatSelectInfiniteScrollModule
+        MatSelectInfiniteScrollModule,
+        MatTooltipModule
     ],
   providers: [
     provideEnvironmentNgxMask(),

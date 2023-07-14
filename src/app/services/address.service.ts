@@ -17,17 +17,25 @@ export class AddressService implements OnInit{
   ngOnInit(): void {
     }
 
-    searchRegionForName(name: string){
+    searchRegionForName(name: string,level: number, sort: string,parentObjId: number){
       const operation = new Operation();
-      operation.url = environment.resourceServerURL + "/fias/addrobj?sort=regionCode,asc&page=0&size=20&name=" + name
+      operation.url = environment.resourceServerURL + `/fias/addrobj?sort=${sort}&size=20&page=0&level=${level}&parentObjId=${parentObjId}&&name=${name}`
       operation.httpMethod = HttpMethod.GET;
       return  this.httpClient.post<any>(environment.bffURI + '/operation', operation)
     }
 
-  getAllRegion(page: number,level: number, sort: string): Observable<Pageable>{
+  getAllRegion(page: number,level: number, sort: string,parentObjId: number): Observable<Pageable>{
     const operation = new Operation();
-    operation.url = environment.resourceServerURL + `/fias/addrobj?sort=${sort}&size=20&page=${page}&level=${level}`
+    operation.url = environment.resourceServerURL + `/fias/addrobj?sort=${sort}&size=20&page=${page}&level=${level}&parentObjId=${parentObjId}`
     operation.httpMethod = HttpMethod.GET;
     return  this.httpClient.post<any>(environment.bffURI + '/operation', operation)
   }
+
+  getNextLevel(objectId: number): Observable<number[]>{
+    const operation = new Operation();
+    operation.url = environment.resourceServerURL + `/fias/addrobj/levels/${objectId}`
+    operation.httpMethod = HttpMethod.GET;
+    return  this.httpClient.post<number[]>(environment.bffURI + '/operation', operation)
+  }
+
 }

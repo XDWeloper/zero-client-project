@@ -4,7 +4,8 @@ import {
   ComponentBound,
   ControlPropType,
   IceComponent,
-  MasterControl, Pageable,
+  MasterControl,
+  Pageable,
   PlaceObject,
   TextPosition
 } from "../../../interfaces/interfaces";
@@ -13,19 +14,42 @@ import {ComponentService} from "../../../services/component.service";
 import {IceComponentType} from "../../../constants";
 import {debounceTime, filter, ReplaySubject, Subject, Subscription, switchMap, takeUntil} from "rxjs";
 import {tap} from "rxjs/operators";
-import {FormControl } from "@angular/forms";
+import {FormControl} from "@angular/forms";
+import {ChangeDetection} from "@angular/cli/lib/config/workspace-schema";
 
 interface LevelClass {
   "levelNum": number,
   "levelPlaceHolder": string,
   "levelSorting": string,
-  "placeLevel":FormControl<PlaceObject>
-  "levelFiltering":FormControl<string>
+  "parentObjId": number
+  "placeLevel": FormControl<PlaceObject>
+  "levelFiltering": FormControl<string>
   "filteredLevel": ReplaySubject<PlaceObject[]>
   "levelList": Array<PlaceObject>,
   "levelData": Pageable
   "levelValue": PlaceObject
 }
+
+interface Map {
+  key: number,
+  value: string
+}
+
+const levelPlaceHolder: Map[] = [
+  {key: 1, value: "Выберите регион ..."},
+  {key: 2, value: "Выберите район ..."},
+  {key: 5, value: "Выберите город ..."},
+  {key: 6, value: "Выберите населенный пункт ..."},
+  {key: 7, value: "Выберите планировочную инфраструктура ..."},
+  {key: 8, value: "Выберите инфраструктуру ..."}
+]
+const levelSortString: Map[] = [
+  {key: 1, value: "name,asc"},
+  {key: 2, value: "name,asc"},
+  {key: 5, value: "name,asc"},
+  {key: 6, value: "name,asc"},
+  {key: 7, value: "name,asc"},
+  {key: 8, value: "name,asc"}]
 
 @Component({
   selector: 'app-address',
@@ -72,28 +96,26 @@ export class AddressComponent implements IceComponent, OnDestroy {
 
   protected _onDestroy = new Subject<void>();
   public searching = false;
-  selectedObject: PlaceObject
 
 
-  constructor(public addressService: AddressService, private cellService: CellService, private componentService: ComponentService) {
+  constructor(public addressService: AddressService, private cellService: CellService, private componentService: ComponentService,
+              private changeDetection: ChangeDetectorRef) {
+    this.createNewLevel([1])
   }
 
-  private loadData(page: number, levelClass: LevelClass) {
-    this.addressService.getAllRegion(page, levelClass.levelNum,levelClass.levelSorting).subscribe({
+  private loadData(page: number, levelClass: LevelClass,) {
+    this.addressService.getAllRegion(page, levelClass.levelNum, levelClass.levelSorting, levelClass.parentObjId).subscribe({
       next: rez => {
         levelClass.levelData = rez
         rez.content.forEach(item => {
-          levelClass.levelList.push(item)
+          if (!levelClass.levelValue || (levelClass.levelValue && item.id !== levelClass.levelValue.id))
+            levelClass.levelList.push(item)
         })
-        console.log(this.selectedObject)
-        if(this.selectedObject) {
-          // let res = levelClass.levelList.find(item => item.id === this.selectedObject.id)
-          // if (!res)
-            levelClass.levelList.push(this.selectedObject)
-          this.selectedObject = null
+        if (levelClass.levelValue) {
+          levelClass.levelList.push(levelClass.levelValue)
         }
         levelClass.filteredLevel.next(levelClass.levelList);
-        console.log(levelClass.levelList)
+        this.changeDetection.detectChanges()
       }
     })
   }
@@ -104,7 +126,7 @@ export class AddressComponent implements IceComponent, OnDestroy {
         tap(v => {
           if (v.length < 1) {
             levelClass.levelList.splice(0, levelClass.levelList.length)
-            this.loadData(0,levelClass);
+            this.loadData(0, levelClass);
           }
         }),
         filter(search => !!search),
@@ -112,7 +134,7 @@ export class AddressComponent implements IceComponent, OnDestroy {
         tap((v) => this.searching = true),
         debounceTime(300),
         switchMap(search => {
-          return this.addressService.searchRegionForName(search)
+          return this.addressService.searchRegionForName(search, levelClass.levelNum, levelClass.levelSorting, levelClass.parentObjId)
         }),
         takeUntil(this._onDestroy),
       ).subscribe({
@@ -133,22 +155,37 @@ export class AddressComponent implements IceComponent, OnDestroy {
     this.left = this.cellService.getClientCellBound(this.cellNumber).x - this.correctX
     this.top = this.cellService.getClientCellBound(this.cellNumber).y - this.correctY
     this.propControl()
+  }
 
-    this.placeClassList.push({
-      "levelNum": 1,
-      "levelPlaceHolder": "Выберите регион ...",
-      "levelSorting": "regionCode,asc",
+  private createNewLevel(levelNum: number[], placeObject?: PlaceObject) {
+    let parentObjId = placeObject ? placeObject.objectId : 0
+    if(placeObject)
+      this.removeOldLevel(placeObject.clevel)
+    levelNum.forEach(num => {
+      this.placeClassList.push(this.createLevelClassObject(num, parentObjId))
+      this.loadData(0, this.placeClassList[this.placeClassList.length - 1]);
+      this.loadFilteringData(this.placeClassList[this.placeClassList.length - 1]);
+    })
+  }
+
+  private removeOldLevel(level: number){
+    let lastIndex = this.placeClassList.findIndex(p => p.levelNum == level) + 1
+    this.placeClassList.splice(lastIndex, (this.placeClassList.length - lastIndex))
+  }
+
+  private createLevelClassObject(levelNum: number, parentObjId: number): LevelClass {
+    return {
+      "levelNum": levelNum,
+      "levelPlaceHolder": levelPlaceHolder.find(i => i.key == levelNum).value,
+      "levelSorting": levelSortString.find(i => i.key == levelNum).value,
+      "parentObjId": parentObjId,
       "placeLevel": new FormControl<PlaceObject>(null),
       "levelFiltering": new FormControl<string>(''),
       "filteredLevel": new ReplaySubject<PlaceObject[]>(1),
       "levelList": new Array<PlaceObject>(),
       "levelData": null,
       "levelValue": null,
-    })
-
-    this.loadData(0, this.placeClassList[0]);
-    this.loadFilteringData(this.placeClassList[0]);
-
+    }
   }
 
   private propControl() {
@@ -201,12 +238,26 @@ export class AddressComponent implements IceComponent, OnDestroy {
 
   getNextBatch(levelClass: LevelClass) {
     if (!levelClass.levelData.last) {
-      this.loadData(levelClass.levelData.number + 1,levelClass);
+      this.loadData(levelClass.levelData.number + 1, levelClass);
     }
   }
 
   changeValue(placeObject: PlaceObject) {
-    console.log("changeValue",placeObject)
-    this.selectedObject = placeObject
+    this.addressService.getNextLevel(placeObject.objectId).pipe(
+      filter(res => !!res),
+    ).subscribe({
+      next: levelValueList => {
+        this.createNewLevel(levelValueList, placeObject)
+      }
+    })
+  }
+
+  clearLevel(level: number) {
+    if(this.placeClassList[level].levelNum == 1){
+      this.placeClassList.splice(1, this.placeClassList.length - 1)
+      this.placeClassList[level].levelValue = undefined
+      return
+    }
+    this.changeValue(this.placeClassList[level - 1].levelValue)
   }
 }

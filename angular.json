@@ -79,7 +79,8 @@
               "browserTarget": "first-client-project:build:development",
               "ssl": true,
               "sslKey": "src/assets/ssl/icedev.pkcs8",
-              "sslCert": "src/assets/ssl/icedev.cer"
+              "sslCert": "src/assets/ssl/icedev.cer",
+              "host": "icedev.ru"
             }
           },
           "defaultConfiguration": "development"

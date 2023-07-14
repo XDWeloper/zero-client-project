@@ -4,7 +4,8 @@
      [style.top.px]="top" [style.left.px]="left" [style.border-color]="localBorderColor"
      [ngClass]="{'border':localBorderColor}">
 
-    <mat-form-field class="w-full" *ngFor="let level of placeClassList">
+  <div  class="w-full flex justify-between" *ngFor="let level of placeClassList; let i = index">
+    <mat-form-field class="w-full rounded-l">
       <mat-select msInfiniteScroll (infiniteScroll)="getNextBatch(level)" (valueChange)="changeValue($event)"
                   [formControl]="level.placeLevel" [placeholder]="level.levelPlaceHolder" [(ngModel)]="level.levelValue">
         <mat-option>
@@ -14,10 +15,17 @@
           ></ngx-mat-select-search>
         </mat-option>
         <mat-option *ngFor="let place of level.filteredLevel | async" [value]="place">
-          {{ place.regionCode }} - {{place.name}} {{ place.typeName}}
+          {{place.name}} {{ place.typeName}}.
         </mat-option>
       </mat-select>
     </mat-form-field>
+
+    <div class="w-[5%] mt-4 flex justify-center">
+    <mat-icon *ngIf="level.levelValue" class="text-red-500 cursor-pointer"
+              matTooltip="Очистить" (click)="clearLevel(i)">close</mat-icon>
+    </div>
+
+  </div>
 
 
 
