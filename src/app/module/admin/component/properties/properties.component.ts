@@ -1,6 +1,5 @@
 import {Component, Input, OnDestroy, OnInit} from '@angular/core';
 import {ComponentService} from "../../../../services/component.service";
-import {MaketComponent} from "../maketComponent/maket.component";
 import {Subscription} from "rxjs";
 import {MatDialog} from "@angular/material/dialog";
 import {MasterControlPropComponent} from "../master-control-prop/master-control-prop.component";

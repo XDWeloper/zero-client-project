@@ -17,16 +17,16 @@ export class AddressService implements OnInit{
   ngOnInit(): void {
     }
 
-    searchRegionForName(name: string,level: number, sort: string,parentObjId: number){
+    searchRegionForName(name: string,level: number, sort: string,parentObjId: number, serviceName: string){
       const operation = new Operation();
-      operation.url = environment.resourceServerURL + `/fias/addrobj?sort=${sort}&size=20&page=0&level=${level}&parentObjId=${parentObjId}&&name=${name}`
+      operation.url = environment.resourceServerURL + `/fias/${serviceName}?sort=${sort}&size=20&page=0&level=${level}&parentObjId=${parentObjId}&&name=${name}`
       operation.httpMethod = HttpMethod.GET;
       return  this.httpClient.post<any>(environment.bffURI + '/operation', operation)
     }
 
-  getAllRegion(page: number,level: number, sort: string,parentObjId: number): Observable<Pageable>{
+  getAllRegion(page: number,level: number, sort: string,parentObjId: number, serviceName: string): Observable<Pageable>{
     const operation = new Operation();
-    operation.url = environment.resourceServerURL + `/fias/addrobj?sort=${sort}&size=20&page=${page}&level=${level}&parentObjId=${parentObjId}`
+    operation.url = environment.resourceServerURL + `/fias/${serviceName}?sort=${sort}&size=20&page=${page}&level=${level}&parentObjId=${parentObjId}`
     operation.httpMethod = HttpMethod.GET;
     return  this.httpClient.post<any>(environment.bffURI + '/operation', operation)
   }
@@ -37,5 +37,7 @@ export class AddressService implements OnInit{
     operation.httpMethod = HttpMethod.GET;
     return  this.httpClient.post<number[]>(environment.bffURI + '/operation', operation)
   }
+
+
 
 }

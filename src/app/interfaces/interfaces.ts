@@ -219,7 +219,8 @@ export interface PlaceObject{
   objectId: number,
   parentObjId: number,
   objectGuid: string,
-  clevel: number
+  clevel: number,
+  cnumber: string
 }
 
 export interface PlaceComponentValue {

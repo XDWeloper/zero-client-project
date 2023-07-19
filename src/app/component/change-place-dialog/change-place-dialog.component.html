@@ -1,0 +1,29 @@
+<div class="w-full h-[95%] overflow-y-auto p-4">
+  <mat-icon class="absolute right-1 top-1 text-white bg-red-600 cursor-pointer" (click)="close()">close</mat-icon>
+
+  <p class="text-center">Выберите адрес</p>
+  <div class="w-full flex justify-between" *ngFor="let level of placeClassList; let i = index">
+    <mat-form-field class="w-full">
+      <mat-select msInfiniteScroll (infiniteScroll)="getNextBatch(level)" (valueChange)="changeValue($event)"
+                  [formControl]="level.placeLevel" [placeholder]="level.levelPlaceHolder"
+                  [(ngModel)]="level.levelValue">
+        <mat-option>
+          <ngx-mat-select-search [formControl]="level.levelFiltering" [searching]="searching"
+                                 noEntriesFoundLabel="Вариантов не найдено"
+                                 placeholderLabel="Введите название..."
+          ></ngx-mat-select-search>
+        </mat-option>
+        <mat-option *ngFor="let place of level.filteredLevel | async" [value]="place">
+          {{ place.cnumber}}{{place.name}} {{ place.typeName}}.
+        </mat-option>
+      </mat-select>
+    </mat-form-field>
+
+    <div class="w-[5%] mt-4 flex justify-center">
+      <mat-icon *ngIf="level.levelValue" class="text-red-500 cursor-pointer"
+                matTooltip="Очистить" (click)="clearLevel(i)">close
+      </mat-icon>
+    </div>
+  </div>
+  <button class="absolute right-1 bottom-1 button-style" (click)="close()">Сохранить</button>
+</div>

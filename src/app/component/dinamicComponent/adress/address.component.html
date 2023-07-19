@@ -4,32 +4,15 @@
      [style.top.px]="top" [style.left.px]="left" [style.border-color]="localBorderColor"
      [ngClass]="{'border':localBorderColor}">
 
-  <div  class="w-full flex justify-between" *ngFor="let level of placeClassList; let i = index">
-    <mat-form-field class="w-full rounded-l">
-      <mat-select msInfiniteScroll (infiniteScroll)="getNextBatch(level)" (valueChange)="changeValue($event)"
-                  [formControl]="level.placeLevel" [placeholder]="level.levelPlaceHolder" [(ngModel)]="level.levelValue">
-        <mat-option>
-          <ngx-mat-select-search [formControl]="level.levelFiltering" [searching]="searching"
-                                 noEntriesFoundLabel="Вариантов не найдено"
-                                 placeholderLabel="Введите название..."
-          ></ngx-mat-select-search>
-        </mat-option>
-        <mat-option *ngFor="let place of level.filteredLevel | async" [value]="place">
-          {{place.name}} {{ place.typeName}}.
-        </mat-option>
-      </mat-select>
-    </mat-form-field>
-
-    <div class="w-[5%] mt-4 flex justify-center">
-    <mat-icon *ngIf="level.levelValue" class="text-red-500 cursor-pointer"
-              matTooltip="Очистить" (click)="clearLevel(i)">close</mat-icon>
+    <label for="search" class="mb-2 text-sm font-medium text-gray-900 sr-only dark:text-white">Search</label>
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20">
+          <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+        </svg>
+      </div>
+      <input [value]="stringValue" type="search" id="search" readonly class="block w-full p-4 pl-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="Адрес" required>
+      <button type="submit" (click)="openPlaceDialog()" class="button-style">Выбрать...</button>
     </div>
-
-  </div>
-
-
-
-
-
 </div>
 

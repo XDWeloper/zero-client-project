@@ -38,6 +38,8 @@ import {MatSelectModule} from "@angular/material/select";
 import {NgxMatSelectSearchModule} from "ngx-mat-select-search";
 import {MatSelectInfiniteScrollModule} from "ng-mat-select-infinite-scroll";
 import {MatTooltipModule} from "@angular/material/tooltip";
+import { ChangePlaceDialogComponent } from './component/change-place-dialog/change-place-dialog.component';
+import {MatButtonModule} from "@angular/material/button";
 
 
 @NgModule({
@@ -54,6 +56,7 @@ import {MatTooltipModule} from "@angular/material/tooltip";
     InformationMainCounterpartiesTableComponent,
     MessageDialogComponent,
     UploadComponent,
+    ChangePlaceDialogComponent,
   ],
     imports: [
         BrowserModule,
@@ -75,7 +78,8 @@ import {MatTooltipModule} from "@angular/material/tooltip";
         NgxMatSelectSearchModule,
         ReactiveFormsModule,
         MatSelectInfiniteScrollModule,
-        MatTooltipModule
+        MatTooltipModule,
+        MatButtonModule
     ],
   providers: [
     provideEnvironmentNgxMask(),
