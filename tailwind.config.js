@@ -1,6 +1,7 @@
 /** @type {DefaultColors} */
 
 module.exports = {
+  important: true,
   darkMode:'class',
   content: [
     "./src/**/*.{html,ts}",

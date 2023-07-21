@@ -3,10 +3,11 @@
 
   <p class="text-center">Выберите адрес</p>
   <div class="w-full flex justify-between" *ngFor="let level of placeClassList; let i = index">
-    <mat-form-field class="w-full">
+    <mat-form-field *ngIf="(level.filteredLevel | async)  ? (level.filteredLevel | async).length > 0 || level.levelNum < 100 : false" class="w-full">
       <mat-select msInfiniteScroll (infiniteScroll)="getNextBatch(level)" (valueChange)="changeValue($event)"
                   [formControl]="level.placeLevel" [placeholder]="level.levelPlaceHolder"
-                  [(ngModel)]="level.levelValue">
+                  [(ngModel)]="level.levelValue" >
+
         <mat-option>
           <ngx-mat-select-search [formControl]="level.levelFiltering" [searching]="searching"
                                  noEntriesFoundLabel="Вариантов не найдено"
@@ -14,7 +15,9 @@
           ></ngx-mat-select-search>
         </mat-option>
         <mat-option *ngFor="let place of level.filteredLevel | async" [value]="place">
-          {{ place.cnumber}}{{place.name}} {{ place.typeName}}.
+          {{ place.domType }} {{ place.dom }}   {{ place.korp ? 'Корп. ' + place.korp : '' }}
+          {{ place.str ? 'Стр. ' + place.str : '' }} {{ place.cnumber  | dotPipe }}
+          {{place.name}} {{ place.typeName | dotPipe}}
         </mat-option>
       </mat-select>
     </mat-form-field>
@@ -25,5 +28,11 @@
       </mat-icon>
     </div>
   </div>
+
+
+
+
+
+
   <button class="absolute right-1 bottom-1 button-style" (click)="close()">Сохранить</button>
 </div>

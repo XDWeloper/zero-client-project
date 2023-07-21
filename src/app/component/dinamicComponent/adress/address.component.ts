@@ -50,7 +50,7 @@ export class AddressComponent implements IceComponent, OnDestroy {
   localBorderColor: string
 
   enabled = true
-  visible = true
+  private _visible = true
 
   private changeValue$: Subscription
   stringValue: string = ""
@@ -75,8 +75,6 @@ export class AddressComponent implements IceComponent, OnDestroy {
 
       if (this.masterControlList) {
         let control: ControlPropType = this.masterControlList.filter(c => c.componentID === componentId).find(c => c.componentValue === value).controlProp
-        console.log(control.toString())
-
 
         switch (control.toString()) {
           case "DISABLED":
@@ -138,11 +136,30 @@ export class AddressComponent implements IceComponent, OnDestroy {
     if(!value) return
     this.stringValue = ""
     value.filter(p => p.levelValue).forEach(place => {
-      this.stringValue = (this.stringValue ? this.stringValue : "") + place.levelValue.typeName + "." + place.levelValue.name + ","
+      let levelValue = place.levelValue
+      let typeName = levelValue.typeName ? levelValue.typeName : ''
+      if(typeName.length > 0)
+        typeName = levelValue.typeName.charAt(levelValue.typeName.length - 1) != '.' ? levelValue.typeName + '.' : levelValue.typeName
+      console.log("levelValue:",levelValue)
+      this.stringValue = `${this.stringValue ? this.stringValue : ''}` +
+        `${typeName} ${levelValue.name ? levelValue.name : ''}` +
+        `${levelValue.cnumber ? levelValue.cnumber : ''}` +
+        `${levelValue.domType ? levelValue.domType  : ''}${levelValue.dom ? levelValue.dom : ','}` +
+        `${levelValue.korp ? ' Корпус ' + levelValue.korp  : ''} ${levelValue.str ? 'Строение ' + levelValue.str : ''}`
     })
+
+    console.log(this.stringValue)
     this._value = value;
     this.changeDetection.detectChanges()
     this.componentService.setComponentValue({componentId: this.componentID, value: value})
   }
 
+  get visible(): boolean {
+    return this._visible;
+  }
+
+  set visible(value: boolean) {
+    this._visible = value;
+    this.changeDetection.detectChanges()
+  }
 }

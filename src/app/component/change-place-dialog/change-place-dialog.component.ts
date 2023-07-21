@@ -27,13 +27,20 @@ interface LevelHardDataCode {
   serviceName: string,
 }
 
+export const steadKey = 100
+export const houseKey = 200
+
 const levelHardDataCodes: LevelHardDataCode[] = [
   {key: 1, placeHolder: "Выберите регион ...", sort: "name,asc", serviceName: "addrobj"},
   {key: 2, placeHolder: "Выберите район ...", sort: "name,asc", serviceName: "addrobj"},
   {key: 5, placeHolder: "Выберите город ...", sort: "name,asc", serviceName: "addrobj"},
   {key: 6, placeHolder: "Выберите населенный пункт ...", sort: "name,asc", serviceName: "addrobj"},
   {key: 7, placeHolder: "Выберите планировочную инфраструктура ...", sort: "name,asc", serviceName: "addrobj"},
-  {key: 8, placeHolder: "Выберите инфраструктуру ...", sort: "name,asc", serviceName: "addrobj"}
+  {key: 8, placeHolder: "Выберите инфраструктуру ...", sort: "name,asc", serviceName: "addrobj"},
+
+  {key: steadKey, placeHolder: "Выберите земельный участок ...", sort: "cNumber,asc", serviceName: "steads"},
+  {key: houseKey, placeHolder: "Номер дома ...", sort: "domNum,asc", serviceName: "houses"}
+
 ]
 
 @Component({
@@ -56,7 +63,8 @@ export class ChangePlaceDialogComponent {
   }
 
   private loadData(page: number, levelClass: LevelClass,) {
-    this.addressService.getAllRegion(page, levelClass.levelNum, levelClass.levelSorting, levelClass.parentObjId, levelClass.levelServiceName).subscribe({
+    let level = levelClass.levelNum != steadKey && levelClass.levelNum !+ houseKey ? levelClass.levelNum : null
+    this.addressService.getAllRegion(page, level, levelClass.levelSorting, levelClass.parentObjId, levelClass.levelServiceName).subscribe({
       next: rez => {
         levelClass.levelData = rez
         rez.content.forEach(item => {
@@ -68,7 +76,8 @@ export class ChangePlaceDialogComponent {
         }
         levelClass.filteredLevel.next(levelClass.levelList);
         this.changeDetection.detectChanges()
-      }
+      },
+      error: err => console.log(err)
     })
   }
 
@@ -86,7 +95,8 @@ export class ChangePlaceDialogComponent {
         tap((v) => this.searching = true),
         debounceTime(300),
         switchMap(search => {
-          return this.addressService.searchRegionForName(search, levelClass.levelNum, levelClass.levelSorting, levelClass.parentObjId,levelClass.levelServiceName)
+          let level = levelClass.levelNum != steadKey && levelClass.levelNum !+ houseKey ? levelClass.levelNum : null
+          return this.addressService.searchRegionForName(search, level, levelClass.levelSorting, levelClass.parentObjId,levelClass.levelServiceName)
         }),
         takeUntil(this._onDestroy),
       ).subscribe({
@@ -95,9 +105,7 @@ export class ChangePlaceDialogComponent {
         levelClass.levelData = rez
         levelClass.filteredLevel.next(rez.content)
       },
-      error: error => {
-        console.log(error)
-      }
+      error: error => console.log(error)
     })
   }
 
@@ -140,15 +148,19 @@ export class ChangePlaceDialogComponent {
   }
 
   changeValue(placeObject: PlaceObject) {
-    console.log("placeObject", placeObject)
+    setTimeout(() => {
+      this.placeList.next(this.placeClassList)
+    },1000)
+
+    if(placeObject.dom || placeObject.cnumber)
+      return
+
     this.addressService.getNextLevel(placeObject.objectId).pipe(
-      filter(res => !!res),
     ).subscribe({
       next: levelValueList => {
-        // console.log("levelValueList : ",levelValueList)
-        // console.log("placeObject.objectId : ",placeObject.objectId)
-        this.placeList.next(this.placeClassList)
-        this.createNewLevel(levelValueList, placeObject)
+        let levelArr = levelValueList ? levelValueList : []
+        levelArr.push(steadKey,houseKey)
+        this.createNewLevel(levelArr, placeObject)
       }
     })
   }

@@ -40,6 +40,7 @@ import {MatSelectInfiniteScrollModule} from "ng-mat-select-infinite-scroll";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import { ChangePlaceDialogComponent } from './component/change-place-dialog/change-place-dialog.component';
 import {MatButtonModule} from "@angular/material/button";
+import { DotPipePipe } from './pipe/dot-pipe.pipe';
 
 
 @NgModule({
@@ -57,6 +58,7 @@ import {MatButtonModule} from "@angular/material/button";
     MessageDialogComponent,
     UploadComponent,
     ChangePlaceDialogComponent,
+    DotPipePipe,
   ],
     imports: [
         BrowserModule,

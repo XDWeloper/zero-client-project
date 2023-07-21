@@ -7,9 +7,11 @@
 .cell-border-style{
 @apply border border-dashed border-t-0 border-l-0 border-b-gray-500 border-r-gray-700 opacity-50
 }
-
+.border-color{
+  @apply border-primary-light border-opacity-50
+}
 .button-style{
-  @apply text-white absolute right-2.5 bottom-2.5 bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800
+  @apply text-white absolute right-2.5 bottom-2.5 bg-primary-base hover:bg-primary-light focus:ring-4 focus:outline-none focus:ring-primary-light font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-light dark:hover:bg-primary-light dark:focus:ring-primary-light
 }
 
 .component-panel-button-style{

@@ -372,7 +372,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         this.tabLabelNode.style.cssText = 'color: red;'
         this.isRequiredFieldNotEmpty = false
       } else {
-        this.tabLabelNode.style.cssText = 'color: green;'
+        this.tabLabelNode.style.cssText = 'color: #0E9F6E;'
         this.isRequiredFieldNotEmpty = true
       }
     }

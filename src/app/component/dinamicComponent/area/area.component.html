@@ -1,10 +1,10 @@
-<div     class="absolute z-10"
+<div     class="absolute z-10 rounded-lg"
          [ngStyle]="{'height.px':height,'width.px':width}"
          [style.top.px]="top" [style.left.px]="left" [style.border-color]="localBorderColor"
          [ngClass] = "{'border':localBorderColor}">
   <textarea
     [id]="componentID" (ended)="enabled" *ngIf="visible"
-    class="h-full w-full bg-white hover:border hover:border-primary-base resize-none dark:bg-slate-700 dark:text-white p-2"
+    class="h-full w-full bg-white hover:border hover:border-primary-base resize-none dark:bg-slate-700 dark:text-white p-2 rounded-lg"
     placeholder="{{placeHolder}}" [(ngModel)]="value" (click)="changeComponent()" [maxlength]="maxLength" [minlength]="minLength"></textarea>
 
   <span  *ngIf="required" class="absolute flex h-2 w-2 top-0 right-0 z-20">

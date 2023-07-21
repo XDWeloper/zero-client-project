@@ -220,7 +220,14 @@ export interface PlaceObject{
   parentObjId: number,
   objectGuid: string,
   clevel: number,
-  cnumber: string
+  cnumber: string,
+  domType: string,
+  domNum: number,
+  korp: string,
+  dom: string,
+  str: string,
+  ind: string,
+  estStat: string
 }
 
 export interface PlaceComponentValue {
