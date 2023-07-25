@@ -70,16 +70,12 @@ export class AreaComponent implements IceComponent, OnDestroy {
 
   private propControl() {
     this.changeValue$ = this.componentService.changeValue$.subscribe(item => {
-      console.log("area:",item)
       let componentId = item.componentId
       let value = item.value
       if (componentId === this.componentID || value === undefined) return
 
       if (this.masterControlList) {
         let control: ControlPropType = this.masterControlList.filter(c => c.componentID === componentId).find(c => c.componentValue === value).controlProp
-        console.log(control.toString())
-
-
         switch (control.toString()) {
           case "DISABLED":
             this.enabled = false;

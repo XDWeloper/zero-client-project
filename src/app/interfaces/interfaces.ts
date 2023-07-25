@@ -227,7 +227,8 @@ export interface PlaceObject{
   dom: string,
   str: string,
   ind: string,
-  estStat: string
+  estStat: string,
+  shortName: string
 }
 
 export interface PlaceComponentValue {

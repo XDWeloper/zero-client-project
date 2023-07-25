@@ -19,7 +19,7 @@ export class AddressService implements OnInit{
 
     searchRegionForName(name: string,level: number, sort: string,parentObjId: number, serviceName: string){
       const operation = new Operation();
-      operation.url = environment.resourceServerURL + `/fias/${serviceName}?sort=${sort}&size=20&page=0` +
+      operation.url = environment.resourceServerURL + `/fias/${serviceName}?${sort ? 'sort=' + sort: ''}&size=20&page=0` +
         `${level ? '&level='+ level : ''}` +
         `&parentObjId=${parentObjId}&&name=${name}`
       operation.httpMethod = HttpMethod.GET;
@@ -28,7 +28,7 @@ export class AddressService implements OnInit{
 
   getAllRegion(page: number,level: number, sort: string,parentObjId: number, serviceName: string): Observable<Pageable>{
     const operation = new Operation();
-    operation.url = environment.resourceServerURL + `/fias/${serviceName}?sort=${sort}&size=20&page=${page}` +
+    operation.url = environment.resourceServerURL + `/fias/${serviceName}?${sort ? 'sort=' + sort: ''}&size=20&page=${page}` +
       `${level ? '&level='+ level : ''}` +
       `&parentObjId=${parentObjId}`
     operation.httpMethod = HttpMethod.GET;

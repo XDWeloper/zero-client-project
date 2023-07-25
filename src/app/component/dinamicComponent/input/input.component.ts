@@ -73,9 +73,6 @@ export class InputComponent implements IceComponent {
 
       if (this.masterControlList) {
         let control: ControlPropType = this.masterControlList.filter(c => c.componentID === componentId).find(c => c.componentValue === value).controlProp
-        console.log(control.toString())
-
-
         switch (control.toString()) {
           case "DISABLED":
             this.enabled = false;
@@ -116,7 +113,6 @@ export class InputComponent implements IceComponent {
       this._value = value;
     this.checkValid()
     if(this.componentID) {
-      console.log('input:',{componentId: this.componentID, value: value})
       this.componentService.setComponentValue({componentId: this.componentID, value: value})
     }
   }

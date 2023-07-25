@@ -3,7 +3,7 @@ import {
   ComponentBound,
   ControlPropType,
   IceComponent,
-  MasterControl,
+  MasterControl, PlaceObject,
   TextPosition
 } from "../../../interfaces/interfaces";
 import {CellService} from "../../../services/cell.service";
@@ -63,9 +63,10 @@ export class AddressComponent implements IceComponent, OnDestroy {
     this.width = this.cellService.getClientCellWidth() * this.componentBound.widthScale
     this.left = this.cellService.getClientCellBound(this.cellNumber).x - this.correctX
     this.top = this.cellService.getClientCellBound(this.cellNumber).y - this.correctY
+
+    this.changeDetection.detectChanges()
     this.propControl()
   }
-
 
   private propControl() {
     this.changeValue$ = this.componentService.changeValue$.subscribe(item => {
@@ -125,7 +126,8 @@ export class AddressComponent implements IceComponent, OnDestroy {
       }
     })
     if(this.value)
-      componentRef.componentInstance.placeClassList = this.value
+      componentRef.componentInstance.reCreatedLevels(this.value.placeList.filter((i: PlaceObject) => i))
+      //componentRef.componentInstance.placeClassList = this.value
   }
 
   get value(): any {
@@ -140,18 +142,16 @@ export class AddressComponent implements IceComponent, OnDestroy {
       let typeName = levelValue.typeName ? levelValue.typeName : ''
       if(typeName.length > 0)
         typeName = levelValue.typeName.charAt(levelValue.typeName.length - 1) != '.' ? levelValue.typeName + '.' : levelValue.typeName
-      console.log("levelValue:",levelValue)
       this.stringValue = `${this.stringValue ? this.stringValue : ''}` +
-        `${typeName} ${levelValue.name ? levelValue.name : ''}` +
-        `${levelValue.cnumber ? levelValue.cnumber : ''}` +
+        `${typeName}${levelValue.name ? levelValue.name : ''}` +
+        `${levelValue.shortName ? levelValue.shortName  : ''}${levelValue.cnumber ? levelValue.cnumber : ''}` +
         `${levelValue.domType ? levelValue.domType  : ''}${levelValue.dom ? levelValue.dom : ','}` +
         `${levelValue.korp ? ' Корпус ' + levelValue.korp  : ''} ${levelValue.str ? 'Строение ' + levelValue.str : ''}`
     })
 
-    console.log(this.stringValue)
-    this._value = value;
+    this._value = {placeList:value.filter(i => i.levelValue).map(item => item.levelValue), placeString: this.stringValue}
     this.changeDetection.detectChanges()
-    this.componentService.setComponentValue({componentId: this.componentID, value: value})
+    this.componentService.setComponentValue({componentId: this.componentID, value: this._value})
   }
 
   get visible(): boolean {
