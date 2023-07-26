@@ -13,6 +13,7 @@ import {ComponentService} from "../../../services/component.service";
 import {BackendService} from "../../../services/backend.service";
 import {MessageService} from "../../../services/message.service";
 import {Subject, Subscription} from "rxjs";
+import {environment} from "../../../../environments/environment";
 
 @Component({
   selector: 'app-upload',
@@ -150,6 +151,7 @@ export class UploadComponent implements IceComponent, OnDestroy{
       formData.append("documentRef", this.currentDocument.id.toString());
       formData.append("fileName", file.name);
       formData.append("fileType", file.type);
+      formData.append("url", environment.resourceServerURL + "/core/files");
 
       this.upload$ = this.backService.upload(formData).subscribe({
         next: (res => {

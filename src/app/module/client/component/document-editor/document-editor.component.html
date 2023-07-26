@@ -1,7 +1,7 @@
 
 <div #watch_mainContainer>
   <div
-    class="w-full mt-2 border-t border-b border-color flex items-center h-10 p-1 bg-primary-base dark:bg-dark-background rounded-lg border border-gray-200" >
+    class="w-full mt-2 border-t border-b border-color flex items-center h-10 p-1 bg-primary-dark dark:bg-dark-background rounded-lg border border-gray-200" >
     <button matTooltip="Очистить" class="toolBar-button-style">
       <mat-icon class="text-red-300 font-bold">clear</mat-icon>
     </button>
@@ -26,9 +26,9 @@
       <div class="border-t border-b border-color ml-10">
         <mat-tab-group  [(selectedIndex)]="currentStepIndex">
           <mat-tab class="font-mono" [label]="tab.stepName" *ngFor="let tab of steps" >
-            <p *ngIf="this.currentDocument.docStep[tab.stepNum - 1].checkedText != undefined" class="text-red-600 mt-4">
-              {{ this.currentDocument.docStep[tab.stepNum - 1].checkedText }}
-            </p>
+<!--            <p *ngIf="this.currentDocument.docStep[tab.stepNum - 1].checkedText != undefined" class="text-red-600 mt-4">-->
+<!--              {{ this.currentDocument.docStep[tab.stepNum - 1].checkedText }}-->
+<!--            </p>-->
           </mat-tab>
         </mat-tab-group>
       </div>
@@ -47,6 +47,7 @@
 
     <div class="w-[20%] ml-6 overflow-auto border-l border-color px-4 pt-2">
       <p class="text-gray-600 dark:text-gray-300 overflow-auto border-b border-color" >{{ commentText }}</p>
+      <p class="text-red-600 dark:text-gray-300 overflow-auto border-b border-color" >{{ checkedText }}</p>
 
       <div class="text-red-500 text-xs dark:text-red-300 overflow-auto" *ngFor="let item of validationText">
         <span class="text-black">&bull;</span>{{ item }}</div>

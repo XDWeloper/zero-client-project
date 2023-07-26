@@ -1,9 +1,10 @@
 import {IceComponentType} from "../../../constants";
 import {ComponentBound, ComponentMaket, MasterControl, TextPosition} from "../../../interfaces/interfaces";
 import {BehaviorSubject} from "rxjs";
+import {DocumentService} from "../../../services/document.service";
 
 export class IceMaketComponent {
-  static componentCounter: number = 0
+  //static componentCounter: number = 0
 
   private _cellNumber: number | undefined
   private _componentType: IceComponentType
@@ -32,9 +33,10 @@ export class IceMaketComponent {
 
   numberObserve$ = new BehaviorSubject<number>(0)
 
-  constructor(cellNumber: number | undefined) {
+  constructor(cellNumber: number | undefined, idNumber: number) {
     this._cellNumber = cellNumber;
-    this._componentID = IceMaketComponent.componentCounter++
+    this.componentID = idNumber
+    //this._componentID = IceMaketComponent.componentCounter++
   }
 
 
@@ -180,7 +182,7 @@ export class IceMaketComponent {
 
 
   set componentType(value: IceComponentType) {
-    this._componentName = value.toString() + IceMaketComponent.componentCounter
+    this.componentName = value.toString() + this.componentID
     this._componentType = value;
   }
 

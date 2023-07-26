@@ -83,8 +83,8 @@
               class="col-span-12 w-[95%] rounded-md dark:bg-slate-700"></textarea>
 
     <div *ngIf="currentComponent.componentType === 'text'"
-         class="col-span-12 w-[95%] text-center rounded-md dark:bg-slate-700 border border-primary-light relative">
-      <p class=" -mt-4 ">Расположение текста компонента</p>
+         class="col-span-12 w-[95%] text-center rounded-md dark:bg-slate-700 border border-primary-light relative mt-2">
+      <p class="">Расположение текста компонента</p>
       <mat-button-toggle-group [(ngModel)]="currentComponent.textPosition.horizontal">
         <mat-button-toggle value="left">
           <mat-icon>format_align_left</mat-icon>

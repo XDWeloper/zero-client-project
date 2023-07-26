@@ -141,7 +141,7 @@ export class BackendService {
   }
 
   upload(uploadParam: FormData): Observable<uploadFile> {
-    return this.http.post<uploadFile>(environment.bffURI + "/operation/files" , uploadParam,);
+    return this.http.post<uploadFile>(environment.bffURI + "/operation/files" , uploadParam);
   }
 
   deleteFileById(fileId: string): Observable<any> {

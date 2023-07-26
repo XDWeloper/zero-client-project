@@ -58,7 +58,7 @@ const levelHardDataCodes: LevelHardDataCode[] = [
 })
 
 export class ChangePlaceDialogComponent {
-  @Output() placeList = new EventEmitter<LevelClass[]>()
+  @Output() placeList = new EventEmitter<{placeList: PlaceObject[], placeString: string}>()
 
   placeClassList: LevelClass[] = []
   public searching = false;
@@ -149,7 +149,6 @@ export class ChangePlaceDialogComponent {
   }
 
   reCreatedLevels(placeList: PlaceObject[]){
-    console.log("placeList: ", placeList)
     this.placeClassList.splice(0, this.placeClassList.length)
     placeList.forEach(item => {
       let newLevel = this.createLevelClassObject(item.clevel, item.parentObjId)
@@ -157,16 +156,7 @@ export class ChangePlaceDialogComponent {
       this.placeClassList.push(newLevel)
       this.loadData(0, this.placeClassList[this.placeClassList.length - 1]);
       this.loadFilteringData(this.placeClassList[this.placeClassList.length - 1]);
-
     })
-
-
-    // placeList.forEach(item => {
-    //   let newLevel:LevelClass = this.createLevelClassObject(item.clevel,item.parentObjId)
-    //   newLevel.levelValue = item
-    //   this.placeClassList.push(newLevel)
-    // })
-    // this.changeDetection.detectChanges()
   }
 
   getNextBatch(levelClass: LevelClass) {
@@ -177,7 +167,7 @@ export class ChangePlaceDialogComponent {
 
   changeValue(level: LevelClass, placeObject: PlaceObject) {
     setTimeout(() => {
-      this.placeList.next(this.placeClassList)
+      this.placeList.next({placeList:this.placeClassList.filter(i => i.levelValue).map(i => i.levelValue),placeString: null})
     },1000)
 
     if(!placeObject.clevel)
@@ -200,7 +190,7 @@ export class ChangePlaceDialogComponent {
     if(this.placeClassList[arrayIndex].levelNum == 1){
       this.placeClassList.splice(1, this.placeClassList.length - 1)
       this.placeClassList[arrayIndex].levelValue = undefined
-      this.placeList.next(this.placeClassList)
+      this.placeList.next({placeList:this.placeClassList.filter(i => i.levelValue).map(i => i.levelValue),placeString: null})
       return
     }
     this.placeClassList[arrayIndex].levelValue = undefined

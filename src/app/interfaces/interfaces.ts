@@ -141,7 +141,7 @@ export interface IceStepMaket {
   stepNum: number
   stepName: string
   componentMaket: ComponentMaket[]
-  checkedText?: String | undefined
+  checkedText?: string | undefined
 }
 
 

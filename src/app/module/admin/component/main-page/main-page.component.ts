@@ -210,8 +210,6 @@ export class MainPageComponent implements OnInit, OnDestroy {
     } else{
       this._modify = true
     }
-
-
       this.componentService.addComponent(this.componentRef)
   }
 

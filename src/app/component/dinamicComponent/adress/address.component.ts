@@ -75,22 +75,25 @@ export class AddressComponent implements IceComponent, OnDestroy {
       if (componentId === this.componentID || value === undefined) return
 
       if (this.masterControlList) {
-        let control: ControlPropType = this.masterControlList.filter(c => c.componentID === componentId).find(c => c.componentValue === value).controlProp
-
-        switch (control.toString()) {
-          case "DISABLED":
-            this.enabled = false;
-            break;
-          case "ENABLED":
-            this.enabled = true;
-            break;
-          case "INVISIBLE":
-            this.visible = false;
-            break;
-          case "VISIBLE":
-            this.visible = true;
-            break;
-        }
+        let list = this.masterControlList.filter(c => c.componentID === componentId)
+        let control: ControlPropType = undefined
+        if (list.length > 0)
+          control = list.find(c => c.componentValue === value).controlProp
+        if (control)
+          switch (control.toString()) {
+            case "DISABLED":
+              this.enabled = false;
+              break;
+            case "ENABLED":
+              this.enabled = true;
+              break;
+            case "INVISIBLE":
+              this.visible = false;
+              break;
+            case "VISIBLE":
+              this.visible = true;
+              break;
+          }
       }
     })
   }
@@ -121,37 +124,35 @@ export class AddressComponent implements IceComponent, OnDestroy {
       exitAnimationDuration,
     })
     componentRef.componentInstance.placeList.subscribe({
-      next: (val: LevelClass[]) => {
-        this.value = val
-      }
+      next: (val: { placeList: PlaceObject[], placeString: string }) => this.value = val
     })
-    if(this.value)
+    if (this.value)
       componentRef.componentInstance.reCreatedLevels(this.value.placeList.filter((i: PlaceObject) => i))
-      //componentRef.componentInstance.placeClassList = this.value
   }
 
   get value(): any {
     return this._value;
   }
 
-  set value(value: LevelClass[]) {
-    if(!value) return
-    this.stringValue = ""
-    value.filter(p => p.levelValue).forEach(place => {
-      let levelValue = place.levelValue
-      let typeName = levelValue.typeName ? levelValue.typeName : ''
-      if(typeName.length > 0)
-        typeName = levelValue.typeName.charAt(levelValue.typeName.length - 1) != '.' ? levelValue.typeName + '.' : levelValue.typeName
-      this.stringValue = `${this.stringValue ? this.stringValue : ''}` +
-        `${typeName}${levelValue.name ? levelValue.name : ''}` +
-        `${levelValue.shortName ? levelValue.shortName  : ''}${levelValue.cnumber ? levelValue.cnumber : ''}` +
-        `${levelValue.domType ? levelValue.domType  : ''}${levelValue.dom ? levelValue.dom : ','}` +
-        `${levelValue.korp ? ' Корпус ' + levelValue.korp  : ''} ${levelValue.str ? 'Строение ' + levelValue.str : ''}`
-    })
+  set value(value: { placeList: PlaceObject[], placeString: string }) {
+    if (!value) return
+    this.stringValue = value.placeString ? value.placeString : ""
+    if (this.stringValue.length < 1) {
+      value.placeList.forEach(place => {
+        let typeName = place.typeName ? place.typeName : ''
+        if (typeName.length > 0)
+          typeName = place.typeName.charAt(place.typeName.length - 1) != '.' ? place.typeName + '.' : place.typeName
+        this.stringValue = `${this.stringValue ? this.stringValue : ''}` +
+          `${typeName}${place.name ? place.name : ''}` +
+          `${place.shortName ? place.shortName : ''}${place.cnumber ? place.cnumber : ''}` +
+          `${place.domType ? place.domType : ''}${place.dom ? place.dom : ','}` +
+          `${place.korp ? ' Корпус ' + place.korp : ''} ${place.str ? 'Строение ' + place.str : ''}`
+      })
+    }
 
-    this._value = {placeList:value.filter(i => i.levelValue).map(item => item.levelValue), placeString: this.stringValue}
-    this.changeDetection.detectChanges()
+    this._value = {placeList: value.placeList, placeString: this.stringValue}
     this.componentService.setComponentValue({componentId: this.componentID, value: this._value})
+    this.changeDetection.detectChanges()
   }
 
   get visible(): boolean {

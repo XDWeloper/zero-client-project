@@ -15,9 +15,20 @@ import {IceComponentType} from "../constants";
 export class DocumentService {
   docTree: DocumentTreeTempl[] = []
   templateList: Array<IceDocumentMaket> = []
+  lastComponentIndex = 0
 
   constructor() {
   }
+
+  calculateComponentId() {
+    this.lastComponentIndex = this.templateList
+      .map(item => item.docStep.map(i => i.componentMaket.length)
+      .reduce((r, i) => r += i, 0))
+      .reduce((r, i) => r += i, 0)
+    console.log("this.lastComponentIndex: ", this.lastComponentIndex)
+  }
+
+
 
   getMaketComponentList(docId: number,selfId: number){
     let resultArr = Array()
@@ -57,7 +68,8 @@ export class DocumentService {
     if(docMaket)
       docMaket.children = childList
 
-    console.log(this.templateList)
+
+    this.calculateComponentId()
   }
 
 
@@ -72,37 +84,7 @@ export class DocumentService {
     })
   }
 
-  // addDocumentTemplate(doc: DocumentTreeTempl, step: IceStepMaket, refComponentList?: ComponentRef<IceMaketComponent>[]) {
-  //   let isDocPresent = this.templateList.find(p => p.docId === doc.id)
-  //   let compList = new Array<ComponentMaket>()
-  //   if (refComponentList != undefined)
-  //     refComponentList.forEach(p => {
-  //       compList.push(p.instance )
-  //     })
-  //
-  //   let newStep: IceStepMaket = step
-  //
-  //   if (isDocPresent === undefined) { //Сохраняем новый шаблон
-  //     let newTempl: IceDocumentMaket = {
-  //       docId: doc.id,
-  //       docName: doc.name,
-  //       docStep: [step]
-  //     }
-  //     this.templateList.push(newTempl)
-  //   } else { //Правим существующий
-  //     isDocPresent.docName = doc.name
-  //     let isStepPresent = isDocPresent.docStep.find(p => p.stepNum === step.stepNum)
-  //
-  //     if (isStepPresent === undefined) { // новый шаг сохраняем
-  //       isDocPresent.docStep.push(step)
-  //     } else { //Правим существующий
-  //       isStepPresent.stepName = step.stepName
-  //       isStepPresent.componentMaket = compList
-  //     }
-  //   }
-  // }
-
-  addTemplate(doc: DocumentTreeTempl, step: StepTreeTempl, refComponentList?: ComponentRef<IceMaketComponent>[]) {
+    addTemplate(doc: DocumentTreeTempl, step: StepTreeTempl, refComponentList?: ComponentRef<IceMaketComponent>[]) {
     if(step.num === 0) return
 
     let isDocPresent = this.templateList.find(p => p.docId === doc.id)
@@ -126,6 +108,7 @@ export class DocumentService {
         docStep: [newStep]
       }
       this.templateList.push(newTempl)
+      this.calculateComponentId()
     } else { //Правим существующий
       isDocPresent.docName = doc.name
       let isStepPresent = isDocPresent.docStep.find(p => p.stepNum === step.num)

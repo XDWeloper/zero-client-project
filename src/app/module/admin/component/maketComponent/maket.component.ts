@@ -7,6 +7,7 @@ import {ComponentService} from "../../../../services/component.service";
 import {DomSanitizer} from "@angular/platform-browser";
 import {cellColl, collInRow, IceComponentType} from "../../../../constants";
 import {CdkDragMove, CdkDragStart} from "@angular/cdk/drag-drop";
+import {DocumentService} from "../../../../services/document.service";
 
 
 @Component({
@@ -44,8 +45,13 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   isDragged = false
 
 
-  constructor(public cellService: CellService, private componentService: ComponentService, public sanitizer: DomSanitizer) {
-    super(0)
+  constructor(public cellService: CellService,
+              private componentService: ComponentService,
+              public sanitizer: DomSanitizer,
+              private documentService: DocumentService) {
+    documentService.lastComponentIndex++
+    super(0, documentService.lastComponentIndex)
+
   }
 
 
