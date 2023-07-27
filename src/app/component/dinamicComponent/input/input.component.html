@@ -1,21 +1,21 @@
 <div     [ngStyle]="{'height.px':height,'width.px':width}"
          [style.top.px]="top" [style.left.px]="left" [style.border-color]="localBorderColor"
-         [ngClass]="{'border':localBorderColor}"
+         [ngClass]="{'border':localBorderColor}" *ngIf="visible"
          class="absolute z-10 flex justify-center items-center rounded-lg" >
   <input class="w-full bg-white hover:border hover:border-primary-base dark:bg-slate-700 dark:text-white p-2 rounded-lg"
-         [maxlength]="maxLength" [minlength]="minLength" [max]="maxVal" [min]="minVal"
+         [maxlength]="maxLength" [minlength]="minLength" [max]="maxVal" [min]="minVal" [matTooltip]="checkedText"
          [ngClass]="{
           'h-[50%]': inputType === 'checkbox',
           'h-full': inputType !== 'checkbox'
-         }" *ngIf="inputType !== 'checkbox' && visible"
+         }" *ngIf="inputType !== 'checkbox'"
          [id]="componentID"
          [disabled] ="!enabled"
 
     type="{{inputType}}" placeholder="{{placeHolder}}" [(ngModel)]="value" (click)="select($event)" [mask]="regExp">
   <input class="w-full bg-white hover:border hover:border-primary-base dark:bg-slate-700 dark:text-white h-[50%] rounded-lg"
-          *ngIf="inputType === 'checkbox' && visible" [disabled] ="!enabled"
+          *ngIf="inputType === 'checkbox'" [disabled] ="!enabled" [matTooltip]="checkedText"
           type="checkbox" (click)="select($event)" [checked]="checked">
-  <span *ngIf="required" class="absolute flex h-2 w-2 top-0 right-0">
+  <span *ngIf="required && checkedText" class="absolute flex h-2 w-2 top-0 right-0">
     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-300 opacity-75"></span>
     <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
   </span>

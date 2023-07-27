@@ -30,7 +30,7 @@
 
     <div *ngIf="currentComponent.inputType === 'text' || currentComponent.componentType === 'area'"
          class="col-span-12 w-[95%] rounded-md border border-primary-light relative">
-      <p class=" -mt-4 text-center">Ограничения текста</p>
+      <p class=" text-center">Ограничения текста</p>
       <div class="w-full grid grid-cols-12 ml-1 mt-1 mr-2 items-baseline dark:text-white">
         <p class="col-span-8">Минимальная длинная:</p>
         <input class="col-span-4 w-[90%] text-center rounded-md dark:bg-slate-700" type="number"
@@ -68,13 +68,15 @@
 
     <p *ngIf="currentComponent.componentType === 'input'
     || currentComponent.componentType === 'area'
+    || currentComponent.componentType === 'place'
     || currentComponent.componentType === 'table'"
        class="col-span-10 mt-4">Обязательно для заполнения
     </p>
     <input *ngIf="currentComponent.componentType === 'input'
     || currentComponent.componentType === 'area'
+    || currentComponent.componentType === 'place'
     || currentComponent.componentType === 'table'"
-           class="col-span-2 w-[90%] text-center rounded-md dark:bg-slate-700" type="checkbox"
+           class="col-span-2 w-[90%] text-center rounded-md dark:bg-slate-700 mt-4" type="checkbox"
            [(ngModel)]="currentComponent.required">
 
     <span *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'" class="col-span-12 text-center">Текст компонента</span>

@@ -8,7 +8,7 @@
     <button matTooltip="Сохранить как черновик" (click)="saveDoc('DRAFT', 1)" class="toolBar-button-style">
       <mat-icon class="text-sky-300 font-bold">hourglass_empty</mat-icon>
     </button>
-    <button *ngIf="isRequiredFieldNotEmpty" (click)="saveDoc('SENDING', 1)" matTooltip="Отправить на рассмотрение" class="toolBar-button-style">
+    <button *ngIf="isDocumentRequiredFieldNotEmpty" (click)="saveDoc('SENDING', 1)" matTooltip="Отправить на рассмотрение" class="toolBar-button-style">
       <mat-icon class="text-yellow-300 font-bold">check_circle_outline</mat-icon>
     </button>
     <button (click)="currentDocument = undefined" matTooltip="Другой документ" class="toolBar-button-style">
@@ -46,8 +46,8 @@
     </div>
 
     <div class="w-[20%] ml-6 overflow-auto border-l border-color px-4 pt-2">
-      <p class="text-gray-600 dark:text-gray-300 overflow-auto border-b border-color" >{{ commentText }}</p>
-      <p class="text-red-600 dark:text-gray-300 overflow-auto border-b border-color" >{{ checkedText }}</p>
+      <p *ngIf="commentText" class="text-gray-600 dark:text-gray-300 overflow-auto border-b border-color" >{{ commentText }}</p>
+      <p *ngIf="checkedText" class="text-red-600 dark:text-gray-300 overflow-auto border-b border-color" >{{ checkedText }}</p>
 
       <div class="text-red-500 text-xs dark:text-red-300 overflow-auto" *ngFor="let item of validationText">
         <span class="text-black">&bull;</span>{{ item }}</div>

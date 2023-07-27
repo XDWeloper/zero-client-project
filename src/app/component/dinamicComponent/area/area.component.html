@@ -3,11 +3,11 @@
          [style.top.px]="top" [style.left.px]="left" [style.border-color]="localBorderColor"
          [ngClass] = "{'border':localBorderColor}">
   <textarea
-    [id]="componentID" (ended)="enabled" *ngIf="visible"
+    [id]="componentID" (ended)="enabled" *ngIf="visible"  [matTooltip]="checkedText"
     class="h-full w-full bg-white hover:border hover:border-primary-base resize-none dark:bg-slate-700 dark:text-white p-2 rounded-lg"
     placeholder="{{placeHolder}}" [(ngModel)]="value" (click)="changeComponent()" [maxlength]="maxLength" [minlength]="minLength"></textarea>
 
-  <span  *ngIf="required" class="absolute flex h-2 w-2 top-0 right-0 z-20">
+  <span  *ngIf="required && checkedText" class="absolute flex h-2 w-2 top-0 right-0 z-20">
       <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-300 opacity-75"></span>
       <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
     </span>

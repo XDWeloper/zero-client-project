@@ -27,10 +27,11 @@ export class IceMaketComponent {
   private _minVal: number | undefined
   private _maxVal: number | undefined
   private _notification: string | undefined
+  private _checkText: string | undefined;
+
+
+
   private _masterControlList: MasterControl[] | undefined
-
-
-
   numberObserve$ = new BehaviorSubject<number>(0)
 
   constructor(cellNumber: number | undefined, idNumber: number) {
@@ -39,6 +40,14 @@ export class IceMaketComponent {
     //this._componentID = IceMaketComponent.componentCounter++
   }
 
+
+  get checkText(): string | undefined {
+    return this._checkText;
+  }
+
+  set checkText(value: string | undefined) {
+    this._checkText = value;
+  }
 
   get masterControlList(): MasterControl[] | undefined {
     return this._masterControlList;
@@ -243,7 +252,8 @@ export class IceMaketComponent {
       minVal: this.minVal,
       maxVal: this.maxVal,
       notification: this.notification,
-      masterControlList: this.masterControlList
+      masterControlList: this.masterControlList,
+      checkedText: this._checkText
   }
   }
 }

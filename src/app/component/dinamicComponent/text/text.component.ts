@@ -79,7 +79,7 @@ export class TextComponent implements OnInit, IceComponent, OnDestroy {
         let list = this.masterControlList.filter(c => c.componentID === componentId)
         let control: ControlPropType = undefined
         if(list.length > 0)
-          control = list.find(c => c.componentValue === value).controlProp
+          control = list.find(c => c.componentValue === value) ? list.find(c => c.componentValue === value).controlProp : undefined
         if(control)
         switch (control.toString()) {
           case "DISABLED":

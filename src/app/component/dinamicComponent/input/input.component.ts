@@ -43,6 +43,7 @@ export class InputComponent implements IceComponent {
   textPosition: TextPosition;
   notification: string | undefined;
   checked: boolean = false
+  checkedText: string | undefined = undefined
 
   private _value: any;
   height: any;
@@ -69,13 +70,21 @@ export class InputComponent implements IceComponent {
     this.changeValue$ = this.componentService.changeValue$.subscribe(item => {
       let componentId = item.componentId
       let value = item.value
+
+
+      if(componentId === this.componentID && value === "NaN") {
+        if(item.checkedText && item.checkedText.length > 0)
+          this.localBorderColor = AlertColor
+        this.checkedText = item.checkedText
+      }
+
       if (componentId === this.componentID || value === undefined) return
 
       if (this.masterControlList) {
         let list = this.masterControlList.filter(c => c.componentID === componentId)
         let control: ControlPropType = undefined
         if(list.length > 0)
-          control = list.find(c => c.componentValue === value).controlProp
+          control = list.find(c => c.componentValue === value) ? list.find(c => c.componentValue === value).controlProp : undefined
         if(control)
         switch (control.toString()) {
           case "DISABLED":
@@ -110,6 +119,8 @@ export class InputComponent implements IceComponent {
   }
 
   set value(value: any) {
+    if (value === undefined && this.inputType === 'checkbox')
+      value = false
     if (value === undefined) return
     if (this.inputType === 'checkbox') {
       this.checked = value
@@ -145,5 +156,4 @@ export class InputComponent implements IceComponent {
       }
     }
   }
-
 }

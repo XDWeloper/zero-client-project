@@ -49,7 +49,8 @@ export type OtpType = "REGISTRATION" | "RESET_PASSWORD"
 
 export interface ComponentChangeValue{
   componentId: number,
-  value: any
+  value: any,
+  checkedText?: string | undefined
 }
 
 export interface IceDocument{
@@ -135,6 +136,7 @@ export interface ComponentMaket {
   maxVal: number | undefined
   notification: string | undefined
   masterControlList: MasterControl[]
+  checkedText?: string | undefined
 }
 
 export interface IceStepMaket {
@@ -176,6 +178,7 @@ export interface IceComponent {
   maxVal: number | undefined
   notification: string | undefined
   masterControlList: MasterControl[]
+  checkedText?: string | undefined
 }
 
 export class MasterControl{

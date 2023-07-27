@@ -58,17 +58,21 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   private updateDocument$: Subscription;
   private tabLabelNode: HTMLElement
 
+
   @Input() set currentDocument(value: IceDocument | undefined) {
     this._currentDocument = value;
     this.commentText = ""
     this.currentComponent = undefined
     this.validationText.splice(0, this.validationText.length)
+
     if (value != undefined) {
       this.steps = value.docStep
       this.currentStepIndex = 0
+      //this.checkAllStepsToRule()
     } else
       this.steps = []
   }
+
 
   @Input() set editDocId(value: number) {
     this._editDocId = value
@@ -95,7 +99,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   changeValue$: Subscription
   currentComponent: IceComponent
   tabChange$: Subscription
-  isRequiredFieldNotEmpty: boolean = false
+  isDocumentRequiredFieldNotEmpty: boolean = false
+  private _isStepRequiredFieldNotEmpty: boolean = false
+
   checkedText: string | undefined
 
 
@@ -126,7 +132,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   ngAfterViewChecked() {
     this.setMainBounds()
-    //this.setTableNode()
   }
 
   @HostListener('window:resize', ['$event'])
@@ -162,17 +167,34 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   private checkStepComponent() {
     if (this.currentDocument) {
-      //Проверим ка мы все компоненты данного шага
-      this.currentDocument.docStep[this._currentStepIndex].checkedText = ""
       this.currentDocument.docStep[this._currentStepIndex].componentMaket.forEach(comp => {
-        let newError = this.checkValidValue(comp, comp.value)
-        this.currentDocument.docStep[this._currentStepIndex].checkedText += newError.length > 0 ? newError + "/" : ""
+        comp.checkedText = this.checkValidValue(comp)
+        this.componentService.setComponentValue({
+          componentId: comp.componentID,
+          value: "NaN",
+          checkedText: comp.checkedText
+        })
+        this.isStepRequiredFieldNotEmpty = comp.checkedText.length < 1
       })
-      if (this.currentDocument.docStep[this._currentStepIndex].checkedText.endsWith("/"))
-        this.currentDocument.docStep[this._currentStepIndex].checkedText = this.currentDocument.docStep[this._currentStepIndex].checkedText.substring(0, this.currentDocument.docStep[this._currentStepIndex].checkedText.length - 1)
-      this.checkedText = this.currentDocument.docStep[this._currentStepIndex].checkedText
     }
   }
+
+  checkAllStepsToRule() {
+
+    if (this.currentDocument) {
+      let compList = this.currentDocument.docStep.map(i => i.componentMaket).flat(2)
+      this.isDocumentRequiredFieldNotEmpty = true
+      for (let i in compList){
+        if(this.checkValidValue(compList[i]).length > 0){
+          this.isDocumentRequiredFieldNotEmpty = false
+          break
+        }
+      }
+      console.log("Rule is checked: ", this.isDocumentRequiredFieldNotEmpty)
+    }
+  }
+
+
 
   setValidationText(component: IceComponent) {
     this.validationText.splice(0, this.validationText.length)
@@ -197,18 +219,21 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     })
     this.changeValue$ = this.componentService.changeValue$.pipe(
       filter(item => !!item.componentId),
-      debounceTime(1000)
+      filter(item => item.value != "NaN"),
+      debounceTime(500),
     ).subscribe(item => {
-//      if (item.componentId) {
+
       let currentComponent = this.currentDocument.docStep[this.currentStepIndex].componentMaket.find(c => c.componentID === item.componentId)
       currentComponent.value = item.value
-      console.log("checkStepComponent")
-      this.checkStepComponent()
-      //this.checkValidValue(currentComponent, item.value)
-      this.isRequiredFieldNotEmpty = this.currentDocument.docStep.filter(item => item.checkedText && item.checkedText.length > 0).length < 1
-      // } else {
-      //   this.isRequiredFieldNotEmpty = this.currentDocument.docStep.find(p => p.componentMaket.find(c => c.required && (c.value === undefined || c.value === ''))) === undefined
-      // }
+      currentComponent.checkedText = this.checkValidValue(currentComponent)
+      this.checkAllStepsToRule()
+      //this.isDocumentRequiredFieldNotEmpty = this.currentDocument.docStep.map(i => i.componentMaket.filter(i => i.checkedText && i.checkedText.length > 0)).filter(i => i.length > 0).length < 1
+      this.isStepRequiredFieldNotEmpty = this.currentDocument.docStep[this.currentStepIndex].componentMaket.filter(i => i.checkedText && i.checkedText.length > 0).length < 1
+      this.componentService.setComponentValue({
+        componentId: item.componentId,
+        value: "NaN",
+        checkedText: currentComponent.checkedText
+      })
     })
 
     this.cellColl = cellColl
@@ -268,6 +293,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       compInstance.notification = comp.notification
       compInstance.value = comp.value
       compInstance.masterControlList = comp.masterControlList
+      compInstance.checkedText = comp.checkedText
 
       if (comp.componentType === IceComponentType.INPUT || comp.componentType === IceComponentType.AREA)
         this.setFirstComponent();
@@ -340,41 +366,31 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     })
   }
 
-
-  // private checkRequiredField() {
-  //
-  //   if (this.currentDocument === undefined) return
-  //   this.setTableNode()
-  //   if (this.tabLabelNode) {
-  //     if (this.currentDocument.docStep[this.currentStepIndex].componentMaket.find(c => c.required && (c.value === undefined || c.value === '')) === undefined) {
-  //       this.currentDocument.docStep[this.currentStepIndex].checkedText = ""
-  //       this.tabLabelNode.style.cssText = 'color: black;'
-  //     } else {
-  //       this.currentDocument.docStep[this.currentStepIndex].checkedText = "Не заполнены обязательные поля."
-  //       this.tabLabelNode.style.cssText = 'color: red;'
-  //     }
-  //   }
-  // }
-
   saveDraft() {
     this.saveDoc("DRAFT", 0)
   }
 
-  private checkValidValue(currentComponent: ComponentMaket, value: any): string {
+  private checkValidValue(currentComponent: ComponentMaket): string {
     let errorStr: string = ""
-    if (this.currentDocument === undefined || value === undefined) return errorStr
 
-//    this.currentDocument.docStep[this.currentStepIndex].checkedText = ""
-//    this.checkRequiredField()
-    if (currentComponent.componentType != IceComponentType.AREA && currentComponent.componentType != IceComponentType.INPUT) return errorStr
+    if (this.currentDocument === undefined) return errorStr
+    let value = currentComponent.value
 
+    if (currentComponent.componentType != IceComponentType.AREA
+      && currentComponent.componentType != IceComponentType.INPUT
+      && currentComponent.componentType != IceComponentType.PLACE)
+      return errorStr
+
+    if (value === undefined)
+      value = ""
     /**В начале проверяем заполнение обязательных полей*/
-    if (this.currentDocument.docStep[this.currentStepIndex].componentMaket.find(c => c.required && (c.value === undefined || c.value === '')) === undefined) {
-      errorStr = ""
-    } else {
-      errorStr = "Не заполнены обязательные поля."
+    if(currentComponent.componentType === IceComponentType.PLACE){
+      if (currentComponent.required && (!value || (value && value.placeString.length < 1)))
+        errorStr = "Не заполнено обязательное поле."
+    }else{
+      if (currentComponent.required && (!value || (value && value.length < 1)))
+        errorStr = "Не заполнено обязательное поле."
     }
-
 
     if (currentComponent.componentType === IceComponentType.AREA
       || (currentComponent.componentType === IceComponentType.INPUT && currentComponent.inputType === 'text')) {
@@ -391,14 +407,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         errorStr += `Нарушено ограничение по минимальному значению.`
     }
 
-    this.setTableNode()
-    if (this.tabLabelNode) {
-      if (errorStr != "") {
-        this.tabLabelNode.style.cssText = 'color: red;'
-      } else {
-        this.tabLabelNode.style.cssText = 'color: #0E9F6E;'
-      }
-    }
     return errorStr
   }
 
@@ -411,4 +419,21 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   }
 
+
+  get isStepRequiredFieldNotEmpty(): boolean {
+    return this._isStepRequiredFieldNotEmpty;
+  }
+
+  set isStepRequiredFieldNotEmpty(value: boolean) {
+    this.setTableNode()
+    if (this.tabLabelNode) {
+      if (!value) {
+        this.tabLabelNode.style.cssText = 'color: red;'
+      } else {
+        this.tabLabelNode.style.cssText = 'color: #0E9F6E;'
+      }
+    }
+
+    this._isStepRequiredFieldNotEmpty = value;
+  }
 }

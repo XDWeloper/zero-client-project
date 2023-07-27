@@ -149,6 +149,7 @@ export class ChangePlaceDialogComponent {
   }
 
   reCreatedLevels(placeList: PlaceObject[]){
+    if(placeList.length < 1) return
     this.placeClassList.splice(0, this.placeClassList.length)
     placeList.forEach(item => {
       let newLevel = this.createLevelClassObject(item.clevel, item.parentObjId)
