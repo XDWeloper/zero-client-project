@@ -28,6 +28,7 @@ import {MatButtonToggleModule} from "@angular/material/button-toggle";
 import { ChangeTableComponent } from './component/change-table/change-table.component';
 import { MasterControlPropComponent } from './component/master-control-prop/master-control-prop.component';
 import {MatSelectModule} from "@angular/material/select";
+import { OptionListComponent } from './component/option-list/option-list.component';
 
 
 
@@ -43,7 +44,8 @@ import {MatSelectModule} from "@angular/material/select";
         PropertiesComponent,
         ChangeTableComponent,
         CellComponent,
-        MasterControlPropComponent
+        MasterControlPropComponent,
+        OptionListComponent
     ],
     exports: [
     ],

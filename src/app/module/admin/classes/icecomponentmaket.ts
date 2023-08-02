@@ -28,6 +28,7 @@ export class IceMaketComponent {
   private _maxVal: number | undefined
   private _notification: string | undefined
   private _checkText: string | undefined;
+  private _optionList: string[] | undefined
 
 
 
@@ -40,6 +41,14 @@ export class IceMaketComponent {
     //this._componentID = IceMaketComponent.componentCounter++
   }
 
+
+  get optionList(): string[] | undefined {
+    return this._optionList;
+  }
+
+  set optionList(value: string[] | undefined) {
+    this._optionList = value;
+  }
 
   get checkText(): string | undefined {
     return this._checkText;
@@ -253,7 +262,8 @@ export class IceMaketComponent {
       maxVal: this.maxVal,
       notification: this.notification,
       masterControlList: this.masterControlList,
-      checkedText: this._checkText
+      checkedText: this.checkText,
+      optionList: this.optionList
   }
   }
 }

@@ -4,6 +4,10 @@
 @tailwind components;
 @tailwind utilities;
 
+.prop-button{
+@apply mt-4 col-span-12 w-[95%] border border-primary-light rounded-lg py-2
+}
+
 .cell-border-style{
 @apply border border-dashed border-t-0 border-l-0 border-b-gray-500 border-r-gray-700 opacity-50
 }

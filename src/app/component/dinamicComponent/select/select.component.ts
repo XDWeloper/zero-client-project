@@ -6,10 +6,10 @@ import {ComponentService} from "../../../services/component.service";
 import {Subscription} from "rxjs";
 
 @Component({
-  selector: 'app-input',
-  templateUrl: './input.component.html',
+  selector: 'app-select',
+  templateUrl: './select.component.html',
 })
-export class InputComponent implements IceComponent {
+export class SelectComponent implements IceComponent {
 
   constructor(private cellService: CellService, private componentSelectedService: ComponentService, private componentService: ComponentService) {
   }
@@ -38,6 +38,7 @@ export class InputComponent implements IceComponent {
   notification: string | undefined;
   checked: boolean = false
   checkedText: string | undefined = undefined
+  optionList?: string[] | undefined
 
   private _value: any;
   height: any;
@@ -80,20 +81,20 @@ export class InputComponent implements IceComponent {
         if(list.length > 0)
           control = list.find(c => c.componentValue === value) ? list.find(c => c.componentValue === value).controlProp : undefined
         if(control)
-        switch (control.toString()) {
-          case "DISABLED":
-            this.enabled = false;
-            break;
-          case "ENABLED":
-            this.enabled = true;
-            break;
-          case "INVISIBLE":
-            this.visible = false;
-            break;
-          case "VISIBLE":
-            this.visible = true;
-            break;
-        }
+          switch (control.toString()) {
+            case "DISABLED":
+              this.enabled = false;
+              break;
+            case "ENABLED":
+              this.enabled = true;
+              break;
+            case "INVISIBLE":
+              this.visible = false;
+              break;
+            case "VISIBLE":
+              this.visible = true;
+              break;
+          }
       }
     })
   }
@@ -105,7 +106,7 @@ export class InputComponent implements IceComponent {
 
   set frameColor(value: string) {
     this._frameColor = value;
-    this.localBorderColor = this.frameColor
+    this.localBorderColor = value
   }
 
   get value(): any {
@@ -113,41 +114,17 @@ export class InputComponent implements IceComponent {
   }
 
   set value(value: any) {
-    if (value === undefined && this.inputType === 'checkbox')
-      value = false
-    if (value === undefined) return
-    if (this.inputType === 'checkbox') {
-      this.checked = value
+    if (value === undefined) {
+      this._value = this.placeHolder
+      return
     }
-      this._value = value;
-    this.checkValid()
+    this._value = value;
     if(this.componentID) {
       this.componentService.setComponentValue({componentId: this.componentID, value: value})
     }
   }
-
-  select($event: any) {
-    this.componentSelectedService.selectedDocumentComponent$.next(this)
-    if (this.inputType === 'checkbox') {
-      this.checked = !this.checked
-      this.value = this.checked
-    }
+  changeComponent() {
+    this.componentService.selectedDocumentComponent$.next(this)
   }
 
-  checkValid() {
-    if(this.value){
-      if(this.inputType === 'number'){
-        if (this.maxVal < this.value || this.minVal > this.value)
-          this.localBorderColor = AlertColor
-        else
-          this.localBorderColor = this.frameColor
-      }
-      if(this.inputType === 'text') {
-        if (this.maxLength < this.value.length || this.minLength > this.value.length)
-          this.localBorderColor = AlertColor
-        else
-          this.localBorderColor = this.frameColor
-      }
-    }
-  }
 }

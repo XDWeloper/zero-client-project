@@ -137,6 +137,7 @@ export interface ComponentMaket {
   notification: string | undefined
   masterControlList: MasterControl[]
   checkedText?: string | undefined
+  optionList?: string[] | undefined
 }
 
 export interface IceStepMaket {
@@ -179,6 +180,7 @@ export interface IceComponent {
   notification: string | undefined
   masterControlList: MasterControl[]
   checkedText?: string | undefined
+  optionList?: string[] | undefined
 }
 
 export class MasterControl{

@@ -43,11 +43,11 @@ import {MessageService} from "../../../../services/message.service";
 import {TabService} from "../../../../services/tab.service";
 import {UploadComponent} from "../../../../component/dinamicComponent/upload/upload.component";
 import {AddressComponent} from "../../../../component/dinamicComponent/adress/address.component";
+import {SelectComponent} from "../../../../component/dinamicComponent/select/select.component";
 
 @Component({
   selector: 'app-document-editor',
   templateUrl: './document-editor.component.html',
-  styleUrls: ['./document-editor.component.scss'],
 })
 export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnInit {
   steps: IceStepMaket[] = new Array()
@@ -190,7 +190,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
           break
         }
       }
-      console.log("Rule is checked: ", this.isDocumentRequiredFieldNotEmpty)
     }
   }
 
@@ -247,6 +246,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     let stepComponentList = this.currentDocument.docStep.find(p => p.stepNum === stepNum).componentMaket
 
     stepComponentList.forEach(comp => {
+      if (comp.componentType === IceComponentType.SELECT)
+        this.componentRef = this.itemsField.createComponent(SelectComponent);
       if (comp.componentType === IceComponentType.PLACE)
         this.componentRef = this.itemsField.createComponent(AddressComponent);
       if (comp.componentType === IceComponentType.TEXT)
@@ -294,6 +295,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       compInstance.value = comp.value
       compInstance.masterControlList = comp.masterControlList
       compInstance.checkedText = comp.checkedText
+      compInstance.optionList = comp.optionList
 
       if (comp.componentType === IceComponentType.INPUT || comp.componentType === IceComponentType.AREA)
         this.setFirstComponent();
@@ -320,7 +322,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   loadDocMaket(maketId: number) {
     this.getMaketFull$ = this.backService.getMaketFull(maketId).subscribe({
       next: ((res) => {
-        console.log(res)
         /**Формируем новый документ*/
         this.currentDocument = {
           maketId: res.id,

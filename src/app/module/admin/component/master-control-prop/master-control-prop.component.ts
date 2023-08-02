@@ -22,8 +22,6 @@ export class MasterControlPropComponent {
   }
 
   init(){
-
-    console.log(this.currentComponent.masterControlList)
     this.componentStepList = this.documentService.getMaketComponentList(this.currentDocId, this.currentComponent.componentID)
       let valuesArr = Object.values(ControlPropType)
       let keyArr = Object.keys(ControlPropType)

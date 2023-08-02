@@ -340,7 +340,6 @@ export class DocumentComponent implements OnInit {
     if (isOpen && !isLoaded)
       this.backendService.getMaketFull(id).subscribe({
         next: ((res) => {
-          console.log(res)
           this.documentService.pushTemplate(
             {
               docId: res.id,

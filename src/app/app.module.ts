@@ -41,6 +41,7 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 import { ChangePlaceDialogComponent } from './component/change-place-dialog/change-place-dialog.component';
 import {MatButtonModule} from "@angular/material/button";
 import { DotPipePipe } from './pipe/dot-pipe.pipe';
+import { SelectComponent } from './component/dinamicComponent/select/select.component';
 
 
 @NgModule({
@@ -59,6 +60,7 @@ import { DotPipePipe } from './pipe/dot-pipe.pipe';
     UploadComponent,
     ChangePlaceDialogComponent,
     DotPipePipe,
+    SelectComponent,
   ],
     imports: [
         BrowserModule,

@@ -53,7 +53,6 @@ const levelHardDataCodes: LevelHardDataCode[] = [
 @Component({
   selector: 'app-change-place-dialog',
   templateUrl: './change-place-dialog.component.html',
-  styleUrls: ['./change-place-dialog.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
@@ -206,6 +205,11 @@ export class ChangePlaceDialogComponent {
 
 
   close() {
+    this.placeList.next({placeList: [],placeString: ""})
+    this.dialogRef.close()
+  }
+
+  save() {
     this.dialogRef.close()
   }
 }

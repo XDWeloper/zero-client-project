@@ -16,6 +16,7 @@ import {
 } from "../../../../component/dinamicComponent/tables/information-company-participants-table/information-company-participants-table.component";
 import {UploadComponent} from "../../../../component/dinamicComponent/upload/upload.component";
 import {AddressComponent} from "../../../../component/dinamicComponent/adress/address.component";
+import {SelectComponent} from "../../../../component/dinamicComponent/select/select.component";
 
 @Component({
   selector: 'app-watch-template',
@@ -82,6 +83,8 @@ export class WatchTemplateComponent implements OnInit,AfterViewInit {
     let stepComponentList = this.currentDocument.docStep.find(p => p.stepNum === stepNum).componentMaket
 
     stepComponentList.forEach(comp => {
+      if (comp.componentType === IceComponentType.SELECT)
+        this.componentRef = this.itemsField.createComponent(SelectComponent);
       if (comp.componentType === IceComponentType.PLACE)
         this.componentRef = this.itemsField.createComponent(AddressComponent);
       if (comp.componentType === IceComponentType.TEXT)
@@ -120,7 +123,7 @@ export class WatchTemplateComponent implements OnInit,AfterViewInit {
       compInstance.minLength = comp.minLength
       compInstance.minVal = comp.minVal
       compInstance.regExp = comp.regExp
-
+      compInstance.optionList = comp.optionList
     })
   }
 

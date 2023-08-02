@@ -116,7 +116,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
           break;
         case IceComponentType.PLACE:
           this.width = this.cellService.getCellWidth() * collInRow * cellColl;
-          this.height = this.cellService.getCellHeight() * 12
+          this.height = this.cellService.getCellHeight()
           break;
         case IceComponentType.UPLOAD:
           this.width = this.cellService.getCellWidth() * 8 * cellColl;

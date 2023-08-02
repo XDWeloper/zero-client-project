@@ -20,9 +20,11 @@
      (contextmenu)="rightClick($event)"
      (cdkDragStarted)="selected($event)"
      (cdkDragMoved)="selected($event)">
-  <div
+  <div *ngIf="componentType != 'select'"
     [innerHTML]="sanitizer.bypassSecurityTrustHtml(value ? value : placeHolder + (inputType ? ' ' + inputType : ''))">
-
+  </div>
+  <div *ngIf="componentType === 'select'"
+    [innerHTML]="sanitizer.bypassSecurityTrustHtml(placeHolder)">
   </div>
 
   <mat-icon *ngIf="isResizable"

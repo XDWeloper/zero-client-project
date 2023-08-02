@@ -204,8 +204,8 @@ export class MainPageComponent implements OnInit, OnDestroy {
       this.componentRef.instance.regExp = compMaket.regExp
       this.componentRef.instance.minVal = compMaket.minVal
       this.componentRef.instance.maxVal = compMaket.maxVal
-
       this.componentRef.instance.masterControlList = compMaket.masterControlList
+      this.componentRef.instance.optionList = compMaket.optionList
 
     } else{
       this._modify = true

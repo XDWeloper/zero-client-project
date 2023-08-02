@@ -5,6 +5,8 @@ import {MatDialog} from "@angular/material/dialog";
 import {MasterControlPropComponent} from "../master-control-prop/master-control-prop.component";
 import {dialogCloseAnimationDuration, dialogOpenAnimationDuration} from "../../../../constants";
 import {IceMaketComponent} from "../../classes/icecomponentmaket";
+import {ComponentType} from "@angular/cdk/overlay";
+import {OptionListComponent} from "../option-list/option-list.component";
 
 @Component({
   selector: 'app-properties',
@@ -46,6 +48,7 @@ export class PropertiesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.selectedComponent$ = this.componentService.selectedComponent$.subscribe(c => {
+
       if (c === undefined)
         this.currentComponent = undefined
       else {
@@ -56,20 +59,43 @@ export class PropertiesComponent implements OnInit, OnDestroy {
   }
 
   openMasterControlDialog(){
-    this.openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration)
+    this.openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration, MasterControlPropComponent)
   }
 
-  openDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
-    let componentRef = this.dialog.open(MasterControlPropComponent, {
+  openOptionsDialog() {
+    this.openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration, OptionListComponent)
+  }
 
+  openDialog<T>(enterAnimationDuration: string, exitAnimationDuration: string, component: ComponentType<T>): void {
+    let componentRef = this.dialog.open(component, {
       width: '' + (window.innerWidth * 0.8) + 'px',
       height: '' + (window.innerHeight * 0.8) + 'px',
       enterAnimationDuration,
       exitAnimationDuration,
     })
-      componentRef.componentInstance.currentComponent = this.currentComponent
-      componentRef.componentInstance.currentDocId = this.currentDocId
-      componentRef.componentInstance.init()
+      // @ts-ignore
+    componentRef.componentInstance.currentComponent = this.currentComponent
+      // @ts-ignore
+    componentRef.componentInstance.currentDocId = this.currentDocId
+      // @ts-ignore
+    componentRef.componentInstance.init()
+  }
+
+  addRow() {
+    if(this.currentComponent.value){
+      this.currentComponent.value.push("")
+    } else {
+      this.currentComponent.value = []
+      this.currentComponent.value.push("")
+    }
+  }
+
+  removeRow() {
+    if(this.currentComponent.value){
+      this.currentComponent.value.splice(this.currentComponent.value.length - 1 , 1)
+    } else {
+      this.currentComponent.value = []
+    }
   }
 
 }
