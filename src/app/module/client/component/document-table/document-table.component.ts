@@ -1,4 +1,12 @@
-import {AfterViewInit, Component, EventEmitter, OnInit, Output, ViewChild} from '@angular/core';
+import {
+  AfterViewInit,
+  ChangeDetectionStrategy, ChangeDetectorRef,
+  Component,
+  EventEmitter,
+  OnInit,
+  Output,
+  ViewChild
+} from '@angular/core';
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {BackendService} from "../../../../services/backend.service";
@@ -16,15 +24,14 @@ import {TabService} from "../../../../services/tab.service";
 import {merge, of as observableOf} from 'rxjs';
 import {catchError, map, startWith, switchMap} from 'rxjs/operators';
 import {animate, style, transition, trigger} from "@angular/animations";
-import {MasterControlPropComponent} from "../../../admin/component/master-control-prop/master-control-prop.component";
 import {BankDocumentListComponent} from "../bank-document-list/bank-document-list.component";
-import {ComponentType} from "@angular/cdk/overlay";
 import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-document-table',
   templateUrl: './document-table.component.html',
   styleUrls: ['./document-table.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush,
   animations: [
     trigger('slideInOut', [
       transition(':enter', [
@@ -37,8 +44,8 @@ import {MatDialog} from "@angular/material/dialog";
     ])
   ]
 })
-export class DocumentTableComponent implements AfterViewInit, OnInit{
-  displayedColumns: string[] = ['id', 'docName', 'createDate', 'status', 'document','operation'];
+export class DocumentTableComponent implements AfterViewInit, OnInit {
+  displayedColumns: string[] = ['id', 'docName', 'createDate', 'status', 'document', 'operation'];
   data: IceDocument[] = []
   length = 50;
   pageSize = 10;
@@ -56,20 +63,22 @@ export class DocumentTableComponent implements AfterViewInit, OnInit{
   docStatus: string
 
 
-  constructor(public backService: BackendService, private messageService: MessageService, tabService: TabService,public dialog: MatDialog) {
+  constructor(public backService: BackendService, private messageService: MessageService, tabService: TabService, public dialog: MatDialog,private changeDetection: ChangeDetectorRef) {
     tabService.onTabChanged().subscribe(tabNum => {
-      if(tabNum === TAB_DOCUMENT_LIST)
+      if (tabNum === TAB_DOCUMENT_LIST)
         this.refreshData()
     })
   }
-  ngOnInit(): void {
-    }
 
-    clearFilter(){
-      this.docName = undefined
-      this.createDate = undefined
-      this.docStatus = undefined
-    }
+  ngOnInit(): void {
+  }
+
+  clearFilter() {
+    this.docName = undefined
+    this.createDate = undefined
+    this.docStatus = undefined
+    this.changeDetection.detectChanges()
+  }
 
 
   ngAfterViewInit(): void {
@@ -102,9 +111,10 @@ export class DocumentTableComponent implements AfterViewInit, OnInit{
         }),
       ).subscribe({
       next: data => {
-          this.data = data
+        this.data = data
+        this.changeDetection.detectChanges()
       },
-      error: err => this.messageService.show(DOCUMENT_NAME_LOAD_ERROR,err.error.message, ERROR)
+      error: err => this.messageService.show(DOCUMENT_NAME_LOAD_ERROR, err.error.message, ERROR)
     })
 
   }
@@ -118,19 +128,19 @@ export class DocumentTableComponent implements AfterViewInit, OnInit{
   }
 
   onInfoClick(statusText: string) {
-    this.messageService.show("Информация о статусе документа",statusText, "INFO")
+    this.messageService.show("Информация о статусе документа", statusText, "INFO")
   }
 
   removeDoc(id: number) {
-    this.messageService.show("Вы действительно хотите удалить документ?","Это действие приведет к безвозвратному удалению документа", "INFO", ["YES","NO"])
+    this.messageService.show("Вы действительно хотите удалить документ?", "Это действие приведет к безвозвратному удалению документа", "INFO", ["YES", "NO"])
       .subscribe({
         next: res => {
-          if(res === "YES"){
+          if (res === "YES") {
             this.backService.removeDocument(id).subscribe({
               next: ((res) => {
                 this.refreshData()
               }),
-              error: ((err) => this.messageService.show(DOCUMENT_REMOVE_ERROR,err.error.message, ERROR))
+              error: ((err) => this.messageService.show(DOCUMENT_REMOVE_ERROR, err.error.message, ERROR))
             })
           }
         }
@@ -142,9 +152,10 @@ export class DocumentTableComponent implements AfterViewInit, OnInit{
     this.clearFilter()
     this.initRefresh()
     this.filterExpanded = false
+    this.changeDetection.detectChanges()
   }
 
-  initRefresh(){
+  initRefresh() {
     let pgE = new PageEvent()
     pgE.pageIndex = 0
     pgE.pageSize = 10
@@ -152,7 +163,7 @@ export class DocumentTableComponent implements AfterViewInit, OnInit{
   }
 
   showDownloadedFile(id: number) {
-    this.openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration,id)
+    this.openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration, id)
   }
 
   openDialog<T>(enterAnimationDuration: string, exitAnimationDuration: string, documentRef: number): void {

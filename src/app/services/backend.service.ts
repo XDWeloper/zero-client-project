@@ -13,6 +13,7 @@ import {
 } from "../interfaces/interfaces";
 import {DocNameEdit} from "../constants";
 import {List} from "postcss/lib/list";
+import {map} from "rxjs/operators";
 
 
 @Injectable({
@@ -22,6 +23,14 @@ import {List} from "postcss/lib/list";
 export class BackendService {
 
   constructor(private http: HttpClient) {  }
+
+  getCoreEnvironment(): Observable<any> {
+    const operation = new Operation();
+    operation.url = environment.resourceServerURL + "/core/env"
+    operation.httpMethod = HttpMethod.GET;
+    return this.http.post(environment.bffURI + '/operation', operation);
+  }
+
 
   downloadFile(documentRef: number, fileId: string): Observable<any> {
     return this.http.get<Blob>(environment.bffURI + "/operation/files/download?documentRef=" + documentRef + "&id=" + fileId,{responseType: 'blob' as 'json'});
@@ -159,8 +168,8 @@ export class BackendService {
     return this.http.post<LoginPasswordProperties>(environment.bffURI + '/operation', operation);
   }
 
-  upload(uploadParam: FormData): Observable<UploadFile> {
-    return this.http.post<UploadFile>(environment.bffURI + "/operation/files" , uploadParam);
+  upload(uploadParam: FormData): Observable<any> {
+    return this.http.post<any>(environment.bffURI + "/operation/files" , uploadParam)
   }
 
   deleteFileById(fileId: string,documentRef: string): Observable<any> {

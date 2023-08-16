@@ -12,6 +12,7 @@ export interface LevelClass {
   "levelSorting": string,
   "parentObjId": number,
   "levelServiceName": string,
+  "levelSearchFieldName": string,
   "placeLevel": FormControl<PlaceObject>
   "levelFiltering": FormControl<string>
   "filteredLevel": ReplaySubject<PlaceObject[]>
@@ -25,6 +26,7 @@ interface LevelHardDataCode {
   placeHolder: string,
   sort: string,
   serviceName: string,
+  searchFieldName: string
 }
 
 export const steadKey = 100
@@ -35,18 +37,18 @@ export const carPlaceKey = 500
 
 
 const levelHardDataCodes: LevelHardDataCode[] = [
-  {key: 1, placeHolder: "Выберите регион ...", sort: "name,asc", serviceName: "addrobj"},
-  {key: 2, placeHolder: "Выберите район ...", sort: "name,asc", serviceName: "addrobj"},
-  {key: 5, placeHolder: "Выберите город ...", sort: "name,asc", serviceName: "addrobj"},
-  {key: 6, placeHolder: "Выберите населенный пункт ...", sort: "name,asc", serviceName: "addrobj"},
-  {key: 7, placeHolder: "Выберите планировочную инфраструктура ...", sort: "name,asc", serviceName: "addrobj"},
-  {key: 8, placeHolder: "Выберите инфраструктуру ...", sort: "name,asc", serviceName: "addrobj"},
+  {key: 1, placeHolder: "Выберите регион ...", sort: "name,asc", serviceName: "addrobj",searchFieldName: "name"},
+  {key: 2, placeHolder: "Выберите район ...", sort: "name,asc", serviceName: "addrobj",searchFieldName: "name"},
+  {key: 5, placeHolder: "Выберите город ...", sort: "name,asc", serviceName: "addrobj",searchFieldName: "name"},
+  {key: 6, placeHolder: "Выберите населенный пункт ...", sort: "name,asc", serviceName: "addrobj",searchFieldName: "name"},
+  {key: 7, placeHolder: "Выберите планировочную инфраструктура ...", sort: "name,asc", serviceName: "addrobj",searchFieldName: "name"},
+  {key: 8, placeHolder: "Выберите инфраструктуру ...", sort: "name,asc", serviceName: "addrobj",searchFieldName: "name"},
 
-  {key: steadKey, placeHolder: "Выберите земельный участок ...", sort: "cNumber,asc", serviceName: "steads"},
-  {key: houseKey, placeHolder: "Номер дома ...", sort: "domNum,asc", serviceName: "houses"},
-  {key: roomKey, placeHolder: "Номер квартиры ...", sort: "", serviceName: "rooms"},
-  {key: apartmentKey, placeHolder: "Номер апартаментов ...", sort: "cNumber,asc", serviceName: "appartments"},
-  {key: carPlaceKey, placeHolder: "Номер машино места ...", sort: "", serviceName: "carplaces"}
+  {key: steadKey, placeHolder: "Выберите земельный участок ...", sort: "cNumber,asc", serviceName: "steads",searchFieldName: "cNumber"},
+  {key: houseKey, placeHolder: "Номер дома ...", sort: "domNum,asc", serviceName: "houses",searchFieldName: "domNum"},
+  {key: roomKey, placeHolder: "Номер квартиры ...", sort: "", serviceName: "rooms",searchFieldName: "cNumber"},
+  {key: apartmentKey, placeHolder: "Номер апартаментов ...", sort: "cNumber,asc", serviceName: "appartments",searchFieldName: "cNumber"},
+  {key: carPlaceKey, placeHolder: "Номер машино места ...", sort: "", serviceName: "carplaces",searchFieldName: "cNumber"}
 
 ]
 
@@ -97,12 +99,15 @@ export class ChangePlaceDialogComponent {
           }
         }),
         filter(search => !!search),
-        filter(search => (search.length > 2 && levelClass.levelNum < steadKey)),
+        filter(search => (search.length > 2 && levelClass.levelNum < steadKey) || levelClass.levelNum >= steadKey),
         tap((v) => this.searching = true),
         debounceTime(300),
         switchMap(search => {
+          console.log(search)
+          console.log(levelClass.levelNum)
+
           let level = levelClass.levelNum < steadKey ? levelClass.levelNum : null
-          return this.addressService.searchRegionForName(search, level, levelClass.levelSorting, levelClass.parentObjId,levelClass.levelServiceName)
+          return this.addressService.searchRegionForName(search, level, levelClass.levelSorting, levelClass.parentObjId,levelClass.levelServiceName,levelClass.levelSearchFieldName)
         }),
         takeUntil(this._onDestroy),
       ).subscribe({
@@ -138,6 +143,7 @@ export class ChangePlaceDialogComponent {
       "levelSorting": levelHardDataCodes.find(i => i.key == levelNum).sort,
       "levelServiceName": levelHardDataCodes.find(i => i.key == levelNum).serviceName,
       "parentObjId": parentObjId,
+      "levelSearchFieldName": levelHardDataCodes.find(i => i.key == levelNum).searchFieldName,
       "placeLevel": new FormControl<PlaceObject>(null),
       "levelFiltering": new FormControl<string>(''),
       "filteredLevel": new ReplaySubject<PlaceObject[]>(1),

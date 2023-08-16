@@ -8,26 +8,24 @@ import {TimeService} from "../../services/time.service";
 @Injectable()
 export class SpinnerInterceptor implements HttpInterceptor {
 
+  requestListSize = 0
+
   constructor(private spinnerService: SpinnerService, private timeService: TimeService) {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+    this.requestListSize ++
     if(!this.timeService.isBlocked)
       this.spinnerService.show();
 
     return next.handle(req)
       .pipe(
         tap({
-          next:
-            (event: HttpEvent<any>) => {
-              // if (event instanceof HttpResponse) {
-              //   this.spinnerService.hide();
-              // }
-            },
-          error: (error) => {
-            //this.spinnerService.hide();
-          },
-          complete: () => this.spinnerService.hide()
+          complete: () => {
+            this.requestListSize --
+            if(this.requestListSize < 1)
+              this.spinnerService.hide()
+          }
         })
       );
   }

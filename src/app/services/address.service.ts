@@ -17,11 +17,11 @@ export class AddressService implements OnInit{
   ngOnInit(): void {
     }
 
-    searchRegionForName(name: string,level: number, sort: string,parentObjId: number, serviceName: string){
+    searchRegionForName(name: string,level: number, sort: string,parentObjId: number, serviceName: string, searchFieldName: string){
       const operation = new Operation();
       operation.url = environment.resourceServerURL + `/fias/${serviceName}?${sort ? 'sort=' + sort: ''}&size=20&page=0` +
         `${level ? '&level='+ level : ''}` +
-        `&parentObjId=${parentObjId}&&name=${name}`
+        `&parentObjId=${parentObjId}&${searchFieldName}=${name}`
       operation.httpMethod = HttpMethod.GET;
       return  this.httpClient.post<any>(environment.bffURI + '/operation', operation)
     }

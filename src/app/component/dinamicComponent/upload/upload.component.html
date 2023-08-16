@@ -31,7 +31,8 @@
   </div>
 
   <div class="absolute bottom-0 left-2 w-[98%] border-t border-t-primary-base h-[8%] text-gray-900">
-    Общий размер файлов: {{ sumSize }} мб.
+    <p class="m-0">Общий размер файлов: {{ sumSize }} мб.</p>
+    <p class="m-0 text-red-500">{{ maxFilesizeString }}</p>
   </div>
 
   <span *ngIf="required" class="absolute flex h-2 w-2 top-0 right-0 z-20">

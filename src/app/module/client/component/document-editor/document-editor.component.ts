@@ -1,5 +1,6 @@
 import {
   AfterViewChecked,
+  ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   ComponentRef,
   ElementRef,
@@ -48,6 +49,7 @@ import {SelectComponent} from "../../../../component/dinamicComponent/select/sel
 @Component({
   selector: 'app-document-editor',
   templateUrl: './document-editor.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnInit {
   steps: IceStepMaket[] = new Array()
@@ -71,6 +73,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       //this.checkAllStepsToRule()
     } else
       this.steps = []
+    this.changeDetection.detectChanges()
   }
 
 
@@ -108,7 +111,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   constructor(private componentService: ComponentService,
               private backService: BackendService,
               private messageService: MessageService,
-              private tabService: TabService) {
+              private tabService: TabService,
+              private changeDetection: ChangeDetectorRef) {
   }
 
   ngOnDestroy(): void {
