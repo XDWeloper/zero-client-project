@@ -8,6 +8,7 @@ import {
 } from "../interfaces/interfaces";
 import {IceMaketComponent} from "../module/admin/classes/icecomponentmaket";
 import {IceComponentType} from "../constants";
+import * as FileSaver from "file-saver";
 
 @Injectable({
   providedIn: 'root'
@@ -25,7 +26,6 @@ export class DocumentService {
       .map(item => item.docStep.map(i => i.componentMaket.length)
       .reduce((r, i) => r += i, 0))
       .reduce((r, i) => r += i, 0)
-    console.log("this.lastComponentIndex: ", this.lastComponentIndex)
   }
 
 
@@ -46,6 +46,7 @@ export class DocumentService {
   }
 
   setTemplateList(tempList: IceDocumentMaket[]) {
+
     this.templateList = tempList
 
     this.templateList.forEach(d => {
@@ -53,7 +54,7 @@ export class DocumentService {
       d.docStep.forEach(c => {
         childList.push({num: c.stepNum, name: c.stepName, parentId: d.docId})
       })
-      this.docTree.push({id: d.docId, name: d.docName, children: childList, isActive: true})
+      this.docTree.push({id: d.docId, name: d.docName, children: childList, isActive: true, isModified: true})
     })
   }
 
@@ -67,16 +68,18 @@ export class DocumentService {
     let docMaket = this.docTree.find(p => p.id === maket.docId)
     if(docMaket)
       docMaket.children = childList
-
-
     this.calculateComponentId()
   }
 
 
-  // saveTemplate(){
-  //     let blob = new Blob([JSON.stringify(this.templateList, null, 2)], {type: 'application/json'});
-  //     FileSaver.saveAs(blob, "template.JSON");
-  // }
+  saveTemplate(dtt: DocumentTreeTempl){
+    if(!this.templateList.find(i => i.docId === dtt.id)) {
+      return
+    }
+
+      let blob = new Blob([JSON.stringify(this.templateList.find(i => i.docId === dtt.id), null, 2)], {type: 'application/json'});
+      FileSaver.saveAs(blob, dtt.name + "_макет.JSON");
+  }
 
   addDocToTemplate(doc: DocumentTreeTempl) {
     doc.children.forEach(step => {

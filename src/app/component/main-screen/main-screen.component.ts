@@ -37,7 +37,7 @@ export class MainScreenComponent implements OnInit {
 
         }),
         error: (err => {//Нужно сделать сообщение, что что-то не так и скинуть на логин
-          this.messageService.show("Ошибка получения роли пользователя", err.message, ERROR).subscribe(value => {
+          this.messageService.show("Ошибка получения роли пользователя", err.error.message, ERROR).subscribe(value => {
             this.redirectLoginPage()
           })
         }),

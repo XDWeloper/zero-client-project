@@ -2,36 +2,37 @@
      [cdkDragFreeDragPosition]="dragPosition"
      [ngStyle]="{'height.px':height,'width.px':width}"
      [cdkDragDisabled]="isResized"
-     class="absolute border border-primary-light bg-white dark:bg-dark-background dark:text-white overflow-hidden cursor-move z-10 flex"
-     [ngClass] = "{
-      'border-red-500 border-2 z-0' : isSelected && isDragged,
+     class=" mat-elevation-z2 absolute border border-primary-light hover:border-2 bg-white dark:bg-dark-background dark:text-white overflow-hidden cursor-move z-10 flex"
+     [ngClass]="{
+      'border-red-500 border-2' : isSelected,
       'z-10': !(isSelected && isDragged),
       'justify-start': textPosition.horizontal === 'left',
-      'justify-center': (textPosition.horizontal === 'center'  || componentType === 'upload'),
+      'justify-center': (textPosition.horizontal === 'center'),
       'justify-end': textPosition.horizontal === 'right',
       'justify-self-stretch': textPosition.horizontal === 'justify',
       'items-start' : textPosition.vertical === 'top',
       'items-end': textPosition.vertical === 'bottom',
-      'items-center': (textPosition.vertical === 'center' || componentType === 'upload')
+      'items-center': (textPosition.vertical === 'center')
      }"
-
-     (click)="selected($event)"
-     (mouseleave)="isSelected = false"
+     (mousedown)="selected($event)"
      (contextmenu)="rightClick($event)"
-     (cdkDragStarted)="selected($event)"
-     (cdkDragMoved)="selected($event)">
-  <div *ngIf="componentType != 'select'"
-    [innerHTML]="sanitizer.bypassSecurityTrustHtml(value ? value : placeHolder + (inputType ? ' ' + inputType : ''))">
-  </div>
-  <div *ngIf="componentType === 'select'"
-    [innerHTML]="sanitizer.bypassSecurityTrustHtml(placeHolder)">
-  </div>
-
+     (cdkDragStarted)="isDragged = true"
+     (cdkDragEnded)="isDragged = false"
+     (mouseenter)="isHover = true"
+     (mouseleave)="!isDragged ? isHover = false : isHover = true">
+    <div *ngIf="componentType != 'select' && componentType != 'upload'" class="w-full h-full"
+         [innerHTML]="sanitizer.bypassSecurityTrustHtml(value ? value : placeHolder + (inputType ? ' ' + inputType : ''))">
+    </div>
+    <div *ngIf="componentType === 'select'" class="w-full h-full"
+         [innerHTML]="sanitizer.bypassSecurityTrustHtml(placeHolder)">
+    </div>
+    <mat-icon *ngIf="componentType === 'upload'" class="ml-4 mt-2 text-blue-500 scale-[2.0]">
+      cloud_upload
+    </mat-icon>
   <mat-icon *ngIf="isResizable"
             (mousedown)="mouseDown($event)"
-            class="text-red-800 scale-50 absolute right-0 bottom-0 translate-x-2 translate-y-2 cursor-nw-resize z-1000">
+            class="text-red-800 scale-50 absolute right-0 bottom-0 translate-x-2 translate-y-2 cursor-nw-resize z-10">
     network_cell
   </mat-icon>
-  <mat-icon *ngIf="componentType === 'upload'" class="text-blue-500 scale-[2.0]">cloud_upload</mat-icon>
 
 </div>

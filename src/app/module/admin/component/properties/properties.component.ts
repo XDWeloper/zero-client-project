@@ -73,11 +73,11 @@ export class PropertiesComponent implements OnInit, OnDestroy {
       enterAnimationDuration,
       exitAnimationDuration,
     })
-      // @ts-ignore
+    // @ts-ignore
     componentRef.componentInstance.currentComponent = this.currentComponent
-      // @ts-ignore
+    // @ts-ignore
     componentRef.componentInstance.currentDocId = this.currentDocId
-      // @ts-ignore
+    // @ts-ignore
     componentRef.componentInstance.init()
   }
 

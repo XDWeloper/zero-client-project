@@ -3,12 +3,23 @@ import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {BackendService} from "../../../../services/backend.service";
 import {IceDocument} from "../../../../interfaces/interfaces";
-import {DOCUMENT_NAME_LOAD_ERROR, DOCUMENT_REMOVE_ERROR, ERROR, TAB_DOCUMENT_LIST} from "../../../../constants";
+import {
+  dialogCloseAnimationDuration,
+  dialogOpenAnimationDuration,
+  DOCUMENT_NAME_LOAD_ERROR,
+  DOCUMENT_REMOVE_ERROR,
+  ERROR,
+  TAB_DOCUMENT_LIST
+} from "../../../../constants";
 import {MessageService} from "../../../../services/message.service";
 import {TabService} from "../../../../services/tab.service";
 import {merge, of as observableOf} from 'rxjs';
 import {catchError, map, startWith, switchMap} from 'rxjs/operators';
 import {animate, style, transition, trigger} from "@angular/animations";
+import {MasterControlPropComponent} from "../../../admin/component/master-control-prop/master-control-prop.component";
+import {BankDocumentListComponent} from "../bank-document-list/bank-document-list.component";
+import {ComponentType} from "@angular/cdk/overlay";
+import {MatDialog} from "@angular/material/dialog";
 
 @Component({
   selector: 'app-document-table',
@@ -45,7 +56,7 @@ export class DocumentTableComponent implements AfterViewInit, OnInit{
   docStatus: string
 
 
-  constructor(public backService: BackendService, private messageService: MessageService, tabService: TabService) {
+  constructor(public backService: BackendService, private messageService: MessageService, tabService: TabService,public dialog: MatDialog) {
     tabService.onTabChanged().subscribe(tabNum => {
       if(tabNum === TAB_DOCUMENT_LIST)
         this.refreshData()
@@ -93,7 +104,7 @@ export class DocumentTableComponent implements AfterViewInit, OnInit{
       next: data => {
           this.data = data
       },
-      error: err => this.messageService.show(DOCUMENT_NAME_LOAD_ERROR,err.message, ERROR)
+      error: err => this.messageService.show(DOCUMENT_NAME_LOAD_ERROR,err.error.message, ERROR)
     })
 
   }
@@ -119,7 +130,7 @@ export class DocumentTableComponent implements AfterViewInit, OnInit{
               next: ((res) => {
                 this.refreshData()
               }),
-              error: ((err) => this.messageService.show(DOCUMENT_REMOVE_ERROR,err.message, ERROR))
+              error: ((err) => this.messageService.show(DOCUMENT_REMOVE_ERROR,err.error.message, ERROR))
             })
           }
         }
@@ -139,5 +150,23 @@ export class DocumentTableComponent implements AfterViewInit, OnInit{
     pgE.pageSize = 10
     this.paginator.page.next(pgE)
   }
+
+  showDownloadedFile(id: number) {
+    this.openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration,id)
+  }
+
+  openDialog<T>(enterAnimationDuration: string, exitAnimationDuration: string, documentRef: number): void {
+    let componentRef = this.dialog.open(BankDocumentListComponent, {
+      width: '' + (window.innerWidth * 0.8) + 'px',
+      height: '' + (window.innerHeight * 0.8) + 'px',
+      enterAnimationDuration,
+      exitAnimationDuration,
+    })
+
+    componentRef.componentInstance.documentRef = documentRef
+    componentRef.componentInstance.init()
+
+  }
+
 
 }

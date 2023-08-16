@@ -1,7 +1,18 @@
 import {IceComponentType} from "../constants";
 
 
-export interface uploadFile {
+export interface BankFile {
+  "id": string,
+  "name": string,
+  "size": number,
+  "status": string,
+  "contentType": string,
+  "fileName": string,
+  "fileDirection": string
+
+}
+
+export interface UploadFile {
   id?: string
   name: string
   size: number

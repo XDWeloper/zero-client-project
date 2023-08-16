@@ -1,19 +1,28 @@
 import {
-  AfterContentInit,ChangeDetectionStrategy,Component,ElementRef,HostListener,OnDestroy,OnInit,ViewChild} from '@angular/core';
+  AfterContentInit,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewChild
+} from '@angular/core';
 import {IceMaketComponent} from "../../classes/icecomponentmaket";
 import {Subscription} from "rxjs";
 import {CellService} from "../../../../services/cell.service";
 import {ComponentService} from "../../../../services/component.service";
 import {DomSanitizer} from "@angular/platform-browser";
 import {cellColl, collInRow, IceComponentType} from "../../../../constants";
-import {CdkDragMove, CdkDragStart} from "@angular/cdk/drag-drop";
+import {CdkDragEnd, CdkDragMove, CdkDragStart} from "@angular/cdk/drag-drop";
 import {DocumentService} from "../../../../services/document.service";
 
 
 @Component({
   selector: 'app-maket',
   templateUrl: './maket.component.html',
-  changeDetection:ChangeDetectionStrategy.Default
+  changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class MaketComponent extends IceMaketComponent implements OnInit, OnDestroy, AfterContentInit {
 
@@ -22,7 +31,8 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   width:number
   height: number
   isResized = false
-
+  isDragged = false
+  private _isHover = false
 
 
   private currentCell: DOMRect
@@ -42,13 +52,12 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   @ViewChild('component', {read: ElementRef})
   private component: ElementRef
   isResizable = true
-  isDragged = false
 
 
   constructor(public cellService: CellService,
               private componentService: ComponentService,
               public sanitizer: DomSanitizer,
-              private documentService: DocumentService) {
+              private documentService: DocumentService,private changeDetection: ChangeDetectorRef ) {
     documentService.lastComponentIndex++
     super(0, documentService.lastComponentIndex)
 
@@ -77,8 +86,15 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   }
 
 
+  get isHover(): boolean {
+    return this._isHover;
+  }
+
+  set isHover(value: boolean) {
+    this._isHover = value;
+  }
+
   selected(event: CdkDragStart | CdkDragMove | MouseEvent) {
-    this.isDragged = true
     this.isSelected = true
     this.componentService.selectedComponent$.next(this.componentID)
   }
@@ -147,6 +163,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
         this.height += $event.y - this.resizeStartY
         this.resizeStartY = $event.y
       }
+      this.changeDetection.detectChanges()
     }
   }
 
@@ -180,6 +197,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   public setCorrectBound() {
     this.width =  this.cellService.getCellWidth() * this.bound.widthScale
     this.height = this.cellService.getCellHeight() * this.bound.heightScale
+    this.changeDetection.detectChanges()
   }
 
   private initObservables() {
@@ -196,11 +214,8 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
 
         this.numObserv$ = this.numberObserve$.subscribe(v => {
           this.currentCell = this.cellService.getCellBound(v)
-          this.dragPosition = {
-            x: this.currentCell.left - this.tableCorrectX - 1,
-            y: this.currentCell.top - this.tableCorrectY - 1
-          }
-          this.setCorrectBound()
+          if((!this.isHover && !this.isDragged && !this.isSelected) || this.isHover)
+            this.setDragPosition();
         })
       }
     })
@@ -210,9 +225,16 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
     })
   }
 
+  private setDragPosition() {
+    this.dragPosition = {
+      x: this.currentCell.left - this.tableCorrectX - 1,
+      y: this.currentCell.top - this.tableCorrectY - 1
+    }
+    this.setCorrectBound()
+  }
+
   initPositionOnMouseEvent(){
     this.cellSubject$ = this.cellService.cellSubject$.subscribe(val => {
-      this.isDragged = false
       if(val === null) return
       if ((this.isSelected && !this.isResized && !this.isRightClicked)) {
         this.cellNumber = val.number
@@ -233,9 +255,8 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   }
 
   private initComponent() {
-
     if(this.componentType !== IceComponentType.TEXT)
       this.value = undefined
-
   }
+
 }

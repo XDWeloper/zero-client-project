@@ -5,6 +5,13 @@
     <div class="w-full bg-primary-dark  dark:bg-dark-background flex items-center relative h-16 dark:border-b rounded-lg">
       <div class="absolute text-lg text-center text-gray-100 w-full">Личный кабинет клиента ({{user ? user.name : ""}}) </div>
       <!--    <img src="https://www.cmrbank.ru/i/logo.png" alt="" class="bg-transparent/60 p-2">-->
+      <div class="absolute right-2 mt-2" matTooltip="Выход">
+        <h1 class="bg-gray-50 rounded-full h-8 w-8 flex justify-center items-center cursor-pointer">
+          <i class="fa-solid fa-arrow-right-from-bracket" (click)="exit()"></i>
+        </h1>
+      </div>
+
+
     </div>
 
     <mat-tab-group [(selectedIndex)]="currentTabNum" (animationDone)="tabChangeDone()">

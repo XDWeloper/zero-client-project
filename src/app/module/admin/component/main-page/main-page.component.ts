@@ -35,6 +35,7 @@ import {User} from "../../../../model/User";
 import {BackendService} from "../../../../services/backend.service";
 import {Router} from "@angular/router";
 import {TimeService} from "../../../../services/time.service";
+import {KeycloakService} from "../../../../services/keycloak.service";
 
 @Component({
   selector: 'app-main-page',
@@ -79,7 +80,8 @@ export class MainPageComponent implements OnInit, OnDestroy {
               public dialog: MatDialog,
               private documentService: DocumentService,
               private backService: BackendService,
-              private timeService: TimeService) {
+              private timeService: TimeService,
+              private keycloakService: KeycloakService) {
 
     /**Разрешить обновление токенов*/
     timeService.isRefreshToken = true
@@ -346,6 +348,12 @@ export class MainPageComponent implements OnInit, OnDestroy {
     componentCollections.forEach(c => {
       this.createComponent(c.componentType.toString(),c)
       //this.cellService.getCell(c.cellNumber).resetPosition()
+    })
+  }
+
+  exit() {
+    this.keycloakService.logoutAction().subscribe({
+      complete:(() => this.router.navigate(["/"]))
     })
   }
 }

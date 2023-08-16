@@ -74,7 +74,7 @@ export class RegisterComponent implements OnDestroy {
            this.passwordPattern = new RegExp(res.passwordRegExpMaskedString.replaceAll("\Q","").replaceAll("\\E",""))
       }),
       error: (err => {
-        this.messageService.show(PASSWORD_PROP, err.message, ERROR)
+        this.messageService.show(PASSWORD_PROP, err.error.message, ERROR)
       })
     })
   }
@@ -95,7 +95,7 @@ export class RegisterComponent implements OnDestroy {
           this.pinResult = res
       }),
       error: (err => {
-        this.messageService.show(REGISTRATION_DATA, err.message, ERROR)
+        this.messageService.show(REGISTRATION_DATA, err.error.message, ERROR)
       })
     })
   }
@@ -119,7 +119,7 @@ export class RegisterComponent implements OnDestroy {
           })
         })      }),
       error: (err => {
-        this.messageService.show(REGISTRATION_CONFIRM_ERROR, err.message, ERROR).subscribe({
+        this.messageService.show(REGISTRATION_CONFIRM_ERROR, err.error.message, ERROR).subscribe({
           next: ((res:DialogButtonType) => {
             this.pinResult = undefined
             this.router.navigate([''])

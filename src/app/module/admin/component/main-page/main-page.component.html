@@ -1,9 +1,13 @@
 <div class="w-screen h-screen">
 
   <mat-toolbar class="bg-primary-base dark:bg-dark-background">
-    <span
-      class="w-full text-center bg-primary-base dark:bg-dark-background text-white">Консоль администратора ({{user ? user.name : ""}}
-      )</span>
+    <span class="w-full text-center bg-primary-base dark:bg-dark-background text-white">Консоль администратора ({{user ? user.name : ""}})</span>
+    <div class="absolute right-2 mt-2" matTooltip="Выход">
+      <h1 class="bg-gray-50 rounded-full h-8 w-8 flex justify-center items-center cursor-pointer">
+        <i class="fa-solid fa-arrow-right-from-bracket" (click)="exit()"></i>
+      </h1>
+    </div>
+
   </mat-toolbar>
 
   <div class="w-[100%] h-[90%] mt-2">
@@ -60,12 +64,12 @@
           </div>
 
           <!--            это поле элементов-->
-          <div class="border border-primary-base w-[90%] m-auto mt-0 boundary overflow-hidden" #splitMainContainer
-               id="mainContainer">
+          <div class="border border-primary-base w-[90%] m-auto mt-0 boundary overflow-hidden "
+               #splitMainContainer id="mainContainer">
             <ng-template #field></ng-template>
             <div class="w-full grid grid-cols-12 overflow-hidden">
               <div *ngFor="let item of cellRowList; let outCell = index " class="flex">
-                <app-cell class="flex-auto" *ngFor="let i of cellInnerList; let innerCell = index"
+                <app-cell class="flex-auto " *ngFor="let i of cellInnerList; let innerCell = index"
                           [cellType]="cellType"
                           [index]="outCell * cellColl + innerCell"></app-cell>
               </div>

@@ -1,0 +1,50 @@
+<div class="z-1000 h-[80%]">
+  <mat-icon class="absolute right-1 top-1 text-white bg-red-700 cursor-pointer" (click)="close()">close</mat-icon>
+  <p class="dark:text-gray-200 text-center text-lg mt-2">Документы банка</p>
+
+  <div class="mat-elevation-z8 w-[98%] m-auto overflow-auto border border-b-gray-400">
+    <table mat-table [dataSource]="data"  matSort matSortActive="id" matSortDisableClear matSortDirection="desc">
+
+      <ng-container matColumnDef="id">
+        <th class="w-[30%]" mat-header-cell *matHeaderCellDef>Ид</th>
+        <td class="w-[30%]" mat-cell *matCellDef="let row">{{row.id}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th class="w-[60%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Наименование документа</th>
+        <td class="w-[60%]" mat-cell *matCellDef="let row">{{row.name}}</td>
+      </ng-container>
+
+<!--      <ng-container matColumnDef="status">-->
+<!--        <th class="w-[20%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Статус</th>-->
+<!--        <td class="w-[20%]" mat-cell *matCellDef="let row">-->
+<!--          <div class="flex justify-start items-center">-->
+<!--            {{row.status }}-->
+<!--          </div>-->
+<!--        </td>-->
+<!--      </ng-container>-->
+
+      <ng-container matColumnDef="operation">
+        <th class="w-[5%]" mat-header-cell *matHeaderCellDef>
+          <div class=" w-full h-full text-center">Операции</div>
+        </th>
+        <td class="w-[5%]" mat-cell *matCellDef="let row">
+          <div class=" w-full h-full flex justify-center">
+            <mat-icon class="text-primary-dark cursor-pointer" matTooltip="Просмотр" (click)="showDoc(row)">remove_red_eye</mat-icon>
+          </div>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+          class="example-element-row"></tr>
+
+    </table>
+<!--    <mat-paginator [length]="length"-->
+<!--                   [pageSize]="pageSize"-->
+<!--                   [pageSizeOptions]="pageSizeOptions"></mat-paginator>-->
+  </div>
+
+
+</div>
+

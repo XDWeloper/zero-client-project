@@ -9,7 +9,13 @@ import {
 } from '@angular/core';
 import {NestedTreeControl} from "@angular/cdk/tree";
 import {MatTreeNestedDataSource} from "@angular/material/tree";
-import {DocumentTreeTempl, IceDocumentMaket, ResponseTree, StepTreeTempl} from "../../../../interfaces/interfaces";
+import {
+  DocumentTreeTempl,
+  IceDocumentMaket,
+  IceStepMaket,
+  ResponseTree,
+  StepTreeTempl
+} from "../../../../interfaces/interfaces";
 import {DocumentService} from "../../../../services/document.service";
 import {BackendService} from "../../../../services/backend.service";
 import {MessageService} from "../../../../services/message.service";
@@ -209,7 +215,7 @@ export class DocumentComponent implements OnInit {
         }
       }),
       error: (err => {
-        this.messageService.show(MAKET_DELETE_ERROR, err.message, ERROR)
+        this.messageService.show(MAKET_DELETE_ERROR, err.error.message, ERROR)
       })
     })
   }
@@ -323,9 +329,11 @@ export class DocumentComponent implements OnInit {
     reader.onload = (f => {
       return e => {
         // @ts-ignore
-        let docList: IceDocumentMaket[] = JSON.parse(e.target.result)
-        this.documentService.setTemplateList(docList)
+        let loadedMaket: IceDocumentMaket = JSON.parse(e.target.result)
+        loadedMaket.docId = loadedMaket.docId * -1
+        this.documentService.setTemplateList([loadedMaket])
         this.refreshTree()
+        this.isModified = true
       };
     })(f);
   }
@@ -374,7 +382,7 @@ export class DocumentComponent implements OnInit {
             this.refreshTree()
             this.isModified = false
           }),
-          error: (err => this.messageService.show("Ошибка  сохранения макета",err.message,ERROR))
+          error: (err => this.messageService.show("Ошибка  сохранения макета",err.error.message,ERROR))
         })
       } else {
         this.backendService.updateMaket(modifyedMaket).subscribe({
@@ -383,10 +391,14 @@ export class DocumentComponent implements OnInit {
             this.refreshTree()
             this.isModified = false
           }),
-          error: (err => this.messageService.show("Ошибка  сохранения макета", err.message, ERROR))
+          error: (err => this.messageService.show("Ошибка  сохранения макета", err.error.message, ERROR))
         })
       }
     })
 
+  }
+
+  uploadCurrentMaket() {
+    this.documentService.saveTemplate(this.currentDocument)
   }
 }

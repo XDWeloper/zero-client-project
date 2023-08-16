@@ -205,8 +205,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       this.validationText.push("Минимальное значение: " + component.minVal)
     if (component.maxVal)
       this.validationText.push("Максимальное значение: " + component.maxVal)
-    if (component.regExp)
-      this.validationText.push("Значение данного поля должно соответствовать маске: " + component.regExp)
+    // if (component.regExp)
+    //   this.validationText.push("Значение данного поля должно соответствовать маске: " + component.regExp)
   }
 
 
@@ -224,9 +224,12 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
       let currentComponent = this.currentDocument.docStep[this.currentStepIndex].componentMaket.find(c => c.componentID === item.componentId)
       currentComponent.value = item.value
+      if(currentComponent.componentType === "upload"){//Если идет изменение загруженных файлов нужно сразу сохранять
+        this.saveDraft()
+      }
+
       currentComponent.checkedText = this.checkValidValue(currentComponent)
       this.checkAllStepsToRule()
-      //this.isDocumentRequiredFieldNotEmpty = this.currentDocument.docStep.map(i => i.componentMaket.filter(i => i.checkedText && i.checkedText.length > 0)).filter(i => i.length > 0).length < 1
       this.isStepRequiredFieldNotEmpty = this.currentDocument.docStep[this.currentStepIndex].componentMaket.filter(i => i.checkedText && i.checkedText.length > 0).length < 1
       this.componentService.setComponentValue({
         componentId: item.componentId,
@@ -332,7 +335,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         // /**И сохраняем его сразу как черновик*/
         // this.saveDraft()
       }),
-      error: (err => this.messageService.show(MAKET_LOAD_ERROR, err.message, ERROR))
+      error: (err => this.messageService.show(MAKET_LOAD_ERROR, err.error.message, ERROR))
     })
   }
 
@@ -347,7 +350,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
             this.currentDocument.id = res.id
           }
         }),
-        error: (err => this.messageService.show(DRAFT_SAVE_ERROR, err.message, ERROR))
+        error: (err => this.messageService.show(DRAFT_SAVE_ERROR, err.error.message, ERROR))
       })
     } else {
       this.updateDocument$ = this.backService.updateDocument(this.currentDocument).subscribe({
@@ -355,7 +358,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
           if (reg === 1)
             this.docSaved(docStatus === "DRAFT" ? DOCUMENT_DRAFT_SAVED : DOCUMENT_SEND)
         }),
-        error: (err => this.messageService.show(DOCUMENT_SAVE_ERROR, err.message, ERROR))
+        error: (err => {
+          this.messageService.show(DOCUMENT_SAVE_ERROR, err.error.message, ERROR)
+        })
       })
     }
   }

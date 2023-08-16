@@ -1,10 +1,18 @@
-import {Observable} from 'rxjs';
+import {Observable, tap} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {HttpClient, HttpEvent, HttpHeaders, HttpRequest} from '@angular/common/http';
 import {environment} from "../../environments/environment";
 import {HttpMethod, Operation} from "../model/RequestBFF";
-import {IceDocument, IceDocumentMaket, LoginPasswordProperties, OtpType, uploadFile} from "../interfaces/interfaces";
+import {
+  BankFile,
+  IceDocument,
+  IceDocumentMaket,
+  LoginPasswordProperties,
+  OtpType,
+  UploadFile
+} from "../interfaces/interfaces";
 import {DocNameEdit} from "../constants";
+import {List} from "postcss/lib/list";
 
 
 @Injectable({
@@ -14,6 +22,17 @@ import {DocNameEdit} from "../constants";
 export class BackendService {
 
   constructor(private http: HttpClient) {  }
+
+  downloadFile(documentRef: number, fileId: string): Observable<any> {
+    return this.http.get<Blob>(environment.bffURI + "/operation/files/download?documentRef=" + documentRef + "&id=" + fileId,{responseType: 'blob' as 'json'});
+  }
+
+  getBankFileList(documentRef: number): Observable<BankFile[]> {
+    const operation = new Operation();
+    operation.url = environment.resourceServerURL + "/core/files?documentRef=" + documentRef + "&fileDirection=BNK"
+    operation.httpMethod = HttpMethod.GET;
+    return this.http.post<BankFile[]>(environment.bffURI + '/operation', operation);
+  }
 
 
   requestUserProfile(): Observable<any> {
@@ -140,13 +159,13 @@ export class BackendService {
     return this.http.post<LoginPasswordProperties>(environment.bffURI + '/operation', operation);
   }
 
-  upload(uploadParam: FormData): Observable<uploadFile> {
-    return this.http.post<uploadFile>(environment.bffURI + "/operation/files" , uploadParam);
+  upload(uploadParam: FormData): Observable<UploadFile> {
+    return this.http.post<UploadFile>(environment.bffURI + "/operation/files" , uploadParam);
   }
 
-  deleteFileById(fileId: string): Observable<any> {
+  deleteFileById(fileId: string,documentRef: string): Observable<any> {
     const operation = new Operation();
-    operation.url = environment.resourceServerURL + "/core/files/" + fileId
+    operation.url = environment.resourceServerURL + "/core/files?id=" + fileId + "&documentRef=" + documentRef
     operation.httpMethod = HttpMethod.DELETE
     return this.http.post<any>(environment.bffURI + '/operation', operation);
   }

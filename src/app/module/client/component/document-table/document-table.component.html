@@ -54,7 +54,7 @@
     </ng-container>
 
     <ng-container matColumnDef="docName">
-      <th class="w-[30%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Документ</th>
+      <th class="w-[30%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Наименование документа</th>
       <td class="w-[30%]" mat-cell *matCellDef="let row">{{row.docName}}</td>
     </ng-container>
 
@@ -75,13 +75,12 @@
 
     <ng-container matColumnDef="document">
       <th class="w-[10%]" mat-header-cell *matHeaderCellDef>
-        <div class=" w-full h-full text-center">Документ</div>
+        <div class=" w-full h-full text-center">Документы банка</div>
       </th>
 
       <td class="w-[10%] " mat-cell *matCellDef="let row">
-        <div *ngIf="row.responseDocReference" class=" w-full h-full flex justify-center">
-          <mat-icon class="text-primary-light cursor-pointer" matTooltip="Просмотр документа">assignment_returned
-          </mat-icon>
+        <div class=" w-full h-full flex justify-center">
+          <mat-icon class="text-primary-light cursor-pointer" matTooltip="Просмотр документов" (click)="showDownloadedFile(row.id)">assignment_returned</mat-icon>
         </div>
       </td>
     </ng-container>

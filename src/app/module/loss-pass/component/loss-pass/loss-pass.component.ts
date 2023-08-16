@@ -61,7 +61,7 @@ export class LossPassComponent implements OnDestroy{
           this.passwordPattern = new RegExp(res.passwordRegExpMaskedString.replaceAll("\Q","").replaceAll("\\E",""))
       }),
       error: (err => {
-        this.messageService.show(PASSWORD_PROP, err.message, ERROR)
+        this.messageService.show(PASSWORD_PROP, err.error.message, ERROR)
       })
     })
   }
@@ -168,7 +168,7 @@ export class LossPassComponent implements OnDestroy{
         this.pinResult = res
       }),
       error: (err => {
-        this.messageService.show(RESET_PASS_ERROR, err.message, ERROR)
+        this.messageService.show(RESET_PASS_ERROR, err.error.message, ERROR)
       })
     })
   }
@@ -198,7 +198,7 @@ export class LossPassComponent implements OnDestroy{
           })
       }),
       error: (err => {
-        this.messageService.show(RESET_PASS_ERROR, err.message, ERROR).subscribe({
+        this.messageService.show(RESET_PASS_ERROR, err.error.message, ERROR).subscribe({
           next: ((res:DialogButtonType) => {
             this.pinResult = undefined
             this.router.navigate([''])

@@ -9,6 +9,7 @@ import {TabService} from "../../../../services/tab.service";
 import {Subscription} from "rxjs";
 import {Router} from "@angular/router";
 import {TimeService} from "../../../../services/time.service";
+import {KeycloakService} from "../../../../services/keycloak.service";
 
 @Component({
   selector: 'app-main-page',
@@ -31,7 +32,8 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
               private backService: BackendService,
               tabService: TabService,
               private router: Router,
-              private timeService: TimeService) {
+              private timeService: TimeService,
+              private keycloakService: KeycloakService) {
     /**Разрешить обновление токенов*/
     timeService.isRefreshToken = true
 
@@ -74,7 +76,9 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
         this.tempOpenedComponent = res
         this.currentTabNum = TAB_DOCUMENT_SHOW
       }),
-      error: (err => this.messageService.show(DOCUMENT_LOAD_ERROR,err.message,ERROR))
+      error: (err => {
+        this.messageService.show(DOCUMENT_LOAD_ERROR,err.error.message,ERROR)
+      })
     })
 
   }
@@ -86,4 +90,11 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
     }
   }
 
+  exit() {
+    this.keycloakService.logoutAction().subscribe({
+      // next: value => this.router.navigate(["/"]),
+      // error: err => this.router.navigate(["/"]),
+      complete:(() => this.router.navigate(["/"]))
+    })
+  }
 }

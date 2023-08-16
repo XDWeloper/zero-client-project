@@ -19,6 +19,7 @@ import {DocStatusPipe} from "./pipe/doc-status.pipe";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {MatDatepickerModule} from "@angular/material/datepicker";
 import {FormsModule} from "@angular/forms";
+import { BankDocumentListComponent } from './component/bank-document-list/bank-document-list.component';
 
 
 
@@ -29,7 +30,8 @@ import {FormsModule} from "@angular/forms";
     DocumentEditorComponent,
     CellComponent,
     MaketListComponent,
-    DocStatusPipe
+    DocStatusPipe,
+    BankDocumentListComponent
   ],
   exports: [
     CellComponent

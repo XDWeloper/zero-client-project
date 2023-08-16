@@ -20,14 +20,14 @@ export class SpinnerInterceptor implements HttpInterceptor {
         tap({
           next:
             (event: HttpEvent<any>) => {
-              if (event instanceof HttpResponse) {
-                this.spinnerService.hide();
-              }
+              // if (event instanceof HttpResponse) {
+              //   this.spinnerService.hide();
+              // }
             },
           error: (error) => {
-            this.spinnerService.hide();
+            //this.spinnerService.hide();
           },
-          //complete: () => this.timeService.setLastTime()
+          complete: () => this.spinnerService.hide()
         })
       );
   }
