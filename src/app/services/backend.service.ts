@@ -169,14 +169,14 @@ export class BackendService {
   }
 
   upload(uploadParam: FormData): Observable<any> {
-    return this.http.post<any>(environment.bffURI + "/operation/files" , uploadParam)
+    return this.http.post<any>(environment.bffURI + "/operation/files" , uploadParam, {observe: 'events',reportProgress: true,})
   }
 
   deleteFileById(fileId: string,documentRef: string): Observable<any> {
     const operation = new Operation();
     operation.url = environment.resourceServerURL + "/core/files?id=" + fileId + "&documentRef=" + documentRef
     operation.httpMethod = HttpMethod.DELETE
-    return this.http.post<any>(environment.bffURI + '/operation', operation);
+    return this.http.post<any>(environment.bffURI + '/operation', operation,{observe: 'events',reportProgress: true,});
   }
 
 

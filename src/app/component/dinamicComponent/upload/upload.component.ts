@@ -24,6 +24,8 @@ import {MessageService} from "../../../services/message.service";
 import {Subject, Subscription} from "rxjs";
 import {environment} from "../../../../environments/environment";
 import {SpinnerService} from "../../../services/spinner.service";
+import {HttpEventType} from "@angular/common/http";
+import {StepService} from "../../../services/step.service";
 
 const fileSize1mb = 1048576
 
@@ -77,6 +79,7 @@ export class UploadComponent implements IceComponent, OnDestroy {
   private maxFilesizeKb = 7340032
   maxFilesizeString = "Максимальный размер файла не должен превышать: 7мб."
 
+  isUpload = false
 
 
   private coreEnvironment: any
@@ -87,7 +90,8 @@ export class UploadComponent implements IceComponent, OnDestroy {
               private backService: BackendService,
               private messageService: MessageService,
               private changeDetection: ChangeDetectorRef,
-              private spinnerService: SpinnerService) {
+              private spinnerService: SpinnerService,
+              private stepService: StepService) {
   }
 
   ngOnDestroy(): void {
@@ -139,7 +143,11 @@ export class UploadComponent implements IceComponent, OnDestroy {
     this.propControl()
     this.changeDetection.detectChanges()
     this.allFilesIsUpLoaded$.subscribe({
-      next: res => this.spinnerService.hide()
+      next: res => {
+        this.isUpload = false
+        this.stepService.disabledAllStep(false)
+        this.changeDetection.detectChanges()
+      }
     })
   }
 
@@ -181,11 +189,20 @@ export class UploadComponent implements IceComponent, OnDestroy {
   }
 
   deleteFile(index: number) {
-    this.deleteFileById$ = this.backService.deleteFileById(this.files[index].id, this.currentDocument.id.toString()).subscribe({
+    this.isUpload = true
+    this.stepService.disabledAllStep(true)
+    let fileId = this.files[index].id
+    this.files[index].id = undefined
+    this.deleteFileById$ = this.backService.deleteFileById(fileId, this.currentDocument.id.toString()).subscribe({
       next: (res => {
-        this.files.splice(index, 1)
-        this.componentService.setComponentValue({componentId: this.componentID, value: this.files})
-        this.reCalculateSumSize()
+        this.spinnerService.hide()
+        if (res.type === HttpEventType.Response) {
+          this.files.splice(index, 1)
+          this.componentService.setComponentValue({componentId: this.componentID, value: this.files})
+          this.isUpload = false
+          this.stepService.disabledAllStep(false)
+          this.reCalculateSumSize()
+        }
       }),
       error: (err => {
         this.delFiles$ = this.messageService.show(FILES_DELETE_ERROR, err.error.message, ERROR)
@@ -195,8 +212,10 @@ export class UploadComponent implements IceComponent, OnDestroy {
   }
 
   private upLoadFiles(files: Array<File>) {
+    this.isUpload = true
+    let fileCont = 0
     const formData: FormData = new FormData();
-    for (let file of files) {
+    files.forEach((file, index) => {
       formData.append("file", file)
       formData.append("documentRef", this.currentDocument.id.toString());
       formData.append("fileName", file.name);
@@ -206,10 +225,28 @@ export class UploadComponent implements IceComponent, OnDestroy {
       this.upload$ = this.backService.upload(formData)
         .subscribe({
         next: (res => {
-          let file: UploadFile = {id : res.id, name : res.name, size : res.fileSize, status : res.status}
-          this.files.push(file)
-          this.reCalculateSumSize()
-          this.componentService.setComponentValue({componentId: this.componentID, value: this.files})
+          this.spinnerService.hide()
+          this.stepService.disabledAllStep(true)
+          let fileName = file.name
+
+          if (res.type === HttpEventType.Sent) {
+            let file: UploadFile = {id : undefined, name : fileName, size : 0, status : "", progress: 0}
+            this.files.push(file)
+            this.reCalculateSumSize()
+            this.componentService.setComponentValue({componentId: this.componentID, value: this.files})
+          }
+
+          if (res.type === HttpEventType.Response) {
+            res = res.body
+            let file: UploadFile = {id : res.id, name : res.name, size : res.fileSize, status : res.status}
+            this.files.splice(this.files.findIndex(i => i.id === undefined), 1)
+            this.files.push(file)
+            this.reCalculateSumSize()
+            this.componentService.setComponentValue({componentId: this.componentID, value: this.files})
+            if(files.length === ++fileCont) {
+              this.allFilesIsUpLoaded$.next(true)
+            }
+          }
         }),
         error: (err => {
             this.show$ = this.messageService.show(FILES_LOAD_ERROR, err.error.message, ERROR)
@@ -221,7 +258,7 @@ export class UploadComponent implements IceComponent, OnDestroy {
       formData.delete("fileName")
       formData.delete("fileType")
       formData.delete("url")
-    }
+    })
   }
 
   showDoc(file: UploadFile) {

@@ -22,20 +22,24 @@
     <!--    это поле элементов-->
     <div class=" w-[80%]  mt-2 boundary ">
 
+<!--      [label]="tab.stepName"-->
       <!--это страницы-->
       <div class="border-t border-b border-color ml-10">
-        <mat-tab-group  [(selectedIndex)]="currentStepIndex">
-          <mat-tab class="font-mono" [label]="tab.stepName" *ngFor="let tab of steps" >
-<!--            <p *ngIf="this.currentDocument.docStep[tab.stepNum - 1].checkedText != undefined" class="text-red-600 mt-4">-->
-<!--              {{ this.currentDocument.docStep[tab.stepNum - 1].checkedText }}-->
-<!--            </p>-->
+        <mat-tab-group  [(selectedIndex)]="currentStepIndex" >
+          <mat-tab class="font-mono" *ngFor="let tab of steps" [disabled]="disabledStep">
+            <ng-template mat-tab-label>
+              <mat-icon *ngIf="tab.checkedText === undefined" class="example-tab-icon">file_copy</mat-icon>
+              <mat-icon *ngIf="tab.checkedText === 'ERROR'" class="example-tab-icon">thumb_down</mat-icon>
+              <mat-icon *ngIf="tab.checkedText === 'SUCCESS'" class="example-tab-icon">thumb_up</mat-icon>
+              <span class="ml-1">{{ tab.stepName }}</span>
+            </ng-template>
           </mat-tab>
         </mat-tab-group>
       </div>
       <div class="h-10 w-full"></div>
 
       <ng-template #watch_field></ng-template>
-      <div class="w-full grid grid-cols-12 overflow-auto">
+      <div class="w-full grid grid-cols-12 overflow-auto pr-2">
         <div *ngFor="let item of cellRowList; let outCell = index " class="flex">
           <app-cell class="flex-auto" *ngFor="let i of cellInnerList; let innerCell = index"
                     [cellType]="cellType"
@@ -48,6 +52,9 @@
     <div class="w-[20%] ml-6 overflow-auto border-l border-color px-4 pt-2">
       <p *ngIf="commentText" class="text-gray-600 dark:text-gray-300 overflow-auto border-b border-color" >{{ commentText }}</p>
       <p *ngIf="checkedText" class="text-red-600 dark:text-gray-300 overflow-auto border-b border-color" >{{ checkedText }}</p>
+      <p *ngIf="!isDocumentRequiredFieldNotEmpty" class="text-red-600 dark:text-gray-300 overflow-auto border-b border-color" >
+        Документ не может быть отправлен на рассмотрение в банк. Не заполнены обязательные поля документа.
+      </p>
 
       <div class="text-red-500 text-xs dark:text-red-300 overflow-auto" *ngFor="let item of validationText">
         <span class="text-black">&bull;</span>{{ item }}</div>

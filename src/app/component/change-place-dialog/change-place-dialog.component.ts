@@ -45,7 +45,7 @@ const levelHardDataCodes: LevelHardDataCode[] = [
   {key: 8, placeHolder: "Выберите инфраструктуру ...", sort: "name,asc", serviceName: "addrobj",searchFieldName: "name"},
 
   {key: steadKey, placeHolder: "Выберите земельный участок ...", sort: "cNumber,asc", serviceName: "steads",searchFieldName: "cNumber"},
-  {key: houseKey, placeHolder: "Номер дома ...", sort: "domNum,asc", serviceName: "houses",searchFieldName: "domNum"},
+  {key: houseKey, placeHolder: "Номер дома ...", sort: "domNum,asc", serviceName: "houses",searchFieldName: "dom"},
   {key: roomKey, placeHolder: "Номер квартиры ...", sort: "", serviceName: "rooms",searchFieldName: "cNumber"},
   {key: apartmentKey, placeHolder: "Номер апартаментов ...", sort: "cNumber,asc", serviceName: "appartments",searchFieldName: "cNumber"},
   {key: carPlaceKey, placeHolder: "Номер машино места ...", sort: "", serviceName: "carplaces",searchFieldName: "cNumber"}

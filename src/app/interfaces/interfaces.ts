@@ -17,6 +17,7 @@ export interface UploadFile {
   name: string
   size: number
   status: string
+  progress?: number
 }
 
 export interface LoginPasswordProperties{

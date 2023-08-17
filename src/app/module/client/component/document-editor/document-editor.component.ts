@@ -45,6 +45,7 @@ import {TabService} from "../../../../services/tab.service";
 import {UploadComponent} from "../../../../component/dinamicComponent/upload/upload.component";
 import {AddressComponent} from "../../../../component/dinamicComponent/adress/address.component";
 import {SelectComponent} from "../../../../component/dinamicComponent/select/select.component";
+import {StepService} from "../../../../services/step.service";
 
 @Component({
   selector: 'app-document-editor',
@@ -106,13 +107,15 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   private _isStepRequiredFieldNotEmpty: boolean = false
 
   checkedText: string | undefined
+  disabledStep: boolean = false
 
 
   constructor(private componentService: ComponentService,
               private backService: BackendService,
               private messageService: MessageService,
               private tabService: TabService,
-              private changeDetection: ChangeDetectorRef) {
+              private changeDetection: ChangeDetectorRef,
+              private stepService: StepService) {
   }
 
   ngOnDestroy(): void {
@@ -180,6 +183,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         })
         this.isStepRequiredFieldNotEmpty = comp.checkedText.length < 1
       })
+      this.changeDetection.detectChanges()
     }
   }
 
@@ -240,12 +244,20 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         value: "NaN",
         checkedText: currentComponent.checkedText
       })
+      this.changeDetection.detectChanges()
     })
 
     this.cellColl = cellColl
     this.cellRowList = new Array(collInRow * cellRow).fill(null).map((_, i) => i + 1);
     this.cellInnerList = new Array(cellColl).fill(null).map((_, i) => i + 1);
     this.currentStepIndex = this.currentStepIndex
+
+    this.stepService.disabledAllStep$.subscribe({
+      next: value => {
+        this.disabledStep = value
+        this.changeDetection.detectChanges()
+      }
+    })
   }
 
   showComponentOnCurrentStep(stepNum: number) {
@@ -308,6 +320,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         this.setFirstComponent();
     })
     this.setFocusToFirstElement()
+    this.changeDetection.detectChanges()
   }
 
   private setFocusToFirstElement() {
@@ -439,11 +452,12 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     if (this.tabLabelNode) {
       if (!value) {
         this.tabLabelNode.style.cssText = 'color: red;'
+        this.currentDocument.docStep[this.currentStepIndex].checkedText = "ERROR"
       } else {
+        this.currentDocument.docStep[this.currentStepIndex].checkedText = "SUCCESS"
         this.tabLabelNode.style.cssText = 'color: #0E9F6E;'
       }
     }
-
     this._isStepRequiredFieldNotEmpty = value;
   }
 }
