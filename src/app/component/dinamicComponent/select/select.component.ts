@@ -51,7 +51,6 @@ export class SelectComponent implements IceComponent {
   enabled = true
   visible = true
 
-
   ngOnInit(): void {
     this.height = this.cellService.getClientCellHeight() * this.componentBound.heightScale
     this.width = this.cellService.getClientCellWidth() * this.componentBound.widthScale
@@ -115,7 +114,7 @@ export class SelectComponent implements IceComponent {
 
   set value(value: any) {
     if (value === undefined) {
-      this._value = this.placeHolder
+      this._value = -888888888888
       return
     }
     this._value = value;

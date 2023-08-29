@@ -4,7 +4,8 @@
          class="absolute z-10 flex justify-center items-center rounded-lg m-1" >
 
   <select class="w-full h-[98%] bg-white hover:border hover:border-primary-base dark:bg-slate-700 dark:text-white pl-2 rounded-lg"
-          [(ngModel)]="value" [disabled]="!enabled" [matTooltip]="checkedText" (click)="changeComponent()">
+          [(ngModel)]="value" [disabled]="!enabled" [matTooltip]="checkedText" (click)="changeComponent()" >
+    <option [value]="-888888888888" hidden>{{placeHolder}}</option>
     <option *ngFor="let item of optionList" [value]="item">{{ item }}</option>
   </select>
 

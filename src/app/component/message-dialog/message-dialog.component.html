@@ -5,11 +5,12 @@
     <div *ngIf="message.dialogType === 'INFO'" class="text-center text-primary-dark mt-2 text-xl">Информация</div>
 
     <mat-accordion>
-      <mat-expansion-panel>
+      <mat-expansion-panel hideToggle>
         <mat-expansion-panel-header>
           <mat-panel-title>
             <div class="text-center mt-4">{{ message.message }}</div>
           </mat-panel-title>
+           <mat-icon class="text-primary-dark mt-2">info</mat-icon>
         </mat-expansion-panel-header>
         <p>{{ message.hideMessage}}</p>
       </mat-expansion-panel>

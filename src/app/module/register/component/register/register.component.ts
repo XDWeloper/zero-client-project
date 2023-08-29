@@ -121,8 +121,10 @@ export class RegisterComponent implements OnDestroy {
       error: (err => {
         this.messageService.show(REGISTRATION_CONFIRM_ERROR, err.error.message, ERROR).subscribe({
           next: ((res:DialogButtonType) => {
-            this.pinResult = undefined
-            this.router.navigate([''])
+            if(err.error.status != 406){
+              this.pinResult = undefined
+              this.router.navigate([''])
+            }
           })
         })
       })
