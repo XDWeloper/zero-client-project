@@ -72,14 +72,14 @@
             "production": {
               "browserTarget": "first-client-project:build:production",
               "ssl": true,
-              "sslKey": "src/assets/ssl/icedev.pkcs8",
-              "sslCert": "src/assets/ssl/icedev.cer"
+              "sslKey": "src/assets/ssl/icebitsy.online.pkcs8",
+              "sslCert": "src/assets/ssl/icebitsy.online.cer"
             },
             "development": {
               "browserTarget": "first-client-project:build:development",
               "ssl": true,
-              "sslKey": "src/assets/ssl/icedev.pkcs8",
-              "sslCert": "src/assets/ssl/icedev.cer",
+              "sslKey": "src/assets/ssl/icebitsy.online.pkcs8",
+              "sslCert": "src/assets/ssl/icebitsy.online.cer",
               "host": "icedev.ru"
             }
           },

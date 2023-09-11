@@ -11,11 +11,11 @@ export const environment = {
 
 // export const environment = {
 //   production: true,
-//   resourceServerURL: 'https://icedev.ru:8765', // ссылка на корневой URL бэкенда
+//   resourceServerURL: 'https://icebitsy.online:8765', // ссылка на корневой URL бэкенда
 //   kcClientID: 'ice-cus-client', // из настроек KeyCloak
-//   kcBaseURL: 'https://icedev.ru:8443/realms/ice-cus/protocol/openid-connect',
-//   bffURI: 'https://icedev.ru:8902',
-//   redirectURI: 'https://icedev.ru'
+//   kcBaseURL: 'https://kk.icebitsy.online/realms/ice-cus/protocol/openid-connect',
+//   bffURI: 'https://icebitsy.online:8902',
+//   redirectURI: 'https://kk.icebitsy.online'
 // };
 
 // export const environment = {
