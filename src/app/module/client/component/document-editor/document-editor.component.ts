@@ -11,7 +11,7 @@ import {
   ViewChild,
   ViewContainerRef
 } from '@angular/core';
-import {ComponentMaket, IceComponent, IceDocument, IceStepMaket} from "../../../../interfaces/interfaces";
+import {ComponentMaket, IceComponent, IceDocument, IceStepMaket, OpenDocType} from "../../../../interfaces/interfaces";
 import {
   cellColl,
   cellRow,
@@ -60,6 +60,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   private createDocument$: Subscription;
   private updateDocument$: Subscription;
   private tabLabelNode: HTMLElement
+  private _openType: OpenDocType = "EDIT"
 
 
   @Input() set currentDocument(value: IceDocument | undefined) {
@@ -69,17 +70,26 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     this.validationText.splice(0, this.validationText.length)
 
     if (value != undefined) {
-      this.steps = value.docStep
+      this.steps = value.docStep.filter(i => i.visible)
       this.currentStepIndex = 0
-      //this.checkAllStepsToRule()
-    } else
+    } else {
       this.steps = []
+      this.openType = "EDIT"
+    }
     this.changeDetection.detectChanges()
   }
 
 
   @Input() set editDocId(value: number) {
     this._editDocId = value
+  }
+
+  @Input() set openType(value: OpenDocType){
+    this._openType = value
+  }
+
+  get openType(): OpenDocType {
+    return this._openType;
   }
 
   @ViewChild("watch_mainContainer", {static: false})
@@ -158,7 +168,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   set currentStepIndex(value: number) {
-    if (this._currentStepIndex != value)
+    this.commentText = ""
+    if (this._currentStepIndex != value && this.openType === "EDIT")
       this.saveDraft()
 
     this._currentStepIndex = value;
@@ -190,7 +201,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   checkAllStepsToRule() {
 
     if (this.currentDocument) {
-      let compList = this.currentDocument.docStep.map(i => i.componentMaket).flat(2)
+      let compList = this.currentDocument.docStep.filter(i => i.visible).map(i => i.componentMaket).flat(2)
       this.isDocumentRequiredFieldNotEmpty = true
       for (let i in compList){
         if(this.checkValidValue(compList[i]).length > 0){
@@ -316,6 +327,11 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       compInstance.checkedText = comp.checkedText
       compInstance.optionList = comp.optionList
 
+      if(this.openType === "EDIT")
+        compInstance.enabled = true
+      else
+        compInstance.enabled = false
+
       if (comp.componentType === IceComponentType.INPUT || comp.componentType === IceComponentType.AREA)
         this.setFirstComponent();
     })
@@ -328,7 +344,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       if (this.firstComponentRef) {
         let componentID = this.firstComponentRef.instance.componentID.toString()
         let elem = document.getElementById(componentID)
-        elem.focus()
+        if(elem)
+          elem.focus()
         this.componentService.selectedDocumentComponent$.next(this.firstComponentRef.instance)
       }
     }, 500)
@@ -349,8 +366,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
           docStep: res.docStep,
           status: "new"
         }
+        this.openType = "EDIT"
         // /**И сохраняем его сразу как черновик*/
-        // this.saveDraft()
+        this.saveDraft()
       }),
       error: (err => this.messageService.show(MAKET_LOAD_ERROR, err.error.message, ERROR))
     })

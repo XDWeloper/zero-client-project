@@ -103,7 +103,7 @@ export class DocumentComponent implements OnInit {
           respTree.forEach(maket => {
             let steps: StepTreeTempl[] = []
             maket.docStep.forEach(step => {
-              steps.push({num: step.stepNum, name: step.stepName, parentId: maket.id})
+              steps.push({num: step.stepNum, name: step.stepName, parentId: maket.id,visible: step.visible})
             })
             this.documentService.docTree.push({
               id: maket.id,
@@ -240,7 +240,8 @@ export class DocumentComponent implements OnInit {
     this.currentEditStep = {
       num: newStepNum,
       name: "Шаг " + newStepNum,
-      parentId: doc.id
+      parentId: doc.id,
+      visible: true
     }
 
     this.documentService.addStep(doc, this.currentEditStep)
@@ -252,27 +253,6 @@ export class DocumentComponent implements OnInit {
     this.currentEditStep = undefined
 
   }
-
-  // addStep(doc: DocumentTreeTempl) {
-  //   this.currentDocAndStep.next(
-  //     {
-  //       currentStepNum: undefined,
-  //       currentDocumentId: undefined
-  //     })
-  //
-  //   this.isModified = true
-  //   this.currentEditDoc = doc
-  //   this.currentEditStep = {
-  //     num: 0,
-  //     name: "",
-  //     parentId: doc.id
-  //   }
-  //   this.newStepName = "Шаг " + this.documentService.getNextStepNumber(doc)
-  //   this.documentService.addStep(doc, this.currentEditStep)
-  //   this.refreshTree()
-  //   this.currentDocument = this.documentService.getDocById(doc.id)
-  //   this.currentDocument.isModified = true
-  // }
 
   enterStep(stepHover: StepTreeTempl) {
     this.isModified = true
@@ -354,7 +334,7 @@ export class DocumentComponent implements OnInit {
               isActive: res.isActive,
               docName: res.docName,
               docStep: res.docStep,
-              isLoaded: true
+              isLoaded: true,
             })
         }),
       })
@@ -363,8 +343,11 @@ export class DocumentComponent implements OnInit {
 
   saveChanges() {
 
-    if (this.currentStep && this.currentDocument)
+    if (this.currentStep && this.currentDocument) {
+      let stepVisible = this.documentService.getStep(this.currentDocument.id, this.currentStep.num).visible
+      this.currentStep.visible = stepVisible
       this.documentService.addTemplate(this.currentDocument, this.currentStep, this.componentService.componentCollection)
+    }
 
     this.documentService.getDocumentMaketList().filter(p => p.isModified).forEach(m => {
       let modifyedMaket = this.documentService.getTemplateByDocId(m.id)

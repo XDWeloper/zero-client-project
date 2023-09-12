@@ -10,7 +10,7 @@ import {
 import {MatPaginator, PageEvent} from "@angular/material/paginator";
 import {MatSort} from "@angular/material/sort";
 import {BackendService} from "../../../../services/backend.service";
-import {IceDocument} from "../../../../interfaces/interfaces";
+import {IceDocument, OpenDocType} from "../../../../interfaces/interfaces";
 import {
   dialogCloseAnimationDuration,
   dialogOpenAnimationDuration,
@@ -55,7 +55,7 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
   @ViewChild(MatSort) sort: MatSort;
 
   @Output()
-  openDocId = new EventEmitter<number>()
+  openDocId = new EventEmitter<{"rowId": number, "openType": OpenDocType}>()
   step: number;
   filterExpanded = false
   docName: string
@@ -124,7 +124,7 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
   }
 
   editDoc(row: IceDocument) {
-    this.openDocId.next(row.id)
+    this.openDocId.next({rowId: row.id,openType: "EDIT"})
   }
 
   onInfoClick(statusText: string) {
@@ -180,4 +180,7 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
   }
 
 
+  showDoc(row: IceDocument) {
+    this.openDocId.next({rowId: row.id,openType: "VIEW"})
+  }
 }

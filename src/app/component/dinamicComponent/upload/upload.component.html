@@ -5,7 +5,7 @@
 
   <div class="w-full h-[40%] border-b border-b-gray-500">
     <input id="fileDropRef" class="absolute top-0 left-0 opacity-0 w-full h-[40%]" type="file" multiple
-           (change)="getFile($event)" [disabled]="isUpload">
+           (change)="getFile($event)" [disabled]="isUpload || !enabled">
     <div class="w-full flex justify-center item-center">
       <mat-icon class="text-blue-500 scale-[2.0] mt-2 opacity-50 ">cloud_upload</mat-icon>
     </div>

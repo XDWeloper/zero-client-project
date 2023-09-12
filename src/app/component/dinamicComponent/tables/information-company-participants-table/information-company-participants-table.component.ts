@@ -48,6 +48,9 @@ export class InformationCompanyParticipantsTableComponent implements IceComponen
   left: any;
 
   tableData: TableRow[] = new Array()
+  enabled = true
+  visible = true
+
 
   constructor(private cellService: CellService, private componentService: ComponentService) {
   }

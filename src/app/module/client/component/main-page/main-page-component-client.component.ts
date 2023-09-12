@@ -3,7 +3,7 @@ import {User} from "../../../../model/User";
 import {DOCUMENT_LOAD_ERROR, ERROR, TAB_DOCUMENT_SHOW} from "../../../../constants";
 import {MessageService} from "../../../../services/message.service";
 import {BackendService} from "../../../../services/backend.service";
-import {IceDocument} from "../../../../interfaces/interfaces";
+import {IceDocument, OpenDocType} from "../../../../interfaces/interfaces";
 import {DocumentEditorComponent} from "../document-editor/document-editor.component";
 import {TabService} from "../../../../services/tab.service";
 import {Subscription} from "rxjs";
@@ -25,6 +25,7 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
   onTabChanged$: Subscription
   requestUserProfile$: Subscription
   getDocumentFull$: Subscription
+  openDocType: OpenDocType
 
   @ViewChild(DocumentEditorComponent) editorComponent: DocumentEditorComponent;
 
@@ -65,9 +66,10 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
   }
 
-  openDoc(doc: number) {
-    this.changeDocId = doc
-    this.loadDocumentForEdit(doc)
+  openDoc(doc: {"rowId": number, "openType": OpenDocType}) {
+    this.openDocType = doc.openType
+    this.changeDocId = doc.rowId
+    this.loadDocumentForEdit(doc.rowId)
   }
 
   loadDocumentForEdit(id: number){

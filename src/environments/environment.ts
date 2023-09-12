@@ -20,8 +20,8 @@ export const environment = {
   production: true,
   resourceServerURL: 'https://icebitsy.online:8765', // ссылка на корневой URL бэкенда
   kcClientID: 'ice-cus-client', // из настроек KeyCloak
-  kcBaseURL: 'https://icebitsy.online/realms/ice-cus/protocol/openid-connect',
+  kcBaseURL: 'https://icebitsy.online:8443/realms/ice-cus/protocol/openid-connect',
   bffURI: 'https://icebitsy.online:8902',
-  redirectURI: 'https://icebitsy.online'
+  redirectURI: 'https://icebitsy.online:4200'
 };
 

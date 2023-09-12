@@ -157,7 +157,7 @@ export class UploadComponent implements IceComponent, OnDestroy {
       let value = item.value
       if (componentId === this.componentID || value === undefined) return
 
-      if (this.masterControlList) {
+      if (this.masterControlList && this.masterControlList.length > 0) {
         let control: ControlPropType = this.masterControlList.filter(c => c.componentID === componentId).find(c => c.componentValue === value).controlProp
         switch (control.toString()) {
           case "DISABLED":

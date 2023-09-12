@@ -94,6 +94,10 @@
           <mat-icon class="text-green-500 cursor-pointer" matTooltip="Редактировать" (click)="editDoc(row)">edit</mat-icon>
           <mat-icon class="text-red-500 ml-4 cursor-pointer" matTooltip="Удалить" (click)="removeDoc(row.id)">delete</mat-icon>
         </div>
+        <div *ngIf="row.status === 'PREPARED' || row.status === 'SENDING' || row.status === 'PROCESSING' || row.status === 'ACCEPTED' || row.status === 'REJECTED'" class=" w-full h-full flex justify-center">
+          <mat-icon class="text-primary-dark cursor-pointer" matTooltip="Просмотр" (click)="showDoc(row)">remove_red_eye</mat-icon>
+        </div>
+
       </td>
     </ng-container>
 

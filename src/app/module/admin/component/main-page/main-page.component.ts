@@ -200,7 +200,6 @@ export class MainPageComponent implements OnInit, OnDestroy {
       this.componentRef.instance.tableType = compMaket.tableType
       this.componentRef.instance.frameColor = compMaket.frameColor
       this.componentRef.instance.notification = compMaket.notification
-
       this.componentRef.instance.minLength = compMaket.minLength
       this.componentRef.instance.maxLength = compMaket.maxLength
       this.componentRef.instance.regExp = compMaket.regExp
@@ -262,16 +261,18 @@ export class MainPageComponent implements OnInit, OnDestroy {
     switch ($event){
       case 'clear' :
         this.componentService.clearComponentList();
-        this._modify = true
+        this.modify = true
         break;
-      case 'save' :
+      case 'changed' :
         this.pushCurrentPage();
         //this.documentService.saveTemplate() ;
+        this.modify = true
         break;
       case 'watch' :
         this.pushCurrentPage();
         this.openWatchDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration)
         break;
+
     }
   }
 
@@ -328,6 +329,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
   }
 
   setCurrentDocAndStep(docAndStep: any) {
+
     this.componentService.selectedComponent$.next(undefined)
     this.pushCurrentPage();
 
@@ -337,9 +339,12 @@ export class MainPageComponent implements OnInit, OnDestroy {
     if(this.currentDoc !== undefined)
       this.currentStep = this.currentDoc.children.find(p => p.num === docAndStep.currentStepNum)
 
+    console.log(this.currentStep)
+
     if(this.currentDoc && this.currentStep) {
       this.transEnd()
       this.restoreComponents(this.documentService.getComponentCollections(this.currentDoc, this.currentStep))
+      this.currentStep.visible = this.documentService.getTemplateByDocId(this.currentDoc.id).docStep.find(s => s.stepNum === this.currentStep.num).visible
     }
   }
 
@@ -347,7 +352,6 @@ export class MainPageComponent implements OnInit, OnDestroy {
     if(componentCollections.length < 1) return
     componentCollections.forEach(c => {
       this.createComponent(c.componentType.toString(),c)
-      //this.cellService.getCell(c.cellNumber).resetPosition()
     })
   }
 

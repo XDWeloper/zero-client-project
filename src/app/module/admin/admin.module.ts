@@ -29,6 +29,7 @@ import { ChangeTableComponent } from './component/change-table/change-table.comp
 import { MasterControlPropComponent } from './component/master-control-prop/master-control-prop.component';
 import {MatSelectModule} from "@angular/material/select";
 import { OptionListComponent } from './component/option-list/option-list.component';
+import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 
 
 
@@ -71,6 +72,7 @@ import { OptionListComponent } from './component/option-list/option-list.compone
         MatDividerModule,
         MatButtonToggleModule,
         MatSelectModule,
+        MatSlideToggleModule,
     ]
 
 })

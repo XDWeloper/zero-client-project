@@ -2,13 +2,13 @@
 <div #watch_mainContainer>
   <div
     class="w-full mt-2 border-t border-b border-color flex items-center h-10 p-1 bg-primary-dark dark:bg-dark-background rounded-lg border border-gray-200" >
-    <button matTooltip="Очистить" class="toolBar-button-style">
+    <button *ngIf="openType === 'EDIT'" matTooltip="Очистить" class="toolBar-button-style">
       <mat-icon class="text-red-300 font-bold">clear</mat-icon>
     </button>
-    <button matTooltip="Сохранить как черновик" (click)="saveDoc('DRAFT', 1)" class="toolBar-button-style">
+    <button *ngIf="openType === 'EDIT'" matTooltip="Сохранить как черновик" (click)="saveDoc('DRAFT', 1)" class="toolBar-button-style">
       <mat-icon class="text-sky-300 font-bold">hourglass_empty</mat-icon>
     </button>
-    <button *ngIf="isDocumentRequiredFieldNotEmpty" (click)="saveDoc('SENDING', 1)" matTooltip="Отправить на рассмотрение" class="toolBar-button-style">
+    <button *ngIf="isDocumentRequiredFieldNotEmpty && openType === 'EDIT'" (click)="saveDoc('SENDING', 1)" matTooltip="Отправить на рассмотрение" class="toolBar-button-style">
       <mat-icon class="text-yellow-300 font-bold">check_circle_outline</mat-icon>
     </button>
     <button (click)="currentDocument = undefined" matTooltip="Другой документ" class="toolBar-button-style">

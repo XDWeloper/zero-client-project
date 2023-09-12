@@ -100,7 +100,8 @@ export class DocumentService {
     let newStep: IceStepMaket = {
       stepNum: step.num,
       stepName: step.name,
-      componentMaket: compList
+      componentMaket: compList,
+      visible: step.visible
     }
 
 
@@ -121,6 +122,7 @@ export class DocumentService {
       } else { //Правим существующий
         isStepPresent.stepName = step.name
         isStepPresent.componentMaket = compList
+        isStepPresent.visible = step.visible
       }
     }
   }

@@ -57,6 +57,7 @@ export interface MessageDialog {
 export type DialogButtonType = "YES" | "CANCEL" | "NO" | "CLOSE"
 export type DialogType = "ERROR" | "INFO"
 export type OtpType = "REGISTRATION" | "RESET_PASSWORD"
+export type OpenDocType = "EDIT" | "VIEW"
 
 
 export interface ComponentChangeValue{
@@ -97,6 +98,7 @@ export interface StepTreeTempl {
   parentId: number
   num: number
   name: string
+  visible?: boolean
 }
 
 export interface ResponseTree {
@@ -110,6 +112,7 @@ export interface ResponseTreeStep {
   stepNum: number
   stepName: string
   componentMaket: ComponentMaket[]
+  visible?: boolean
 }
 
 
@@ -150,6 +153,8 @@ export interface ComponentMaket {
   masterControlList: MasterControl[]
   checkedText?: string | undefined
   optionList?: string[] | undefined
+  enabled?: boolean
+  visible?: boolean
 }
 
 export interface IceStepMaket {
@@ -157,6 +162,7 @@ export interface IceStepMaket {
   stepName: string
   componentMaket: ComponentMaket[]
   checkedText?: string | undefined
+  visible?: boolean
 }
 
 
@@ -193,6 +199,8 @@ export interface IceComponent {
   masterControlList: MasterControl[]
   checkedText?: string | undefined
   optionList?: string[] | undefined
+  enabled?: boolean
+  visible?: boolean
 }
 
 export class MasterControl{

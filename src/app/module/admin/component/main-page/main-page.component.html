@@ -31,6 +31,7 @@
       <as-split-area [size]="100 - docPanelCurrentSize - propPanelCurrentSize"
                      class="bg-gray-200 dark:bg-dark-background duration-300">
         <app-admin-tool-bar [ngClass]="currentDoc && currentStep ? 'visible' : 'invisible'"
+                            [currentStep]="currentStep"
                             (clickButton)="toolBarButtonClick($event)"></app-admin-tool-bar>
         <div class="h-8">
           <div *ngIf="currentDoc && currentStep"

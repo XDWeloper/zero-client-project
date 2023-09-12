@@ -75,7 +75,7 @@ export class TextComponent implements OnInit, IceComponent, OnDestroy {
       let value = item.value
       if (componentId === this.componentID || value === undefined) return
 
-      if (this.masterControlList) {
+      if (this.masterControlList && this.masterControlList.length > 0) {
         let list = this.masterControlList.filter(c => c.componentID === componentId)
         let control: ControlPropType = undefined
         if(list.length > 0)

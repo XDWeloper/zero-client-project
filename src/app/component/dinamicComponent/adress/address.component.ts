@@ -88,7 +88,7 @@ export class AddressComponent implements IceComponent, OnDestroy {
 
       if (componentId === this.componentID || value === undefined) return
 
-      if (this.masterControlList) {
+      if (this.masterControlList && this.masterControlList.length > 0) {
         let list = this.masterControlList.filter(c => c.componentID === componentId)
         let control: ControlPropType = undefined
         if (list.length > 0)
