@@ -1,7 +1,7 @@
 <div class="relative h-10 w-full min-w-[200px] mt-4">
   <div class = "">
     <input [type]="show ? inputType : 'text'" [(ngModel)]="localValue" [title]="toolTip"
-           [mask]="inputType === 'phone' ? '(000) 000-0000': ''" [prefix]="inputType === 'phone' ? '+7' : ''" [showMaskTyped]="inputType === 'phone'" placeHolderCharacter="*"
+           [mask]="inputType === 'phone' ? '(000) 000-0000': ''" [prefix]="inputType === 'phone' ? '7' : ''" [showMaskTyped]="inputType === 'phone'" placeHolderCharacter="*"
            class="peer h-full w-full rounded-[7px] border border-gray-200 border-t-transparent bg-transparent px-3 py-2.5
            font-sans text-sm font-normal text-gray-700 outline outline-0 transition-all placeholder-shown:border
            placeholder-shown:border-gray-200 placeholder-shown:border-t-gray-200 focus:border-2 focus:border-primary-base

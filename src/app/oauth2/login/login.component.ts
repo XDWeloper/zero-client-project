@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {ActivatedRoute, Router} from '@angular/router';
 import {environment} from '../../../environments/environment';
+import {TimeService} from "../../services/time.service";
 
 /*
 
@@ -21,7 +22,8 @@ export class LoginComponent implements OnInit {
   constructor(
     private router: Router, // навигация
     private activatedRoute: ActivatedRoute, // текущий роут, который применился
-    private http: HttpClient // http запросы
+    private http: HttpClient, // http запросы
+    private timeService: TimeService
   ) {
   }
 
@@ -50,6 +52,7 @@ export class LoginComponent implements OnInit {
 
         // запрос на BBF, который обменяет code на токены
         // в Response от BFF будут добавлены токены (заголовок Set-Cookie), которые запишутся в куки браузера
+        console.log("code:", code)
         this.requestTokens(code, state);
 
         return; // обязательно выходим из метода, чтобы не выполнялся дальнейший код
@@ -119,17 +122,16 @@ export class LoginComponent implements OnInit {
       }
     }).subscribe({
       next: ((response: any) => {
-
         // если запрос на получение токенов в BFF выполнился успешно -
         // значит токены будут сохранены в безопасные куки и будут автоматически
         // отправляться с каждым запросом на BFF
-
         // и можно переходить на страницу для запроса данных
-
         this.router.navigate(['main']);
       }),
 
       error: (error => {
+        this.timeService.isRefreshToken = false
+        this.timeService.isLogout = false
         console.log("ошибка получения токена",error)
       })
     });

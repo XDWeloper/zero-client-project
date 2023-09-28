@@ -28,6 +28,9 @@
       <option value="color">цвет</option>
     </select>
 
+    <p class="col-span-2">Ссылка:</p>
+    <input *ngIf="currentComponent.componentType === 'text'" class="col-span-10 w-[92%] rounded-md dark:bg-slate-700" type="text" [(ngModel)]="currentComponent.inputType">
+
     <div *ngIf="currentComponent.inputType === 'text' || currentComponent.componentType === 'area'"
          class="col-span-12 w-[95%] rounded-md border border-primary-light relative">
       <p class=" text-center">Ограничения текста</p>

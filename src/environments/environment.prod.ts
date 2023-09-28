@@ -4,9 +4,9 @@ export const environment = {
   production: true,
   resourceServerURL: 'https://zeroclient.cmrbank.ru:8765', // ссылка на корневой URL бэкенда
   kcClientID: 'ice-cus-client', // из настроек KeyCloak
+  //kcBaseURL: 'https://kk.cmrbank.ru/realms/ice-cus/protocol/openid-connect',
   kcBaseURL: 'https://zero.cmrbank.ru/realms/ice-cus/protocol/openid-connect',
-  //kcBaseURL: 'https://zeroclient.cmrbank.ru:8443/realms/ice-cus/protocol/openid-connect',
-  bffURI: 'https://zeroclient.cmrbank.ru:8902',
+  bffURI: 'https://zeroclient.cmrbank.ru',
   redirectURI: 'https://zeroclient.cmrbank.ru'
 };
 

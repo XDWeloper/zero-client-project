@@ -13,6 +13,7 @@ export class TimeService {
   inter: Subscription
   isBlocked = false
   isRefreshToken = true
+  isLogout = true
 
   constructor(private keyCloakService: KeycloakService, private router: Router) {
   }
@@ -32,7 +33,7 @@ export class TimeService {
     this.inter = interval(10_000).subscribe((r) => {
       let newTime = new Date().getTime()
         //console.log(fiveMin - (newTime - this.lastRequestTime))
-      if (newTime - this.lastRequestTime > fiveMin) {
+      if (newTime - this.lastRequestTime > fiveMin && this.isLogout) {
         this.keyCloakService.logoutAction().subscribe({
           next: value => {},
           error: err => {},
