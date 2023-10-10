@@ -28,12 +28,12 @@ export class MainScreenComponent implements OnInit {
 
           localStorage.setItem("user", JSON.stringify(res))
           let adminRole = res.roles.findIndex(r => r === "ROLE_admin")
-          let userRole = res.roles.findIndex(r => r === "ROLE_operator")
-          let operRole = res.roles.findIndex(r => r === "ROLE_user")
+          let operRole = res.roles.findIndex(r => r === "ROLE_operator")
+          let userRole = res.roles.findIndex(r => r === "ROLE_user")
 
           if (adminRole !== -1) this.router.navigate(["/admin"])
           else if (userRole !== -1) this.router.navigate(["/client"])
-          else if (operRole !== -1) this.router.navigate(["/client"])
+          else if (operRole !== -1) this.router.navigate(["/operator"])
 
         }),
         error: (err => {//Нужно сделать сообщение, что что-то не так и скинуть на логин

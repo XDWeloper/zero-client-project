@@ -339,8 +339,6 @@ export class MainPageComponent implements OnInit, OnDestroy {
     if(this.currentDoc !== undefined)
       this.currentStep = this.currentDoc.children.find(p => p.num === docAndStep.currentStepNum)
 
-    console.log(this.currentStep)
-
     if(this.currentDoc && this.currentStep) {
       this.transEnd()
       this.restoreComponents(this.documentService.getComponentCollections(this.currentDoc, this.currentStep))

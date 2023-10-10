@@ -14,6 +14,8 @@ export class DocStatusPipe implements PipeTransform {
         break;
       case "SENDING": retStr = "Отправлен в банк"
         break;
+      case "CONTROL": retStr = "Предварительный контроль"
+        break;
       case "PROCESSING": retStr = "На рассмотрении"
         break;
       case "INCORRECT": retStr = "Требует корректировки"

@@ -52,7 +52,6 @@ export class LoginComponent implements OnInit {
 
         // запрос на BBF, который обменяет code на токены
         // в Response от BFF будут добавлены токены (заголовок Set-Cookie), которые запишутся в куки браузера
-        console.log("code:", code)
         this.requestTokens(code, state);
 
         return; // обязательно выходим из метода, чтобы не выполнялся дальнейший код

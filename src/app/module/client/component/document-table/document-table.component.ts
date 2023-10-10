@@ -100,7 +100,7 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
             this.docName,
             this.createDate,
             this.docStatus
-          ).pipe(catchError(() => observableOf(null)));
+          )//.pipe(catchError(() => observableOf(null)));
         }),
         map(data => {
           if (data === null) {

@@ -1,6 +1,7 @@
 import {Component, EventEmitter, Inject, OnInit, Output} from '@angular/core';
 import {MAT_DIALOG_DATA} from "@angular/material/dialog";
 import {editorConfig} from "../../../../constants";
+import {AngularEditorConfig} from "@kolkov/angular-editor";
 
 @Component({
   selector: 'app-edit-text',
@@ -8,7 +9,7 @@ import {editorConfig} from "../../../../constants";
 })
 export class EditTextComponent {
 
-  editorConfig: any;
+  editorConfig: AngularEditorConfig;
   private _htmlContent: string
   private _startValue: string
 

@@ -61,7 +61,7 @@ export enum CellType {
   client = "client"
 }
 
-export type DocStat = "DRAFT" | "PREPARED" | "SENDING" | "PROCESSING" | "INCORRECT" | "ACCEPTED" | "REJECTED"
+export type DocStat = "DRAFT" | "PREPARED" | "SENDING" | "PROCESSING" | "INCORRECT" | "ACCEPTED" | "REJECTED" | "CONTROL"
 
 
 export const collInRow = 12             /**Всегда 12 колонок в строке это константа не менять!!!! */
