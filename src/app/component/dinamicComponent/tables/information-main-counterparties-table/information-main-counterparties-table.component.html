@@ -30,7 +30,7 @@
   </div>
 
   <!--  Кнопки управления-->
-  <div class="flex justify-start items-center border bg-primary-light/50" [style.border-color]="frameColor" *ngIf="enabled">
+  <div class="flex justify-start items-center border bg-primary-dark" [style.border-color]="frameColor" *ngIf="enabled">
     <mat-icon class="text-green-500 cursor-pointer" matTooltip="Добавить строку" (click)="addRow()">add</mat-icon>
     <mat-icon class="text-red-500 cursor-pointer" matTooltip="Удалить строку" (click)="removeRow()">remove</mat-icon>
     <mat-icon class="text-red-500 cursor-pointer" matTooltip="Очистить таблицу" (click)="clearTable()">close</mat-icon>

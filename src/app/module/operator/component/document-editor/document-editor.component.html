@@ -1,38 +1,24 @@
-<div #watch_mainContainer xmlns="http://www.w3.org/1999/html">
+
+<div #watch_mainContainer>
   <div
     class="w-full mt-2 border-t border-b border-color flex items-center h-10 p-1 bg-primary-dark dark:bg-dark-background rounded-lg border border-gray-200" >
-
-    <button *ngIf="openType === 'EDIT'" matTooltip="Очистить" (click)="clearStep()" class="toolBar-button-style">
-      <mat-icon class="text-red-300 font-bold">clear</mat-icon>
-      Очистить
-    </button>
-
-    <button *ngIf="openType === 'EDIT'" matTooltip="Сохранить как черновик" (click)="saveDoc('DRAFT', 1)" class="toolBar-button-style">
-      <mat-icon class="text-sky-300 font-bold">hourglass_empty</mat-icon>
-      Сохранить
-    </button>
-
-    <button *ngIf="currentDocument && currentDocument.status === 'DRAFT'" (click)="currentDocument = undefined" matTooltip="Другой документ" class="toolBar-button-style">
-      <mat-icon class="text-emerald-300 font-bold">sort</mat-icon>
-      <span class="ml-1">Новый</span>
-    </button>
-
-    <button *ngIf="isDocumentRequiredFieldNotEmpty && openType === 'EDIT'" (click)="saveDoc('CONTROL', 1)" matTooltip="Отправить на рассмотрение" class="toolBar-button-style">
-      <mat-icon class="text-yellow-300 font-bold">check_circle_outline</mat-icon>
-      <span class="ml-1">Отправить</span>
-    </button>
-
-    <button *ngIf="currentDocument && currentDocument.status === 'AGREE'" (click)="changeStatusWithReason('DRAFT')" matTooltip="Вернуть документ для корректировки данных" class="toolBar-button-style">
-      <mat-icon class="text-red-300 font-bold">arrow_back</mat-icon>
-      <span class="ml-1">Отмена</span>
-    </button>
-
-    <button *ngIf="currentDocument && currentDocument.status === 'AGREE'" (click)="changeStatus('SENDING', '')" matTooltip="Подтвердить корректность данных" class="toolBar-button-style">
+    <button *ngIf="isDocumentRequiredFieldNotEmpty && openType === 'EDIT'" matTooltip="Отправить клиенту на подтверждение"
+            (click)="updateDoc('AGREE')" class="toolBar-button-style">
       <mat-icon class="text-green-500 font-bold">check</mat-icon>
-      <span class="ml-1">Подтвердить</span>
+      <span class="ml-1">Заполнено</span>
+    </button>
+    <button *ngIf="currentDocument && currentDocument.status ==='CONTROL'" (click)="changeStatusWithReason('INCORRECT')" matTooltip="Вернуть клиенту для корректировки" class="toolBar-button-style">
+      <mat-icon class="text-red-300 font-bold">arrow_back</mat-icon>
+      <span class="ml-1">Не корректно</span>
     </button>
 
-    <div *ngIf="openType === 'VIEW'" class="w-full text-center text-gray-200 font-semibold">Просмотр документа</div>
+    <button *ngIf="currentDocument && currentDocument.status ==='CONTROL'" (click)="changeStatusWithReason('REJECTED')" matTooltip="Отвергнуто" class="toolBar-button-style">
+      <mat-icon class="text-red-300 font-bold">block</mat-icon>
+      <span class="ml-1">Отвергнуть</span>
+    </button>
+    <div *ngIf="openType === 'VIEW' && (currentDocument && currentDocument.status !='CONTROL')" class="w-full text-center text-gray-200 font-semibold">
+      Просмотр документа ({{ currentDocument.status | docStatus }})
+    </div>
   </div>
 
   <div class="flex justify-between w-full">
@@ -90,7 +76,4 @@
 
 </div>
 
-<div *ngIf="!currentDocument && isOpenedTab" class=" absolute top-0 left-0 w-full h-full flex justify-center items-center">
-  <app-maket-list (selectedMaket)="loadDocMaket($event)" class="mat-elevation-z8"></app-maket-list>
-</div>
 

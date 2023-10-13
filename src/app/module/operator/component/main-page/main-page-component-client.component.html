@@ -18,19 +18,12 @@
           <mat-tab >
             <ng-template mat-tab-label >
               <mat-icon >assignment</mat-icon>
-              Документы пользователя
+              Документы пользователей
             </ng-template>
             <app-document-table (openDocId)="openDoc($event)"></app-document-table>
           </mat-tab>
-
-      <mat-tab>
-        <div *ngIf="openDocType != 'VIEW'">
-          <ng-template mat-tab-label>
-            <mat-icon>border_color</mat-icon>
-            Создать документ
-          </ng-template>
-        </div>
-        <app-document-editor [currentDocument]="openedDocument" [openType]="openDocType" [isOpenedTab] = tabDone></app-document-editor>
+      <mat-tab [disabled]="true">
+        <app-document-editor [currentDocument]="openedDocument" [openType]="openDocType"></app-document-editor>
       </mat-tab>
     </mat-tab-group>
   </div>

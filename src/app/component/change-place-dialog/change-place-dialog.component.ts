@@ -103,9 +103,6 @@ export class ChangePlaceDialogComponent {
         tap((v) => this.searching = true),
         debounceTime(300),
         switchMap(search => {
-          console.log(search)
-          console.log(levelClass.levelNum)
-
           let level = levelClass.levelNum < steadKey ? levelClass.levelNum : null
           return this.addressService.searchRegionForName(search, level, levelClass.levelSorting, levelClass.parentObjId,levelClass.levelServiceName,levelClass.levelSearchFieldName)
         }),

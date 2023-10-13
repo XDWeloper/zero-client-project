@@ -16,13 +16,16 @@ import {ComponentMaket, IceComponent, IceDocument, IceStepMaket, OpenDocType} fr
 import {
   cellColl,
   cellRow,
-  CellType, CHANGE_STATUS_ERROR, CHANGE_STATUS_TO_DRAFT, CHANGE_STATUS_TO_SENDING,
-  collInRow, dialogCloseAnimationDuration, dialogOpenAnimationDuration,
+  CellType,
+  CHANGE_STATUS_ERROR,
+  CHANGE_STATUS_TO_AGREE,
+  CHANGE_STATUS_TO_INCORRECT,
+  CHANGE_STATUS_TO_REJECT,
+  collInRow,
+  dialogCloseAnimationDuration,
+  dialogOpenAnimationDuration,
   DocStat,
-  DOCUMENT_DRAFT_SAVED,
   DOCUMENT_SAVE_ERROR,
-  DOCUMENT_SEND,
-  DRAFT_SAVE_ERROR,
   ERROR,
   IceComponentType,
   INFO,
@@ -47,8 +50,8 @@ import {UploadComponent} from "../../../../component/dinamicComponent/upload/upl
 import {AddressComponent} from "../../../../component/dinamicComponent/adress/address.component";
 import {SelectComponent} from "../../../../component/dinamicComponent/select/select.component";
 import {StepService} from "../../../../services/step.service";
-import {StatusReasonComponent} from "../../../../component/status-reason/status-reason.component";
 import {MatDialog} from "@angular/material/dialog";
+import {StatusReasonComponent} from "../../../../component/status-reason/status-reason.component";
 
 @Component({
   selector: 'app-document-editor',
@@ -64,15 +67,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   private updateDocument$: Subscription;
   private tabLabelNode: HTMLElement
   private _openType: OpenDocType = "EDIT"
-  private _isOpenedTab: boolean = false
+  $reason: Observable<string> = new Observable<string>()
 
-  @Input() set isOpenedTab(value: boolean){
-    this._isOpenedTab = value
-  }
-
-  get isOpenedTab(): boolean{
-    return this._isOpenedTab
-  }
 
   @Input() set currentDocument(value: IceDocument | undefined) {
     this._currentDocument = value;
@@ -81,18 +77,14 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     this.validationText.splice(0, this.validationText.length)
 
     if (value != undefined) {
-      if(value.status === "INCORRECT") {
-        this.changeStatus("DRAFT", "")
-      }
-
-      this.steps = value.docStep.filter(i => i.visible)
+      this.steps = value.docStep
       this.currentStepIndex = 0
     } else {
-      if(this.itemsField)
+      if (this.itemsField)
         this.itemsField.clear()
       this.steps = []
     }
-    //this.changeDetection.detectChanges()
+    this.changeDetection.detectChanges()
   }
 
 
@@ -100,7 +92,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     this._editDocId = value
   }
 
-  @Input() set openType(value: OpenDocType){
+  @Input() set openType(value: OpenDocType) {
     this._openType = value
   }
 
@@ -134,8 +126,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   checkedText: string | undefined
   disabledStep: boolean = false
-  isReasonAsk: boolean = false
-  $reason: Observable<string> = new Observable<string>()
+
 
   constructor(private componentService: ComponentService,
               private backService: BackendService,
@@ -186,30 +177,28 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   set currentStepIndex(value: number) {
-    if (!this.currentDocument) return
-
     this.commentText = ""
     this.checkedText = ""
     this.validatonTextClear()
 
-
-    if (this._currentStepIndex != value && this.openType === "EDIT") {
-      this.saveDoc(this.currentDocument.status, 0)
-    }
+    if (this._currentStepIndex != value && this.openType === "EDIT")
+      this.saveControl()
 
     this._currentStepIndex = value;
 
     if (this.itemsField)
       this.itemsField.clear()
 
-    this.showComponentOnCurrentStep(this._currentStepIndex + 1)
-
-    this.checkStepComponent();
-    this.checkRequiredOnCurrentStep()
+    if (this.currentDocument) {
+      this.showComponentOnCurrentStep(this._currentStepIndex + 1)
+    }
+    if (this.openType === "EDIT") {
+      this.checkStepComponent()
+      this.checkRequiredOnCurrentStep()
+    }
   }
 
   private checkStepComponent() {
-    if(this.openType != "EDIT") return
     if (this.currentDocument) {
       this.steps[this.currentStepIndex].componentMaket.filter(c => c.componentType != IceComponentType.TEXT).forEach(comp => {
         comp.checkedText = this.checkValidValue(comp)
@@ -218,10 +207,10 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
           value: "NaN",
           checkedText: comp.checkedText
         })
-        if(comp.checkedText.length > 0) {
+        if (comp.checkedText.length > 0) {
           this.isStepRequiredFieldNotEmpty = false
         }
-       })
+      })
 
       this.changeDetection.detectChanges()
     }
@@ -229,10 +218,10 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   checkAllStepsToRule() {
     if (this.currentDocument) {
-      let compList = this.currentDocument.docStep.filter(i => i.visible).map(i => i.componentMaket).flat(2)
+      let compList = this.currentDocument.docStep.map(i => i.componentMaket).flat(2)
       this.isDocumentRequiredFieldNotEmpty = true
-      for (let i in compList){
-        if(this.checkValidValue(compList[i]).length > 0){
+      for (let i in compList) {
+        if (this.checkValidValue(compList[i]).length > 0) {
           this.isDocumentRequiredFieldNotEmpty = false
           break
         }
@@ -241,8 +230,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
 
-
   setValidationText(component: IceComponent) {
+    if (this.openType === "VIEW") return
     this.validatonTextClear()
     if (component.minLength)
       this.validationText.push("Минимальная длина текста: " + component.minLength)
@@ -256,7 +245,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     //   this.validationText.push("Значение данного поля должно соответствовать маске: " + component.regExp)
   }
 
-  validatonTextClear(){
+  validatonTextClear() {
     this.validationText.splice(0, this.validationText.length)
   }
 
@@ -273,13 +262,12 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       debounceTime(500),
     ).subscribe(item => {
       let currentComponent = this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === item.componentId)
-      //let currentComponent = this.currentDocument.docStep[this.currentStepIndex].componentMaket.find(c => c.componentID === item.componentId)
       currentComponent.value = item.value
-      if(currentComponent.componentType === "upload"){//Если идет изменение загруженных файлов нужно сразу сохранять
-        this.saveDoc(this.currentDocument.status, 0)
+      if (currentComponent.componentType === "upload") {//Если идет изменение загруженных файлов нужно сразу сохранять
+        this.saveControl()
       }
 
-      if(this.openType === "EDIT") {
+      if (this.openType === "EDIT") {
         currentComponent.checkedText = this.checkValidValue(currentComponent)
         this.checkAllStepsToRule()
         this.checkRequiredOnCurrentStep()
@@ -307,15 +295,14 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     })
   }
 
-  checkRequiredOnCurrentStep(){
-    if(this.openType != "EDIT") return
-    if(this.steps.length > 0)
+  checkRequiredOnCurrentStep() {
+    if (this.steps.length > 0)
       this.isStepRequiredFieldNotEmpty = this.steps[this.currentStepIndex].componentMaket.filter(i => i.checkedText && i.checkedText.length > 0).length < 1
   }
 
   showComponentOnCurrentStep(stepNum: number) {
     this.firstComponentRef = undefined;
-    let stepComponentList = this.steps[stepNum -1].componentMaket
+    let stepComponentList = this.steps[stepNum - 1].componentMaket
     //let stepComponentList = this.currentDocument.docStep.find(p => p.stepNum === stepNum).componentMaket
     stepComponentList.forEach(comp => {
       if (comp.componentType === IceComponentType.SELECT)
@@ -369,7 +356,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       compInstance.checkedText = comp.checkedText
       compInstance.optionList = comp.optionList
 
-      if(this.openType === "EDIT")
+      if (this.openType === "EDIT")
         compInstance.enabled = true
       else
         compInstance.enabled = false
@@ -387,7 +374,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       if (this.firstComponentRef) {
         let componentID = this.firstComponentRef.instance.componentID.toString()
         let elem = document.getElementById(componentID)
-        if(elem)
+        if (elem)
           elem.focus()
         this.componentService.selectedDocumentComponent$.next(this.firstComponentRef.instance)
       }
@@ -410,48 +397,33 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
           status: "DRAFT"
         }
         this.openType = "EDIT"
-        // /**И сохраняем его сразу как черновик*/
-        this.saveDoc(this.currentDocument.status, 0)
+        this.saveControl()
       }),
       error: (err => this.messageService.show(MAKET_LOAD_ERROR, err.error.message, ERROR))
     })
   }
 
-  saveDoc(docStatus: DocStat, reg: number ) {
-    if (!this.currentDocument || docStatus === "INCORRECT") return
-    this.currentDocument.status = docStatus
-
-    if (this.currentDocument.id === undefined) {
-      this.createDocument$ = this.backService.createDocument(this.currentDocument).subscribe({
-        next: (res => {
-          if (res) {
-            this.currentDocument.id = res.id
-          }
-        }),
-        error: (err => this.messageService.show(DRAFT_SAVE_ERROR, err.error.message, ERROR))
+  updateDoc(docStatus: DocStat) {
+    if (!this.currentDocument || (this.currentDocument && this.currentDocument.status != 'CONTROL')) return
+    //this.currentDocument.status = docStatus
+    this.updateDocument$ = this.backService.updateDocument(this.currentDocument).subscribe({
+      next: (res => {
+        if (docStatus === 'AGREE') {
+          this.changeStatus(docStatus, "Отправлено клиенту на согласование")
+          this.docSaved(CHANGE_STATUS_TO_AGREE, CHANGE_STATUS_TO_AGREE)
+        }
+      }),
+      error: (err => {
+        this.messageService.show(DOCUMENT_SAVE_ERROR, err.error.message, ERROR)
       })
-    } else {
-      this.updateDocument$ = this.backService.updateDocument(this.currentDocument).subscribe({
-        next: (res => {
-          if (reg === 1)
-            this.docSaved(docStatus === "DRAFT" ? DOCUMENT_DRAFT_SAVED : DOCUMENT_SEND,"")
-        }),
-        error: (err => {
-          this.messageService.show(DOCUMENT_SAVE_ERROR, err.error.message, ERROR)
-        })
-      })
-    }
-  }
-
-  private docSaved(message: string, message2: string) {
-    this.tabChange$ = this.messageService.show(message, message2, INFO).subscribe(res => {
-      this.tabService.openTab(TAB_DOCUMENT_LIST)
-      this.currentDocument = undefined
     })
   }
 
-  private checkValidValue(currentComponent: ComponentMaket): string {
+  saveControl() {
+    this.updateDoc("CONTROL")
+  }
 
+  private checkValidValue(currentComponent: ComponentMaket): string {
     let errorStr: string = ""
 
     if (this.currentDocument === undefined) return errorStr
@@ -468,10 +440,10 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     if (value === undefined)
       value = ""
     /**В начале проверяем заполнение обязательных полей*/
-    if(currentComponent.componentType === IceComponentType.PLACE){
+    if (currentComponent.componentType === IceComponentType.PLACE) {
       if (currentComponent.required && (!value || (value && value.placeString.length < 1)))
         errorStr = "Не заполнено обязательное поле."
-    }else{
+    } else {
       if (currentComponent.required && (!value || (value && value.length < 1)))
         errorStr = "Не заполнено обязательное поле."
     }
@@ -503,6 +475,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   set isStepRequiredFieldNotEmpty(value: boolean) {
+    if (this.openType === "VIEW") return
     this.setTableNode()
     if (this.tabLabelNode) {
 
@@ -517,12 +490,20 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     this._isStepRequiredFieldNotEmpty = value;
   }
 
+  private docSaved(message: string, message2: string) {
+    this.tabChange$ = this.messageService.show(message, message2, INFO).subscribe(res => {
+      this.tabService.openTab(TAB_DOCUMENT_LIST)
+      this.currentDocument = undefined
+    })
+  }
+
   changeStatusWithReason(status: string) {
     let componentRef = this.dialog.open(StatusReasonComponent, {
-      width: '' + window.innerWidth/2 + 'px',
-      height:'' + window.innerWidth/4 + 'px',
-      enterAnimationDuration: dialogOpenAnimationDuration,
-      exitAnimationDuration: dialogCloseAnimationDuration}
+        width: '' + window.innerWidth / 2 + 'px',
+        height: '' + window.innerWidth / 4 + 'px',
+        enterAnimationDuration: dialogOpenAnimationDuration,
+        exitAnimationDuration: dialogCloseAnimationDuration
+      }
     );
 
     componentRef.afterClosed().subscribe({
@@ -530,32 +511,25 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     })
   }
 
-
-  changeStatus(status: string, reason: string){
-    this.backService.changeStatus(this.currentDocument.id,status,reason).subscribe({
+  changeStatus(status: string, reason: string) {
+    this.backService.changeStatus(this.currentDocument.id, status, reason).subscribe({
         next: value => {
-          if(this.currentDocument.status === "INCORRECT" && status === "DRAFT") {
-            this.currentDocument.status = "DRAFT"
+          let message = ""
+          switch (status) {
+            case "AGREE":
+              message = CHANGE_STATUS_TO_AGREE
+              break
+            case "INCORRECT":
+              message = CHANGE_STATUS_TO_INCORRECT
+              break
+            case "REJECT":
+              message = CHANGE_STATUS_TO_REJECT
+              break
           }
-          if(this.currentDocument.status === "AGREE"){
-            this.docSaved(value.message,status === "DRAFT" ? CHANGE_STATUS_TO_DRAFT : CHANGE_STATUS_TO_SENDING)
-          }
-
+          this.docSaved(message, value.message)
         },
         error: err => this.messageService.show(CHANGE_STATUS_ERROR, err.error.message, ERROR)
       }
     )
   }
-
-  clearStep() {
-    this.currentDocument.docStep[this.currentStepIndex].componentMaket.forEach(c => {
-      c.value = undefined
-    })
-    this.currentStepIndex = this.currentStepIndex
-  }
-
-  setReason(reason: string) {
-
-  }
 }
-

@@ -28,7 +28,6 @@
             <select class="w-full text-sm border border-gray-500 bg-white hover:border-primary-light cursor-pointer"
                     [(ngModel)]="docStatus">
               <option selected value="NONE"></option>
-              <option value="DRAFT">Черновик</option>
               <option value="CONTROL">Предварительный контроль</option>
               <option value="SENDING">Отправлен в банк</option>
               <option value="PROCESSING">На рассмотрении</option>
@@ -110,21 +109,20 @@
         <div class=" w-full h-full text-center">Операции</div>
       </th>
       <td class="w-[10%]" mat-cell *matCellDef="let row">
-        <div class="grid grid-cols-4 gap-2">
+        <div class="grid grid-cols-4 gap-0.5">
           <div class="w-1/4">
-            <mat-icon *ngIf="row.status != 'DRAFT' && row.status != 'INCORRECT'"
-                      class="text-primary-dark cursor-pointer" matTooltip="Просмотр" (click)="showDoc(row)">
+            <mat-icon class="text-primary-dark cursor-pointer" matTooltip="Просмотр" (click)="showDoc(row)">
               remove_red_eye
             </mat-icon>
           </div>
           <div class="w-1/4">
-            <mat-icon *ngIf="row.status === 'DRAFT' || row.status === 'INCORRECT'" class="text-green-500 cursor-pointer"
-                      matTooltip="Редактировать" (click)="editDoc(row)">edit
+            <mat-icon *ngIf="row.status === 'CONTROL'" class="text-green-500 cursor-pointer" matTooltip="Редактировать"
+                      (click)="editDoc(row)">edit
             </mat-icon>
           </div>
           <div class="w-1/4">
-            <mat-icon *ngIf="row.status === 'DRAFT' || row.status === 'INCORRECT'" class=" text-red-500 cursor-pointer"
-                      matTooltip="Удалить" (click)="removeDoc(row.id)">delete
+            <mat-icon *ngIf="false" class=" text-red-500 cursor-pointer" matTooltip="Удалить"
+                      (click)="removeDoc(row.id)">delete
             </mat-icon>
           </div>
           <div class="w-1/4">
@@ -132,7 +130,6 @@
                       (click)="openHistoryDialog(row.id)">history
             </mat-icon>
           </div>
-
         </div>
       </td>
     </ng-container>

@@ -1,4 +1,4 @@
-import {Component, HostListener, OnInit} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, HostListener, OnInit} from '@angular/core';
 import {KeycloakService} from "./services/keycloak.service";
 import {Router} from "@angular/router";
 import {SpinnerService} from "./services/spinner.service";
@@ -8,7 +8,8 @@ import {TimeService} from "./services/time.service";
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.css']
+  styleUrls: ['./app.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class AppComponent implements OnInit {
   title = 'zero-client-project';
@@ -20,11 +21,9 @@ export class AppComponent implements OnInit {
   constructor(private keycloakService: KeycloakService,
               private router: Router,
               private spinnerService: SpinnerService,
+              private changeDetection: ChangeDetectorRef,
               private timeService: TimeService) {
-    window.onbeforeunload
-    this.spinnerService$ = this.spinnerService.visibility.subscribe({
-      next: (res => this.isSpiner = res)
-    })
+    //window.onbeforeunload
   }
 
   ngOnInit(): void {
@@ -36,6 +35,13 @@ export class AppComponent implements OnInit {
       document.cookie = 'testcookie';
       this.cookieEnabled = (document.cookie.indexOf('testcookie') !== -1);
     }
+    this.spinnerService$ = this.spinnerService.visibility.subscribe({
+      next: (res => {
+        this.isSpiner = res
+        this.changeDetection.detectChanges()
+      })
+    })
+
   }
 
   ThemeToggle() {

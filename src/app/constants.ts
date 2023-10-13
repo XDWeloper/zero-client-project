@@ -23,6 +23,13 @@ export const DOCUMENT_REMOVE_ERROR = "Ошибка удаления докуме
 export const FILE_SIZE_ERROR = "Не верный размер файла"
 export const BANK_DOCUMENT_LOAD_ERROR = "Ошибка загрузки списка документов"
 export const BANK_FILE_LOAD_ERROR = "Ошибка загрузки файла"
+export const CHANGE_STATUS_ERROR = "Ошибка смены статуса документа"
+export const CHANGE_STATUS_TO_DRAFT = "Документ возвращен на этап редактирования"
+export const CHANGE_STATUS_TO_SENDING = "Документ отправлен на обработку в банк"
+export const CHANGE_STATUS_TO_AGREE = "Документ отправлен на согласование клиенту"
+export const CHANGE_STATUS_TO_INCORRECT = "Документ отправлен клиенту для корректровки"
+export const CHANGE_STATUS_TO_REJECT = "Документ отвергнут"
+export const GET_DOCUMENT_STATUS_HISTORY_ERROR = "Ошибка получения истории изменения статусов"
 
 export const ERROR = "ERROR"
 export const INFO = "INFO"
@@ -61,7 +68,7 @@ export enum CellType {
   client = "client"
 }
 
-export type DocStat = "DRAFT" | "PREPARED" | "SENDING" | "PROCESSING" | "INCORRECT" | "ACCEPTED" | "REJECTED" | "CONTROL"
+export type DocStat = "DRAFT" | "SENDING" | "PROCESSING" | "INCORRECT" | "ACCEPTED" | "REJECTED" | "CONTROL" | "AGREE"
 
 
 export const collInRow = 12             /**Всегда 12 колонок в строке это константа не менять!!!! */

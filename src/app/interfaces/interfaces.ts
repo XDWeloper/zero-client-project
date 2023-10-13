@@ -1,4 +1,4 @@
-import {IceComponentType} from "../constants";
+import {DocStat, IceComponentType} from "../constants";
 
 
 export interface BankFile {
@@ -71,7 +71,7 @@ export interface IceDocument{
   maketId: number
   docName: string,
   createDate?: Date,
-  status?: string,
+  status?: DocStat,
   statusText?: string
   responseDocReference?: string | undefined,
   docStep?: IceStepMaket[],

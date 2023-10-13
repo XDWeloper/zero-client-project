@@ -1,0 +1,41 @@
+<div class="p-4">
+  <div class="text-center">
+    Выберите документ для заполнения
+  </div>
+
+  <div class="w-full m-auto rounded-t-lg mt-4">
+    <mat-form-field class="w-full">
+      <mat-label>Поиск</mat-label>
+      <input matInput (keyup)="applyFilter($event)" placeholder="Поиск" #input>
+    </mat-form-field>
+  </div>
+
+  <div class="w-full overflow-auto">
+    <table mat-table [dataSource]="data" matSort matSortActive="date" matSortDisableClear matSortDirection="desc">
+
+      <ng-container matColumnDef="id">
+        <th class="w-[5%]" mat-header-cell *matHeaderCellDef>Ид</th>
+        <td class="w-[5%]" mat-cell *matCellDef="let row">{{row.id}}</td>
+      </ng-container>
+
+      <ng-container matColumnDef="name">
+        <th class="w-[30%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Документ</th>
+        <td class="w-[30%]" mat-cell *matCellDef="let row">{{row.docName}}</td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="selectMaket(row.id)"
+          class="cursor-pointer element-row"></tr>
+
+      <tr class="mat-row" *matNoDataRow>
+        <td class="mat-cell" colspan="4">Не найдено данных по фильтру: "{{input.value}}"</td>
+      </tr>
+    </table>
+    <mat-paginator [length]="resultsLength" [pageSize]="pageSize" aria-label="Select page"></mat-paginator>
+  </div>
+  <!--  <div class="border border-red-700 p-2">-->
+  <!--    <p>Пока нет бэка нужно выбрать файл</p>-->
+  <!--    <input  class="" type="file" (change)="handleFileSelect($event)">-->
+  <!--  </div>-->
+
+</div>

@@ -9,7 +9,7 @@ const routes: Routes = [
   {path: '', component: LoginComponent},
   {path: 'main', component: MainScreenComponent},
   {path: 'admin', loadChildren: () => import('./module/admin/admin.module').then(m => m.AdminModule)},
-  {path: 'operator', loadChildren: () => import('./module/client/client.module').then(m => m.ClientModule)},
+  {path: 'operator', loadChildren: () => import('./module/operator/operator.module').then(m => m.OperatorModule)},
   {path: 'client', loadChildren: () => import('./module/client/client.module').then(m => m.ClientModule)},
   {path: 'register', loadChildren: () => import('./module/register/register.module').then(m => m.RegisterModule)},
   {path: 'lossPass', loadChildren: () => import('./module/loss-pass/loss-pass.module').then(m => m.LossPassModule)},

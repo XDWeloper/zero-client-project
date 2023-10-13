@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'docStatus'
+  name: 'docStatus',
+  standalone: true
 })
 export class DocStatusPipe implements PipeTransform {
 
@@ -10,9 +11,9 @@ export class DocStatusPipe implements PipeTransform {
     switch (value) {
       case "DRAFT": retStr = "Черновик"
         break;
-      case "PREPARED": retStr = "Подготовлен к отправке"
-        break;
       case "SENDING": retStr = "Отправлен в банк"
+        break;
+      case "AGREE": retStr = "Требует подтверждения пользователем"
         break;
       case "CONTROL": retStr = "Предварительный контроль"
         break;
@@ -20,7 +21,7 @@ export class DocStatusPipe implements PipeTransform {
         break;
       case "INCORRECT": retStr = "Требует корректировки"
         break;
-      case "ACCEPTED": retStr = "Принят "
+      case "ACCEPTED": retStr = "Принят"
         break;
       case "REJECTED": retStr = "Отвергнут"
         break;

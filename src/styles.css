@@ -15,7 +15,7 @@
   @apply border-primary-light border-opacity-50
 }
 .button-style{
-  @apply text-white absolute right-2.5 bottom-2.5 bg-primary-base hover:bg-primary-light focus:ring-4 focus:outline-none focus:ring-primary-light font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-light dark:hover:bg-primary-light dark:focus:ring-primary-light
+  @apply w-32 text-white absolute right-2.5 bottom-2.5 bg-primary-base hover:bg-primary-light focus:ring-4 focus:outline-none focus:ring-primary-light font-medium rounded-lg text-sm px-4 py-2 dark:bg-primary-light dark:hover:bg-primary-light dark:focus:ring-primary-light
 }
 
 .component-panel-button-style{
@@ -23,7 +23,7 @@
 }
 
 .toolBar-button-style{
-  @apply ml-2 border border-white duration-300 bg-primary-base rounded-md w-16 h-[90%] flex justify-center items-center px-2 text-white hover:bg-primary-dark dark:bg-dark-background dark:hover:bg-primary-light
+  @apply text-gray-200 font-semibold ml-2 border border-white duration-300 bg-primary-base rounded-md w-36 h-[90%] flex justify-center items-center px-1 text-white hover:bg-primary-dark dark:bg-dark-background dark:hover:bg-primary-light
 }
 .placeholder-style{
   @apply transform transition-all absolute top-0 left-2 h-full flex items-center pl-2 text-sm group-focus-within:text-xs peer-valid:text-xs group-focus-within:h-1/2 peer-valid:h-1/2 group-focus-within:-translate-y-full peer-valid:-translate-y-full group-focus-within:pl-0 peer-valid:pl-0 dark:text-gray-300 font-mono tracking-[1px]

@@ -26,8 +26,8 @@ import {catchError, map, startWith, switchMap} from 'rxjs/operators';
 import {animate, style, transition, trigger} from "@angular/animations";
 import {BankDocumentListComponent} from "../bank-document-list/bank-document-list.component";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
-import {HistoryDialogComponent} from "../../../../component/history-dialog/history-dialog.component";
 import {ComponentType} from "@angular/cdk/overlay";
+import {HistoryDialogComponent} from "../../../../component/history-dialog/history-dialog.component";
 
 @Component({
   selector: 'app-document-table',
@@ -47,7 +47,7 @@ import {ComponentType} from "@angular/cdk/overlay";
   ]
 })
 export class DocumentTableComponent implements AfterViewInit, OnInit {
-  displayedColumns: string[] = ['id', 'docName', 'createDate', 'status','statusDate', 'document', 'operation'];
+  displayedColumns: string[] = ['id', 'docName', 'createDate', 'statusDate','status', 'document', 'operation'];
   data: IceDocument[] = []
   length = 50;
   pageSize = 10;
@@ -189,6 +189,4 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
     let componentRef = this.openDialog(HistoryDialogComponent,dialogOpenAnimationDuration, dialogCloseAnimationDuration, id)
     componentRef.componentInstance.documentRef = id
   }
-
-
 }

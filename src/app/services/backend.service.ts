@@ -11,7 +11,7 @@ import {
   OtpType,
   UploadFile
 } from "../interfaces/interfaces";
-import {DocNameEdit} from "../constants";
+import {DocNameEdit, DocStat} from "../constants";
 import {List} from "postcss/lib/list";
 import {map} from "rxjs/operators";
 
@@ -27,6 +27,14 @@ export class BackendService {
   getCoreEnvironment(): Observable<any> {
     const operation = new Operation();
     operation.url = environment.resourceServerURL + "/core/env"
+    operation.httpMethod = HttpMethod.GET;
+    return this.http.post(environment.bffURI + '/operation', operation);
+  }
+
+  getDocumentStatusHistory(id: number, page?: number,size?: number, sort?: string, order?: string, status?: DocStat): Observable<any> {
+    const operation = new Operation();
+    operation.url = environment.resourceServerURL + `/core/documents/status?id=${id}&page=${page}&size=${size}&sort=${sort},${order}`
+    operation.url +=  status != undefined ? `&status=${status}` : ''
     operation.httpMethod = HttpMethod.GET;
     return this.http.post(environment.bffURI + '/operation', operation);
   }
@@ -103,6 +111,17 @@ export class BackendService {
     operation.url = environment.resourceServerURL + "/core/documents"
     operation.httpMethod = HttpMethod.POST
     operation.body = maket
+    return this.http.post(environment.bffURI + '/operation', operation);
+  }
+
+  changeStatus(id: number, status: string, reason: string): Observable<any> {
+    const operation = new Operation();
+    operation.url = environment.resourceServerURL + `/core/documents/status/${id}`
+    operation.httpMethod = HttpMethod.PUT
+    operation.body = {
+      reason: reason,
+      status: status
+    }
     return this.http.post(environment.bffURI + '/operation', operation);
   }
 

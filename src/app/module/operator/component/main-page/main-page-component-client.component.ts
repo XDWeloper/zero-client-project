@@ -25,10 +25,9 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
   onTabChanged$: Subscription
   requestUserProfile$: Subscription
   getDocumentFull$: Subscription
-  openDocType: OpenDocType
+  openDocType: OpenDocType | undefined = undefined
 
   @ViewChild(DocumentEditorComponent) editorComponent: DocumentEditorComponent;
-  tabDone: boolean;
 
   constructor(private messageService: MessageService,
               private backService: BackendService,
@@ -43,7 +42,7 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
     if(userString)
       this.user = JSON.parse(userString)
 
-    if(this.user.roles.length < 1 || !this.user.roles.includes("ROLE_user"))
+    if(this.user.roles.length < 1 || !this.user.roles.includes("ROLE_operator"))
       this.router.navigate(["/"])
 
     this.onTabChanged$ = tabService.onTabChanged().subscribe(tab => this.currentTabNum = tab)
@@ -71,7 +70,6 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
     this.getDocumentFull$ = this.backService.getDocumentFull(id).subscribe({
       next: ((res: IceDocument) => {
         this.tempOpenedComponent = res
-        //this.openedDocument = res
         this.currentTabNum = TAB_DOCUMENT_SHOW
       }),
       error: (err => {
@@ -89,13 +87,10 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
       this.openedDocument = this.tempOpenedComponent
       this.tempOpenedComponent = undefined
     }
-    this.tabDone = this.currentTabNum === TAB_DOCUMENT_SHOW
   }
 
   exit() {
     this.keycloakService.logoutAction().subscribe({
-      // next: value => this.router.navigate(["/"]),
-      // error: err => this.router.navigate(["/"]),
       complete:(() => this.router.navigate(["/"]))
     })
   }

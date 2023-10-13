@@ -14,15 +14,18 @@ export class SpinnerInterceptor implements HttpInterceptor {
   }
 
   intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    this.requestListSize ++
     if(!this.timeService.isBlocked) {
+      this.requestListSize ++
       this.spinnerService.show();
     }
 
     return next.handle(req)
       .pipe(
         tap({
-          error: err => this.spinnerService.hide(),
+          error: err => {
+            this.requestListSize --
+            this.spinnerService.hide()
+          },
           complete: () => {
             this.requestListSize --
             if(this.requestListSize < 1)
