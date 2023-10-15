@@ -8,7 +8,7 @@ import {
 } from "../interfaces/interfaces";
 import {IceMaketComponent} from "../module/admin/classes/icecomponentmaket";
 import {IceComponentType} from "../constants";
-import * as FileSaver from "file-saver";
+import {saveAs} from "file-saver";
 
 @Injectable({
   providedIn: 'root'
@@ -76,9 +76,9 @@ export class DocumentService {
     if(!this.templateList.find(i => i.docId === dtt.id)) {
       return
     }
-
       let blob = new Blob([JSON.stringify(this.templateList.find(i => i.docId === dtt.id), null, 2)], {type: 'application/json'});
-      FileSaver.saveAs(blob, dtt.name + "_макет.JSON");
+      saveAs(blob, dtt.name + "_макет.JSON");
+      //FileSaver.saveAs(blob, dtt.name + "_макет.JSON");
   }
 
   addDocToTemplate(doc: DocumentTreeTempl) {

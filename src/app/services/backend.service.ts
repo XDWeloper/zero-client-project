@@ -31,10 +31,10 @@ export class BackendService {
     return this.http.post(environment.bffURI + '/operation', operation);
   }
 
-  getDocumentStatusHistory(id: number, page?: number,size?: number, sort?: string, order?: string, status?: DocStat): Observable<any> {
+  getDocumentStatusHistory(id: number, page?: number,size?: number, sort?: string, order?: string, status?: DocStat | undefined): Observable<any> {
     const operation = new Operation();
     operation.url = environment.resourceServerURL + `/core/documents/status?id=${id}&page=${page}&size=${size}&sort=${sort},${order}`
-    operation.url +=  status != undefined ? `&status=${status}` : ''
+    operation.url +=  (status || (status && status.length > 0)) ? `&status=${status}` : ''
     operation.httpMethod = HttpMethod.GET;
     return this.http.post(environment.bffURI + '/operation', operation);
   }

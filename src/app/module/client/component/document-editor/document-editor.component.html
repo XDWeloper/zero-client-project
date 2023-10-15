@@ -27,7 +27,7 @@
       <span class="ml-1">Отмена</span>
     </button>
 
-    <button *ngIf="currentDocument && currentDocument.status === 'AGREE'" (click)="changeStatus('SENDING', '')" matTooltip="Подтвердить корректность данных" class="toolBar-button-style">
+    <button *ngIf="currentDocument && currentDocument.status === 'AGREE'" (click)="changeStatus('SENDING', 'Клиент подтвердил корректность данных')" matTooltip="Подтвердить корректность данных" class="toolBar-button-style">
       <mat-icon class="text-green-500 font-bold">check</mat-icon>
       <span class="ml-1">Подтвердить</span>
     </button>

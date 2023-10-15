@@ -128,7 +128,7 @@
 <div *ngIf="isPanelOpen && (docPanelCurrentSize > docPanelOpenWidth / 2)" class="w-[24%] absolute left-2 bottom-6 border-t border-t-white py-1">
   <label for="file-download" class="text-white text-center bg-primary-base hover:bg-primary-light w-full inline-block
                 focus:ring-4 focus:outline-none focus:ring-primary-light font-medium rounded-lg text-sm px-4 py-2
-                dark:bg-primary-light dark:hover:bg-primary-light dark:focus:ring-primary-light">
+                dark:bg-primary-light dark:hover:bg-primary-light dark:focus:ring-primary-light cursor-pointer">
     Загрузить макет
   </label>
   <input id="file-download" type="file" (change)="handleFileSelect($event)" class="invisible absolute left-2 bottom-10"/>
@@ -136,10 +136,10 @@
   <label *ngIf="currentDocument && currentDocument.children.length > 0"
     for="file-upload" class="text-white text-center bg-primary-base hover:bg-primary-light w-full inline-block mt-2
                 focus:ring-4 focus:outline-none focus:ring-primary-light font-medium rounded-lg text-sm px-4 py-2
-                dark:bg-primary-light dark:hover:bg-primary-light dark:focus:ring-primary-light">
+                dark:bg-primary-light dark:hover:bg-primary-light dark:focus:ring-primary-light cursor-pointer">
     Выгрузить макет
   </label>
-  <input id="file-upload" type="button" (click)="uploadCurrentMaket()" class="invisible absolute left-2 bottom-10"/>
+  <input id="file-upload" type="button" (click)="uploadCurrentMaket()" class="invisible absolute left-2 bottom-10 "/>
 </div>
 
 <!--  <input class="text-white absolute left-2 bottom-4 bg-primary-base hover:bg-primary-light-->

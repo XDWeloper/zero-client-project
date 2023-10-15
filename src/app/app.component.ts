@@ -4,6 +4,7 @@ import {Router} from "@angular/router";
 import {SpinnerService} from "./services/spinner.service";
 import {Subscription} from "rxjs";
 import {TimeService} from "./services/time.service";
+import {APP_VERSION} from "./constants";
 
 @Component({
   selector: 'app-root',
@@ -17,6 +18,7 @@ export class AppComponent implements OnInit {
   cookieEnabled: boolean;
   isSpiner = false
   spinnerService$: Subscription
+  app_version = APP_VERSION
 
   constructor(private keycloakService: KeycloakService,
               private router: Router,

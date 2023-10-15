@@ -1,7 +1,59 @@
 <div class="w-full h-full p-1 ">
   <h3 class="text-center h-[5%] ">История изменения статусов</h3>
-  <div class=" h-[80%]"></div>
+  <div class="h-[5%] pb-1 pl-1 z-100000">
+    <label for="select">Фильтр по статусу: </label>
+    <select class="text-center bg-white border p-1 cursor-pointer" [(ngModel)]="docStatus" id="select">
+      <option *ngFor="let val of statusList" [value]=val.status>{{val.name}}</option>
+    </select>
+  </div>
+
+  <div class="h-[80%]">
+    <div class=" h-[90%] overflow-auto border">
+      <table mat-table [dataSource]="data" matSort matSortActive="id" matSortDisableClear matSortDirection="desc">
+
+        <ng-container matColumnDef="createDate">
+          <th class="w-[10%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Дата создания</th>
+          <td class="w-[10%]" mat-cell *matCellDef="let row">{{row.createDate | date: 'dd.MM.yyyy hh:mm' }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="createUserName">
+          <th class="w-[30%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Инициатор статуса</th>
+          <td class="w-[30%]" mat-cell *matCellDef="let row">{{row.createUserName }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="status">
+          <th class="w-[30%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Статус</th>
+          <td class="w-[30%]"
+              [ngClass]="{'bg-cyan-100/50':row.status === 'CONTROL',
+            'bg-yellow-100/50':row.status === 'AGREE',
+            'bg-red-100/50': (row.status === 'REJECTED' || row.status === 'INCORRECT')}"
+              mat-cell *matCellDef="let row"> {{ row.status | docStatus }}</td>
+        </ng-container>
+
+        <ng-container matColumnDef="statusText">
+          <th class="w-[30%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Причина статуса</th>
+          <td class="w-[30%]" mat-cell *matCellDef="let row">
+            {{ row.statusText }}
+          </td>
+        </ng-container>
+
+
+        <tr mat-header-row *matHeaderRowDef="displayedColumns; sticky: true"></tr>
+        <tr mat-row *matRowDef="let row; index as i; columns: displayedColumns;"
+            [ngClass]="{'bg-gray-200': i % 2 == 0}"
+            class="example-element-row"></tr>
+      </table>
+      <div *ngIf="data.length < 1" class="absolute top-[20%] left-0 w-full h-[60%] flex justify-center items-center">
+        <h1 class="text-gray-500">Данные не найдены... </h1>
+      </div>
+    </div>
+    <div class="h-[10%]">
+      <mat-paginator [length]="length"
+                     [pageSize]="pageSize"
+                     [pageSizeOptions]="pageSizeOptions"></mat-paginator>
+    </div>
+  </div>
   <div class="border-t h-[5%]">
-    <button class="float-right button-style " (click)="dialogRef.close()">Ок</button>
+    <button class="float-right button-style" (click)="dialogRef.close()">Ок</button>
   </div>
 </div>

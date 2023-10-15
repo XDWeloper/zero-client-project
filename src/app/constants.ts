@@ -1,5 +1,8 @@
 import {AngularEditorConfig} from "@kolkov/angular-editor";
 
+
+export const APP_VERSION="1.2.12"
+
 export const MAKET_NAME_LOAD_ERROR = "Ошибка получения списка доступных макетов"
 export const MAKET_LOAD_ERROR = "Ошибка получения макета"
 export const MAKET_DELETE_ERROR = "Ошибка удаления макета"
@@ -14,7 +17,7 @@ export const REGISTRATION_DATA = "Ошибка отправки регистра
 export const RESET_PASS_ERROR = "Ошибка сброса пароля."
 export const RESET_PASS_SUCCESS = "Пароль успешно сброшен."
 export const REGISTRATION_CONFIRM_ERROR = "Ошибка регистрации клиента"
-export const REGISTRATION_CONFIRM = "Пользователь успешно зарегистриован"
+export const REGISTRATION_CONFIRM = "Пользователь успешно зарегистрирован"
 export const PASSWORD_PROP = "Ошибка получения требований к паролю."
 export const FILES_LOAD_ERROR = "Ошибка загрузки файлов"
 export const FILES_DELETE_ERROR = "Ошибка удаления файла"
@@ -27,7 +30,7 @@ export const CHANGE_STATUS_ERROR = "Ошибка смены статуса до�
 export const CHANGE_STATUS_TO_DRAFT = "Документ возвращен на этап редактирования"
 export const CHANGE_STATUS_TO_SENDING = "Документ отправлен на обработку в банк"
 export const CHANGE_STATUS_TO_AGREE = "Документ отправлен на согласование клиенту"
-export const CHANGE_STATUS_TO_INCORRECT = "Документ отправлен клиенту для корректровки"
+export const CHANGE_STATUS_TO_INCORRECT = "Документ отправлен клиенту для корректировки"
 export const CHANGE_STATUS_TO_REJECT = "Документ отвергнут"
 export const GET_DOCUMENT_STATUS_HISTORY_ERROR = "Ошибка получения истории изменения статусов"
 

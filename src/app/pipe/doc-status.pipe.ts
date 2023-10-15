@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import {DocStatus} from "../interfaces/interfaces";
 
 @Pipe({
   name: 'docStatus',
@@ -7,26 +8,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 export class DocStatusPipe implements PipeTransform {
 
   transform(value: string): string {
-    let retStr: string = "Не известный статус"
-    switch (value) {
-      case "DRAFT": retStr = "Черновик"
-        break;
-      case "SENDING": retStr = "Отправлен в банк"
-        break;
-      case "AGREE": retStr = "Требует подтверждения пользователем"
-        break;
-      case "CONTROL": retStr = "Предварительный контроль"
-        break;
-      case "PROCESSING": retStr = "На рассмотрении"
-        break;
-      case "INCORRECT": retStr = "Требует корректировки"
-        break;
-      case "ACCEPTED": retStr = "Принят"
-        break;
-      case "REJECTED": retStr = "Отвергнут"
-        break;
-    }
-    return retStr;
+    return  Object.values(DocStatus)[Object.keys(DocStatus).findIndex(k => k === value)]
   }
 
 }

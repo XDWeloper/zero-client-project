@@ -235,6 +235,17 @@ export enum ControlPropType{
   VALUE = "Значение"
 }
 
+export enum DocStatus{
+  DRAFT = "Черновик",
+  SENDING = "Отправлен в банк",
+  AGREE = "Требует подтверждения пользователем",
+  CONTROL = "Предварительный контроль",
+  PROCESSING = "На рассмотрении",
+  INCORRECT = "Требует корректировки",
+  ACCEPTED = "Принят",
+  REJECTED = "Отвергнут"
+}
+
 export interface PlaceObject{
   id: number,
   regionCode: number,

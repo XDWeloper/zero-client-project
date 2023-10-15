@@ -138,7 +138,8 @@
     </ng-container>
 
     <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
-    <tr mat-row *matRowDef="let row; columns: displayedColumns;"
+    <tr mat-row *matRowDef="let row; index as i; columns: displayedColumns;"
+        [ngClass]="{'bg-gray-200': i % 2 == 0}"
         class="example-element-row"></tr>
 
   </table>
