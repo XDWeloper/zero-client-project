@@ -111,7 +111,7 @@
       <td class="w-[10%]" mat-cell *matCellDef="let row">
         <div class="grid grid-cols-4 gap-0.5">
           <div class="w-1/4">
-            <mat-icon class="text-primary-dark cursor-pointer" matTooltip="Просмотр" (click)="showDoc(row)">
+            <mat-icon class="text-primary-base cursor-pointer" matTooltip="Просмотр" (click)="showDoc(row)">
               remove_red_eye
             </mat-icon>
           </div>
@@ -126,7 +126,7 @@
             </mat-icon>
           </div>
           <div class="w-1/4">
-            <mat-icon class=" text-red-500 cursor-pointer" matTooltip="История статусов"
+            <mat-icon class="text-primary-dark cursor-pointer" matTooltip="История статусов"
                       (click)="openHistoryDialog(row.id)">history
             </mat-icon>
           </div>

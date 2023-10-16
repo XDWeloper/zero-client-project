@@ -1,11 +1,11 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {MainPageComponentClient} from "../operator/component/main-page/main-page-component-client.component";
-import {DocumentTableComponent} from "../operator/component/document-table/document-table.component";
-import {DocumentEditorComponent} from "../operator/component/document-editor/document-editor.component";
-import {CellComponent} from "../operator/component/cell/cell.component";
-import {MaketListComponent} from "../operator/component/maket-list/maket-list.component";
-import {BankDocumentListComponent} from "../operator/component/bank-document-list/bank-document-list.component";
+import {MainPageComponentClient} from "./component/main-page/main-page-component-client.component";
+import {DocumentTableComponent} from "./component/document-table/document-table.component";
+import {DocumentEditorComponent} from "./component/document-editor/document-editor.component";
+import {CellComponent} from "./component/cell/cell.component";
+import {MaketListComponent} from "./component/maket-list/maket-list.component";
+import {BankDocumentListComponent} from "./component/bank-document-list/bank-document-list.component";
 import {RouterModule} from "@angular/router";
 import {MatTableModule} from "@angular/material/table";
 import {MatPaginatorModule} from "@angular/material/paginator";
@@ -21,6 +21,7 @@ import {MatDatepickerModule} from "@angular/material/datepicker";
 import {FormsModule} from "@angular/forms";
 import {DocStatusPipe} from "../../pipe/doc-status.pipe";
 import {StatusReasonComponent} from "../../component/status-reason/status-reason.component";
+import {MatButtonModule} from "@angular/material/button";
 
 
 
@@ -54,7 +55,8 @@ import {StatusReasonComponent} from "../../component/status-reason/status-reason
         MatDatepickerModule,
         FormsModule,
         DocStatusPipe,
-        StatusReasonComponent
+        StatusReasonComponent,
+        MatButtonModule
     ]
 })
 export class OperatorModule { }
