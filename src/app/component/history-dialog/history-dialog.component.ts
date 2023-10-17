@@ -5,7 +5,7 @@ import {
   MasterControlPropComponent
 } from "../../module/admin/component/master-control-prop/master-control-prop.component";
 import {BackendService} from "../../services/backend.service";
-import {DocStat, DOCUMENT_NAME_LOAD_ERROR, ERROR, GET_DOCUMENT_STATUS_HISTORY_ERROR} from "../../constants";
+import {DocStat, DOCUMENT_NAME_LOAD_ERROR, ERROR} from "../../constants";
 import {MessageService} from "../../services/message.service";
 import {DocumentStatusEntity} from "../../model/DocumentStatusEntity";
 import {DocStatusPipe} from "../../pipe/doc-status.pipe";
@@ -32,7 +32,7 @@ export class HistoryDialogComponent implements OnInit, AfterViewInit {
   length = 100;
   pageSize = 100;
   pageSizeOptions = [100, 200, 300];
-  private _docStatus: DocStat | undefined = undefined
+  private _docStatus: Partial<DocStat> = undefined
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -53,7 +53,7 @@ export class HistoryDialogComponent implements OnInit, AfterViewInit {
   }
 
   ngAfterViewInit(): void {
-    this.sort.sortChange.subscribe((s) => {
+    this.sort.sortChange.subscribe(() => {
       this.paginator.firstPage();
     })
 
