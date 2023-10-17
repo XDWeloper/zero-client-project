@@ -16,6 +16,8 @@ export class TimeService {
   isLogout = true
 
   constructor(private keyCloakService: KeycloakService, private router: Router) {
+    this.lastRequestTime = new Date().getTime()
+    this.lastTokenUpdate = new Date().getTime()
   }
 
   setLastTime() {
@@ -30,13 +32,10 @@ export class TimeService {
       this.inter.remove(null)
     }
 
-    this.inter = interval(10_000).subscribe((r) => {
+    this.inter = interval(10_000).subscribe(() => {
       let newTime = new Date().getTime()
-        //console.log(fiveMin - (newTime - this.lastRequestTime))
       if (newTime - this.lastRequestTime > fiveMin && this.isLogout) {
         this.keyCloakService.logoutAction().subscribe({
-          next: value => {},
-          error: err => {},
           complete: () => this.router.navigate(['/'])
         })
       }
