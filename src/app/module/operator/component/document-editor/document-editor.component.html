@@ -2,11 +2,6 @@
 <div #watch_mainContainer>
   <div
     class="w-full mt-2 border-t border-b border-color flex items-center h-10 p-1 bg-primary-dark dark:bg-dark-background rounded-lg border border-gray-200" >
-    <button *ngIf="isDocumentRequiredFieldNotEmpty && openType === 'EDIT'" matTooltip="Отправить клиенту на подтверждение"
-            (click)="updateDoc('AGREE')" class="toolBar-button-style">
-      <mat-icon class="text-green-500 font-bold">check</mat-icon>
-      <span class="ml-1">Заполнено</span>
-    </button>
     <button *ngIf="currentDocument && currentDocument.status ==='CONTROL'" (click)="changeStatusWithReason('INCORRECT')" matTooltip="Вернуть клиенту для корректировки" class="toolBar-button-style">
       <mat-icon class="text-red-300 font-bold">arrow_back</mat-icon>
       <span class="ml-1">Не корректно</span>
@@ -16,6 +11,12 @@
       <mat-icon class="text-red-300 font-bold">block</mat-icon>
       <span class="ml-1">Отвергнуть</span>
     </button>
+    <button *ngIf="isDocumentRequiredFieldNotEmpty && openType === 'EDIT'" matTooltip="Отправить клиенту на подтверждение"
+            (click)="updateDoc('AGREE')" class="toolBar-button-style">
+      <mat-icon class="text-green-500 font-bold">arrow_forward</mat-icon>
+      <span class="ml-1">Заполнено</span>
+    </button>
+
     <div *ngIf="openType === 'VIEW' && (currentDocument && currentDocument.status !='CONTROL')" class="w-full text-center text-gray-200 font-semibold">
       Просмотр документа ({{ currentDocument.status | docStatus }})
     </div>

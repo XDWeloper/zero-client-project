@@ -4,35 +4,37 @@
 
     <button *ngIf="openType === 'EDIT'" matTooltip="Очистить" (click)="clearStep()" class="toolBar-button-style">
       <mat-icon class="text-red-300 font-bold">clear</mat-icon>
-      Очистить
+      <span class="ml-1">Очистить</span>
     </button>
 
     <button *ngIf="openType === 'EDIT'" matTooltip="Сохранить как черновик" (click)="saveDoc('DRAFT', 1)" class="toolBar-button-style">
-      <mat-icon class="text-sky-300 font-bold">hourglass_empty</mat-icon>
-      Сохранить
+      <mat-icon class="text-sky-300 font-bold">archive</mat-icon>
+      <span class="ml-1">Сохранить</span>
     </button>
 
     <button *ngIf="currentDocument && currentDocument.status === 'DRAFT'" (click)="currentDocument = undefined" matTooltip="Другой документ" class="toolBar-button-style">
       <mat-icon class="text-emerald-300 font-bold">sort</mat-icon>
-      <span class="ml-1">Новый</span>
+      <span class="ml-1">Новый документ</span>
     </button>
 
     <button *ngIf="isDocumentRequiredFieldNotEmpty && openType === 'EDIT'" (click)="saveDoc('CONTROL', 1)" matTooltip="Отправить на рассмотрение" class="toolBar-button-style">
-      <mat-icon class="text-yellow-300 font-bold">check_circle_outline</mat-icon>
       <span class="ml-1">Отправить</span>
+      <mat-icon class="text-green-500 font-bold">arrow_forward</mat-icon>
     </button>
 
     <button *ngIf="currentDocument && currentDocument.status === 'AGREE'" (click)="changeStatusWithReason('DRAFT')" matTooltip="Вернуть документ для корректировки данных" class="toolBar-button-style">
       <mat-icon class="text-red-300 font-bold">arrow_back</mat-icon>
-      <span class="ml-1">Отмена</span>
+      <span class="ml-1">Редактировать</span>
     </button>
 
     <button *ngIf="currentDocument && currentDocument.status === 'AGREE'" (click)="changeStatus('SENDING', 'Клиент подтвердил корректность данных')" matTooltip="Подтвердить корректность данных" class="toolBar-button-style">
-      <mat-icon class="text-green-500 font-bold">check</mat-icon>
       <span class="ml-1">Подтвердить</span>
+      <mat-icon class="text-green-500 font-bold">arrow_forward</mat-icon>
     </button>
 
-    <div *ngIf="openType === 'VIEW'" class="w-full text-center text-gray-200 font-semibold">Просмотр документа</div>
+    <div *ngIf="openType === 'VIEW' && (currentDocument && currentDocument.status !='AGREE')" class="w-full text-center text-gray-200 font-semibold">
+      Просмотр документа ({{ currentDocument.status | docStatus }})
+    </div>
   </div>
 
   <div class="flex justify-between w-full">

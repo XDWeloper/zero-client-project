@@ -1,4 +1,4 @@
-import {Injectable} from '@angular/core';
+import {Injectable, OnDestroy} from '@angular/core';
 import {interval, Subscription} from "rxjs";
 import {KeycloakService} from "./keycloak.service";
 import {Router} from "@angular/router";
@@ -7,7 +7,7 @@ import {fiveMin, freeMin} from "../constants";
 @Injectable({
   providedIn: 'root'
 })
-export class TimeService {
+export class TimeService implements OnDestroy{
   lastRequestTime: number
   lastTokenUpdate: number = 0
   inter: Subscription
@@ -16,39 +16,42 @@ export class TimeService {
   isLogout = true
 
   constructor(private keyCloakService: KeycloakService, private router: Router) {
+    this.lastRequestTime = new Date().getTime()
+    this.lastTokenUpdate = new Date().getTime()
+    this.startInterval()
   }
 
-  setLastTime() {
-    this.lastRequestTime = new Date().getTime()
-
-    if (this.isBlocked) {
-      this.isBlocked = false
-      return
-    }
+  ngOnDestroy(): void {
     if (this.inter) {
       this.inter.unsubscribe()
       this.inter.remove(null)
     }
+    }
 
-    this.inter = interval(10_000).subscribe((r) => {
+  setLastTime() {
+    this.lastRequestTime = new Date().getTime()
+  }
+
+  private startInterval() {
+    this.inter = interval(10_000).subscribe(() => {
       let newTime = new Date().getTime()
-        //console.log(fiveMin - (newTime - this.lastRequestTime))
+      //console.log("logout time: " + (newTime - this.lastRequestTime))
       if (newTime - this.lastRequestTime > fiveMin && this.isLogout) {
         this.keyCloakService.logoutAction().subscribe({
-          next: value => {},
-          error: err => {},
           complete: () => this.router.navigate(['/'])
         })
       }
+      //console.log("refresh token time: " + (newTime - this.lastTokenUpdate))
       if (newTime - this.lastTokenUpdate > freeMin && this.isRefreshToken) {
         this.isBlocked = true
         this.keyCloakService.exchangeRefreshToken().subscribe({
-          next: () => {
-            this.lastTokenUpdate = newTime
-          },
-          error: () => {this.lastRequestTime = 0}
+          next: () => this.lastTokenUpdate = newTime,
+          error: () => this.lastRequestTime = 0,
+          complete: () =>  this.isBlocked = false
         })
       }
     })
   }
+
+
 }

@@ -25,7 +25,7 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
   onTabChanged$: Subscription
   requestUserProfile$: Subscription
   getDocumentFull$: Subscription
-  openDocType: OpenDocType
+  openDocType: OpenDocType = undefined
 
   @ViewChild(DocumentEditorComponent) editorComponent: DocumentEditorComponent;
   tabDone: boolean;
@@ -62,8 +62,10 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
   }
 
   openDoc(doc: {"rowId": number, "openType": OpenDocType}) {
+
     this.openDocType = doc.openType
     this.changeDocId = doc.rowId
+    console.log(this.openDocType)
     this.loadDocumentForEdit(doc.rowId)
   }
 
@@ -84,6 +86,7 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
   tabChangeDone() {
     if(this.currentTabNum == TAB_DOCUMENT_LIST){
       this.openedDocument = undefined
+      this.openDocType = undefined
     }
     if(this.tempOpenedComponent && this.currentTabNum === TAB_DOCUMENT_SHOW){
       this.openedDocument = this.tempOpenedComponent
@@ -94,8 +97,6 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
 
   exit() {
     this.keycloakService.logoutAction().subscribe({
-      // next: value => this.router.navigate(["/"]),
-      // error: err => this.router.navigate(["/"]),
       complete:(() => this.router.navigate(["/"]))
     })
   }

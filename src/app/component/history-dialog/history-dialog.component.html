@@ -13,7 +13,7 @@
 
         <ng-container matColumnDef="createDate">
           <th class="w-[10%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Дата создания</th>
-          <td class="w-[10%]" mat-cell *matCellDef="let row">{{row.createDate | date: 'dd.MM.yyyy hh:mm' }}</td>
+          <td class="w-[10%]" mat-cell *matCellDef="let row">{{row.createDate | date: 'dd.MM.yy hh:mm' }}</td>
         </ng-container>
 
         <ng-container matColumnDef="createUserName">
