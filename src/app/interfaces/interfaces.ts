@@ -57,7 +57,7 @@ export interface MessageDialog {
 export type DialogButtonType = "YES" | "CANCEL" | "NO" | "CLOSE"
 export type DialogType = "ERROR" | "INFO"
 export type OtpType = "REGISTRATION" | "RESET_PASSWORD"
-export type OpenDocType = "EDIT" | "VIEW"
+export type OpenDocType = "EDIT" | "VIEW" | "CREATE"
 
 
 export interface ComponentChangeValue{

@@ -1,19 +1,10 @@
-import {Observable, tap} from 'rxjs';
+import {Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpEvent, HttpHeaders, HttpRequest} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {environment} from "../../environments/environment";
 import {HttpMethod, Operation} from "../model/RequestBFF";
-import {
-  BankFile,
-  IceDocument,
-  IceDocumentMaket,
-  LoginPasswordProperties,
-  OtpType,
-  UploadFile
-} from "../interfaces/interfaces";
+import {BankFile, IceDocument, IceDocumentMaket, LoginPasswordProperties, OtpType} from "../interfaces/interfaces";
 import {DocNameEdit, DocStat} from "../constants";
-import {List} from "postcss/lib/list";
-import {map} from "rxjs/operators";
 
 
 @Injectable({
@@ -22,7 +13,8 @@ import {map} from "rxjs/operators";
 
 export class BackendService {
 
-  constructor(private http: HttpClient) {  }
+  constructor(private http: HttpClient) {
+  }
 
   getCoreEnvironment(): Observable<any> {
     const operation = new Operation();
@@ -31,17 +23,17 @@ export class BackendService {
     return this.http.post(environment.bffURI + '/operation', operation);
   }
 
-  getDocumentStatusHistory(id: number, page?: number,size?: number, sort?: string, order?: string, status?: DocStat | undefined): Observable<any> {
+  getDocumentStatusHistory(id: number, page?: number, size?: number, sort?: string, order?: string, status?: DocStat | undefined): Observable<any> {
     const operation = new Operation();
     operation.url = environment.resourceServerURL + `/core/documents/status?id=${id}&page=${page}&size=${size}&sort=${sort},${order}`
-    operation.url +=  (status || (status && status.length > 0)) ? `&status=${status}` : ''
+    operation.url += (status || (status && status.length > 0)) ? `&status=${status}` : ''
     operation.httpMethod = HttpMethod.GET;
     return this.http.post(environment.bffURI + '/operation', operation);
   }
 
 
   downloadFile(documentRef: number, fileId: string): Observable<any> {
-    return this.http.get<Blob>(environment.bffURI + "/operation/files/download?documentRef=" + documentRef + "&id=" + fileId,{responseType: 'blob' as 'json'});
+    return this.http.get<Blob>(environment.bffURI + "/operation/files/download?documentRef=" + documentRef + "&id=" + fileId, {responseType: 'blob' as 'json'});
   }
 
   getBankFileList(documentRef: number): Observable<BankFile[]> {
@@ -96,7 +88,7 @@ export class BackendService {
     return this.http.post(environment.bffURI + '/operation', operation);
   }
 
-  editMaketName(maketId: number, val:DocNameEdit): Observable<any> {
+  editMaketName(maketId: number, val: DocNameEdit): Observable<any> {
     const operation = new Operation();
     operation.url = environment.resourceServerURL + `/core/makets/${maketId}/updatename`
     operation.httpMethod = HttpMethod.PUT
@@ -133,12 +125,12 @@ export class BackendService {
     return this.http.post(environment.bffURI + '/operation', operation);
   }
 
-  getDocumentNameList(page?: number,size?: number, sort?: string, order?: string, docName?: string, createDate?: Date, status?: string): Observable<any> {
+  getDocumentNameList(page?: number, size?: number, sort?: string, order?: string, docName?: string, createDate?: Date, status?: string): Observable<any> {
     const operation = new Operation();
     operation.url = environment.resourceServerURL + `/core/documents?page=${page}&size=${size}&sort=${sort},${order}`
-    operation.url +=  docName != undefined ? `&name=${docName}` : ''
-    operation.url +=  createDate != undefined ? `&createDate=${createDate}` : ''
-    operation.url +=  status != undefined ? `&status=${status}` : ''
+    operation.url += docName != undefined ? `&name=${docName}` : ''
+    operation.url += createDate != undefined ? `&createDate=${createDate}` : ''
+    operation.url += status != undefined ? `&status=${status}` : ''
     operation.httpMethod = HttpMethod.GET;
     return this.http.post(environment.bffURI + '/operation', operation);
   }
@@ -188,14 +180,20 @@ export class BackendService {
   }
 
   upload(uploadParam: FormData): Observable<any> {
-    return this.http.post<any>(environment.bffURI + "/operation/files" , uploadParam, {observe: 'events',reportProgress: true,})
+    return this.http.post<any>(environment.bffURI + "/operation/files", uploadParam, {
+      observe: 'events',
+      reportProgress: true,
+    })
   }
 
-  deleteFileById(fileId: string,documentRef: string): Observable<any> {
+  deleteFileById(fileId: string, documentRef: string): Observable<any> {
     const operation = new Operation();
     operation.url = environment.resourceServerURL + "/core/files?id=" + fileId + "&documentRef=" + documentRef
     operation.httpMethod = HttpMethod.DELETE
-    return this.http.post<any>(environment.bffURI + '/operation', operation,{observe: 'events',reportProgress: true,});
+    return this.http.post<any>(environment.bffURI + '/operation', operation, {
+      observe: 'events',
+      reportProgress: true,
+    });
   }
 
 

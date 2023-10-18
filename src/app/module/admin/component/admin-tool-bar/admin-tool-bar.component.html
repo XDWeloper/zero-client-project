@@ -1,19 +1,20 @@
-<div class="border border-primary-base w-[100%] h-10 p-1 bg-primary-base dark:bg-dark-background flex items-center justify-between">
+<div
+  class="border border-primary-base w-[100%] h-10 p-1 bg-primary-base dark:bg-dark-background flex items-center justify-between">
   <div class="flex items-center">
-    <button (click)="buttonClick('clear')" matTooltip="Очистить" class="toolBar-button-style">
+
+    <button (click)="buttonClick('clear')" class="toolBar-button-style" matTooltip="Очистить">
       <mat-icon class="text-red-300 font-bold">clear</mat-icon>
+      <span class="ml-1">Очистить</span>
     </button>
-    <!--  <button (click)="buttonClick('save')" matTooltip="Сохранить изменения"-->
-    <!--          class="toolBar-button-style">-->
-    <!--    <mat-icon class="text-sky-300 font-bold">save</mat-icon>-->
-    <!--  </button>-->
-    <button (click)="buttonClick('watch')" matTooltip="Просмотр документа"
-            class="toolBar-button-style">
-      <mat-icon class="text-white font-bold">face</mat-icon>
+
+    <button (click)="buttonClick('watch')" class="toolBar-button-style" matTooltip="Просмотр документа">
+      <mat-icon class="text-primary-light">remove_red_eye</mat-icon>
+      <span class="ml-1">Просмотр</span>
     </button>
+
   </div>
   <mat-slide-toggle *ngIf="currentStep" [(ngModel)]="currentStep.visible" (change)="change($event)">
     <div *ngIf="currentStep.visible" class="text-white">Видимый</div>
-    <div *ngIf="!currentStep.visible"class="text-white">Не видимый</div>
+    <div *ngIf="!currentStep.visible" class="text-white">Не видимый</div>
   </mat-slide-toggle>
 </div>

@@ -15,7 +15,6 @@ import {CellService} from "../../../../services/cell.service";
 import {ComponentService} from "../../../../services/component.service";
 import {DomSanitizer} from "@angular/platform-browser";
 import {cellColl, collInRow, IceComponentType} from "../../../../constants";
-import {CdkDragEnd, CdkDragMove, CdkDragStart} from "@angular/cdk/drag-drop";
 import {DocumentService} from "../../../../services/document.service";
 
 
@@ -94,7 +93,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
     this._isHover = value;
   }
 
-  selected(event: CdkDragStart | CdkDragMove | MouseEvent) {
+  selected() {
     this.isSelected = true
     this.componentService.selectedComponent$.next(this.componentID)
   }
@@ -119,6 +118,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
     this.height = this.cellService.getCellHeight()
 
     switch (this.componentType){
+        case IceComponentType.BUTTON: this.width = this.cellService.getCellWidth() * 2 * cellColl; break;
         case IceComponentType.TEXT: this.width = this.cellService.getCellWidth() * collInRow * cellColl; break;
         case IceComponentType.INPUT:this.width = this.cellService.getCellWidth() * 3 * cellColl;break;
         case IceComponentType.SELECT: this.width = this.cellService.getCellWidth() * 3 * cellColl; break;
@@ -159,7 +159,9 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
     if(this.isResized){
       this.width += $event.x - this.resizeStartX
       this.resizeStartX = $event.x
-      if(this.componentType !== IceComponentType.INPUT && this.componentType !== IceComponentType.SELECT){
+      if(this.componentType !== IceComponentType.INPUT
+        && this.componentType !== IceComponentType.SELECT
+        && this.componentType !== IceComponentType.BUTTON){
         this.height += $event.y - this.resizeStartY
         this.resizeStartY = $event.y
       }
@@ -220,7 +222,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
       }
     })
 
-    this.tableResizer$ = this.cellService.tableResizer$.subscribe(val => {
+    this.tableResizer$ = this.cellService.tableResizer$.subscribe(() => {
       this.correctToCellBound()
     })
   }

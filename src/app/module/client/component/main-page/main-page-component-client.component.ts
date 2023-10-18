@@ -62,10 +62,8 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
   }
 
   openDoc(doc: {"rowId": number, "openType": OpenDocType}) {
-
     this.openDocType = doc.openType
     this.changeDocId = doc.rowId
-    console.log(this.openDocType)
     this.loadDocumentForEdit(doc.rowId)
   }
 
@@ -73,7 +71,6 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
     this.getDocumentFull$ = this.backService.getDocumentFull(id).subscribe({
       next: ((res: IceDocument) => {
         this.tempOpenedComponent = res
-        //this.openedDocument = res
         this.currentTabNum = TAB_DOCUMENT_SHOW
       }),
       error: (err => {

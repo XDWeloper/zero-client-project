@@ -58,13 +58,14 @@ export const tableList = [
 ]
 
 export enum IceComponentType{
-  TEXT  = "text",
-  INPUT = "input",
-  AREA  = "area",
-  TABLE = "table",
-  SELECT= "select",
-  PLACE = "place",
-  UPLOAD= "upload"
+  TEXT   = "text",
+  INPUT  = "input",
+  AREA   = "area",
+  TABLE  = "table",
+  SELECT = "select",
+  PLACE  = "place",
+  UPLOAD = "upload",
+  BUTTON = "button"
 }
 export enum CellType {
   admin= "admin",

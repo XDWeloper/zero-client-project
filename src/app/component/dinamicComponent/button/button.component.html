@@ -1,0 +1,8 @@
+<div     [ngStyle]="{'height.px':height,'width.px':width}"
+         [style.top.px]="top" [style.left.px]="left" [style.border-color]="localBorderColor"
+         [ngClass]="{'border':localBorderColor}" *ngIf="visible"
+         class="absolute z-10 flex justify-center items-center rounded-lg m-1 p-0.5" >
+  <Button class="w-full h-full button-style m-0 right-0 bottom-0 " [id]="componentID">{{ placeHolder }}</Button>
+
+</div>
+

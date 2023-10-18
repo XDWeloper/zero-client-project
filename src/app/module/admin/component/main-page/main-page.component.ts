@@ -176,7 +176,11 @@ export class MainPageComponent implements OnInit, OnDestroy {
         break;
       case "upload":
         this.componentRef.instance.componentType = IceComponentType.UPLOAD;
-         this.componentRef.instance.placeHolder = " "
+         this.componentRef.instance.placeHolder = ""
+        break;
+      case "button":
+        this.componentRef.instance.componentType = IceComponentType.BUTTON;
+         this.componentRef.instance.placeHolder = "Кнопка"
         break;
     }
 
@@ -218,7 +222,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
     this.cellColl = cellColl
     this.cellRowList = new Array(collInRow * cellRow).fill(null).map((_, i) => i + 1);
     this.cellInnerList = new Array(cellColl).fill(null).map((_, i) => i + 1);
-    new ResizeObserver(v => {
+    new ResizeObserver(() => {
       let bound = this.mainContainer.nativeElement.getBoundingClientRect()
       this.cellService.tableResize$.next(bound)
       this.cellService.tableResizer$.next(bound)

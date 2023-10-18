@@ -86,9 +86,9 @@
            class="col-span-2 w-[90%] text-center rounded-md dark:bg-slate-700 mt-4" type="checkbox"
            [(ngModel)]="currentComponent.required">
 
-    <span *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'|| currentComponent.componentType === 'select'"
+    <span *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'|| currentComponent.componentType === 'select' || currentComponent.componentType === 'button'"
           class="col-span-12 text-center">Текст компонента</span>
-    <textarea *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'|| currentComponent.componentType === 'select'"
+    <textarea *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'|| currentComponent.componentType === 'select' || currentComponent.componentType === 'button'"
               [(ngModel)]="currentComponent.placeHolder"
               class="col-span-12 w-[95%] rounded-md dark:bg-slate-700"></textarea>
 

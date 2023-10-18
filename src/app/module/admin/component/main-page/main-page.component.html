@@ -1,5 +1,4 @@
 <div class="w-screen h-screen">
-
   <mat-toolbar class="bg-primary-base dark:bg-dark-background">
     <span class="w-full text-center bg-primary-base dark:bg-dark-background text-white">Консоль администратора ({{user ? user.name : ""}})</span>
     <div class="absolute right-2 mt-2" matTooltip="Выход">
@@ -9,9 +8,7 @@
     </div>
 
   </mat-toolbar>
-
   <div class="w-[100%] h-[90%] mt-2">
-
     <as-split id="split" class="bg-gray-200 dark:bg-dark-background" direction="horizontal"
               (dragEnd)="docPanelResize($event)">
       <as-split-area class="bg-gray-200 dark:bg-dark-background duration-300"
@@ -57,10 +54,13 @@
                       [matTooltipPosition]="'right'" (click)="createComponent('select')">view_list
             </mat-icon>
             <mat-icon class="component-panel-button-style text-green-500" matTooltip="Адрес"
-                      [matTooltipPosition]="'right'" (click)="createComponent('place')">place
+                      [matTooltipPosition]="'right'" (click)="createComponent('place')">add_location
             </mat-icon>
             <mat-icon class="component-panel-button-style text-blue-500" matTooltip="Вложение"
                       [matTooltipPosition]="'right'" (click)="createComponent('upload')">cloud_upload
+            </mat-icon>
+            <mat-icon class="component-panel-button-style text-cyan-500" matTooltip="Кнопка"
+                      [matTooltipPosition]="'right'" (click)="createComponent('button')">crop_16_9
             </mat-icon>
           </div>
 
@@ -78,6 +78,13 @@
           </div>
 
         </div>
+
+        <div class="w-full flex mt-4 h-[10%]">
+          <div class="w-10 "></div>
+          <div class="border border-primary-base h-full w-[90%] m-auto"></div>
+        </div>
+
+
         <app-right-click-menu *ngIf="!isMenuHidden"
                               [x]="xPosTabMenu"
                               [y]="yPosTabMenu"
