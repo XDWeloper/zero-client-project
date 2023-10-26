@@ -1,5 +1,6 @@
 import {PDFDocObject} from "../services/print.service";
-import {ComponentMaket, IceComponent, IceDocument} from "../interfaces/interfaces";
+import {ComponentMaket, IceDocument} from "../interfaces/interfaces";
+import {IceComponentType} from "../constants";
 
 
 export class AnketaScriptRule {
@@ -9,30 +10,42 @@ export class AnketaScriptRule {
 
   getPrintRules(): PDFDocObject[] {
     let resRul = [...constRule]
-    let componentListId: number[] = [25, 27, 5, 7, 185]
+    let componentListId: number[] = [25, 184,27, 5, 7, 185]
 
     componentListId.forEach(id => {
       let comp = this.getComponentFromDoc(id)
       if (comp) {
-        resRul.push({
-            value: comp.placeHolder + ":",
-            fontStyle: "bold",
-          },
-          {
-            type:"space",
-            subLineHeight: 2
-          },
-          {
-            value: comp.value ? comp.value : "Не указано."
-          },
-          {
-          type:"space"
-          })
+        if (comp.componentType === IceComponentType.AREA ||
+            comp.componentType === IceComponentType.SELECT ||
+              (comp.componentType === IceComponentType.INPUT
+                && comp.inputType != "checkbox"
+                && comp.inputType != "radio")) {
+          resRul.push(...this.setPdfRuleForAreaInputComponent(comp))
+        }
       }
     })
 
 
     return resRul as PDFDocObject[]
+  }
+
+  setPdfRuleForAreaInputComponent(comp: ComponentMaket): PDFDocObject[]{
+    return [{
+      redLine: true,
+      fontSize: 11,
+      value: comp.placeHolder + ":",
+      fontStyle: "bold",
+    },
+      {
+        type: "space",
+        subLineHeight: 2
+      },
+      {
+        value: comp.value ? comp.value : "Не указано."
+      },
+      {
+        type: "space"
+      }]
   }
 
   getComponentFromDoc(id: number): ComponentMaket {
