@@ -4,10 +4,10 @@
 
   <div class="h-full overflow-y-auto m-4"> <!--тело таблицы-->
 
-    <div class="grid grid-cols-3 w-full border-border-red-500">
-      <div class="text-center border dark:text-gray-200" >Управляющий компонент</div>
-      <div class="text-center border dark:text-gray-200" >Управляющее значение</div>
-      <div class="text-center border dark:text-gray-200" >Изменяемое свойство</div>
+    <div class="grid grid-cols-3 w-full border border-solid">
+      <div class="text-center border border-solid dark:text-gray-200" >Управляющий компонент</div>
+      <div class="text-center border border-solid dark:text-gray-200" >Управляющее значение</div>
+      <div class="text-center border border-solid dark:text-gray-200" >Изменяемое свойство</div>
     </div>
 
 
@@ -51,7 +51,7 @@
 
 <div class="absolute bottom-4 left-0 mx-4 w-[98%]">
   <!--  Кнопки управления-->
-  <div class="flex justify-start items-center border bg-primary-light/50 " >
+  <div class="flex justify-start items-center border border-solid bg-primary-light/50 " >
     <mat-icon class="text-green-500 cursor-pointer" matTooltip="Добавить строку" (click)="addRow()">add</mat-icon>
     <mat-icon class="text-red-500 cursor-pointer" matTooltip="Удалить строку" (click)="removeRow()">remove</mat-icon>
     <mat-icon class="text-red-500 cursor-pointer" matTooltip="Очистить таблицу" (click)="clearTable()">close</mat-icon>

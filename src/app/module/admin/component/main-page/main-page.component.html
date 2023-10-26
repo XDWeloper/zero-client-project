@@ -65,7 +65,7 @@
           </div>
 
           <!--            это поле элементов-->
-          <div class="border border-primary-base w-[90%] m-auto mt-0 boundary overflow-hidden "
+          <div class="border border-solid border-primary-base w-[90%] m-auto mt-0 boundary overflow-hidden "
                #splitMainContainer id="mainContainer">
             <ng-template #field></ng-template>
             <div class="w-full grid grid-cols-12 overflow-hidden">
@@ -93,7 +93,7 @@
                      [maxSize]="propPanelOpenWidth "
                      (transitionend)="transEnd()">
         <div
-          class="relative w-full h-10 bg-primary-base dark:bg-dark-background text-center text-white text-lg border border-primary-base">
+          class="relative w-full h-10 bg-primary-base dark:bg-dark-background text-center text-white text-lg border border-solid border-primary-base">
           <p *ngIf="propPanelCurrentSize > propPanelOpenWidth / 2"
              class="inline-block bg-primary-base dark:bg-dark-background">панель свойств</p>
           <mat-icon class="mt-1 absolute text-white left-0.5" (click)="openPropPanel()">menu</mat-icon>

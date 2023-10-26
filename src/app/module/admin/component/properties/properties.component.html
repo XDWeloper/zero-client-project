@@ -32,7 +32,7 @@
     <input *ngIf="currentComponent.componentType === 'text'" class="col-span-10 w-[92%] rounded-md dark:bg-slate-700" type="text" [(ngModel)]="currentComponent.inputType">
 
     <div *ngIf="currentComponent.inputType === 'text' || currentComponent.componentType === 'area'"
-         class="col-span-12 w-[95%] rounded-md border border-primary-light relative">
+         class="col-span-12 w-[95%] rounded-md border border-solid border-primary-light relative">
       <p class=" text-center">Ограничения текста</p>
       <div class="w-full grid grid-cols-12 ml-1 mt-1 mr-2 items-baseline dark:text-white">
         <p class="col-span-8">Минимальная длинная:</p>
@@ -50,7 +50,7 @@
     </div>
 
     <div *ngIf="currentComponent.inputType === 'number'"
-         class="col-span-12 w-[95%] rounded-md border border-primary-light relative">
+         class="col-span-12 w-[95%] rounded-md border border-solid border-primary-light relative">
       <p class="text-center">Ограничения значения</p>
       <div class="w-full grid grid-cols-12 ml-1 mt-1 mr-2 items-baseline dark:text-white">
         <p class="col-span-8">Минимальное значение</p>
@@ -93,7 +93,7 @@
               class="col-span-12 w-[95%] rounded-md dark:bg-slate-700"></textarea>
 
     <div *ngIf="currentComponent.componentType === 'text'"
-         class="col-span-12 w-[95%] text-center rounded-md dark:bg-slate-700 border border-primary-light relative mt-2">
+         class="col-span-12 w-[95%] text-center rounded-md dark:bg-slate-700 border border-solid border-primary-light relative mt-2">
       <p class="">Расположение текста компонента</p>
       <mat-button-toggle-group [(ngModel)]="currentComponent.textPosition.horizontal">
         <mat-button-toggle value="left">
@@ -130,7 +130,7 @@
               [(ngModel)]="currentComponent.notification"
               class="col-span-12 w-[95%] rounded-md dark:bg-slate-700"></textarea>
 
-    <button *ngIf="currentComponent.componentType === 'select'" class="prop-button mat-elevation-z5 hover:border-primary-dark" (click)="openOptionsDialog()">
+    <button *ngIf="currentComponent.componentType === 'select'" class="prop-button mat-elevation-z5 hover:border-primary-dark border-solid" (click)="openOptionsDialog()">
       <mat-icon >list</mat-icon>
       <p>Список значений</p>
     </button>
