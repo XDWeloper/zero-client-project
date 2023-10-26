@@ -117,7 +117,7 @@ export class UploadComponent implements IceComponent, OnDestroy {
     this._value = value;
     if (value) {
       let docArray = value as Array<UploadFile>
-      docArray.forEach(doc => this.files.push(doc))
+      docArray.filter(f => f.id).forEach(doc => this.files.push(doc))
       this.reCalculateSumSize()
     }
   }
@@ -224,34 +224,47 @@ export class UploadComponent implements IceComponent, OnDestroy {
 
       this.upload$ = this.backService.upload(formData)
         .subscribe({
-        next: (res => {
-          this.spinnerService.hide()
-          this.stepService.disabledAllStep(true)
-          let fileName = file.name
+          next: (res => {
+            this.spinnerService.hide()
+            this.stepService.disabledAllStep(true)
+            let fileName = file.name
 
-          if (res.type === HttpEventType.Sent) {
-            let file: UploadFile = {id : undefined, name : fileName, size : 0, status : "", progress: 0}
-            this.files.push(file)
-            this.reCalculateSumSize()
-            this.componentService.setComponentValue({componentId: this.componentID, value: this.files})
-          }
-
-          if (res.type === HttpEventType.Response) {
-            res = res.body
-            let file: UploadFile = {id : res.id, name : res.name, size : res.fileSize, status : res.status}
-            this.files.splice(this.files.findIndex(i => i.id === undefined), 1)
-            this.files.push(file)
-            this.reCalculateSumSize()
-            this.componentService.setComponentValue({componentId: this.componentID, value: this.files})
-            if(files.length === ++fileCont) {
-              this.allFilesIsUpLoaded$.next(true)
+            if (res.type === HttpEventType.Sent) {
+              let file: UploadFile = {id: undefined, name: fileName, size: 0, status: "", progress: 0}
+              this.files.push(file)
+              this.reCalculateSumSize()
+              this.componentService.setComponentValue({componentId: this.componentID, value: this.files})
             }
-          }
-        }),
-        error: (err => {
-            this.show$ = this.messageService.show(FILES_LOAD_ERROR, err.error.message, ERROR)
-          }
-        )
+
+            if (res.type === HttpEventType.Response) {
+              res = res.body
+              let file: UploadFile = {id: res.id, name: res.name, size: res.fileSize, status: res.status}
+              this.files.splice(this.files.findIndex(i => i.id === undefined), 1)
+              this.files.push(file)
+              this.reCalculateSumSize()
+              this.componentService.setComponentValue({componentId: this.componentID, value: this.files})
+              if (files.length === ++fileCont) {
+                this.allFilesIsUpLoaded$.next(true)
+              }
+            }
+          }),
+          error: (err => {
+            console.log(this.files)
+              let errorFileIndex = this.files.findIndex(f => f.id === undefined)
+              console.log(errorFileIndex)
+              let message = undefined
+              if (errorFileIndex != -1) {
+                let errorFile = this.files[errorFileIndex]
+                console.log(errorFile)
+                message = `Ошибка загрузки файла ${errorFile.name}. Смотри доп. информацию.(Кликни на иконку информации.)`
+                this.files.splice(errorFileIndex,1)
+              }
+              console.log("message: " + message)
+              this.show$ = this.messageService.show(message ? message : FILES_LOAD_ERROR, err.error.message, ERROR)
+              this.reCalculateSumSize()
+              this.stepService.disabledAllStep(false)
+            }
+          )
         })
       formData.delete("file")
       formData.delete("documentRef")
