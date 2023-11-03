@@ -2,7 +2,7 @@
   <h1 mat-dialog-title>Редактировать текст</h1>
   <div mat-dialog-content >
 <!--    <angular-editor id="editor"  [config]="editorConfig" >-->
-    <angular-editor [placeholder]="'Введите текст...'" [(ngModel)]="htmlContent" [config]="editorConfig" >
+    <angular-editor [placeholder]="'Введите текст...'" [(ngModel)]="htmlContent" [config]="editorConfig">
 <!--    <angular-editor id="editor" formControlName="htmlContent" [config]="editorConfig" >-->
       <ng-template #customButtons let-executeCommandFn="executeCommandFn">
         <ae-toolbar-set class="h-full">

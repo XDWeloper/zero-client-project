@@ -1,6 +1,6 @@
 import {ComponentRef, Injectable} from '@angular/core';
 import {
-  ComponentMaket,
+  ComponentMaket, DocStatus,
   DocumentTreeTempl,
   IceDocumentMaket,
   IceStepMaket,
@@ -17,8 +17,21 @@ export class DocumentService {
   docTree: DocumentTreeTempl[] = []
   templateList: Array<IceDocumentMaket> = []
   lastComponentIndex = 0
+  statusList:{status: string , name: string}[] = []
 
   constructor() {
+    this.statusList.push({status: "", name: ""})
+    Object.keys(DocStatus).forEach((status, index) => {
+      this.statusList.push({status: status, name: Object.values(DocStatus)[index]})
+    })
+  }
+
+  getMaxComponentID(id: number): number{
+    return  Math.max(...this.getTemplateByDocId(id).docStep.map(s => s.componentMaket).flat(1).map(c => c.componentID))
+  }
+
+  getStatusListForSelect(): {status: string , name: string}[] {
+    return this.statusList
   }
 
   calculateComponentId() {
@@ -27,8 +40,6 @@ export class DocumentService {
       .reduce((r, i) => r += i, 0))
       .reduce((r, i) => r += i, 0)
   }
-
-
 
   getMaketComponentList(docId: number,selfId: number){
     let resultArr = Array()
@@ -71,7 +82,6 @@ export class DocumentService {
     this.calculateComponentId()
   }
 
-
   saveTemplate(dtt: DocumentTreeTempl){
     if(!this.templateList.find(i => i.docId === dtt.id)) {
       return
@@ -87,7 +97,7 @@ export class DocumentService {
     })
   }
 
-    addTemplate(doc: DocumentTreeTempl, step: StepTreeTempl, refComponentList?: ComponentRef<IceMaketComponent>[]) {
+  addTemplate(doc: DocumentTreeTempl, step: StepTreeTempl, refComponentList?: ComponentRef<IceMaketComponent>[]) {
     if(step.num === 0) return
 
     let isDocPresent = this.templateList.find(p => p.docId === doc.id)
@@ -153,7 +163,6 @@ export class DocumentService {
     else
       step.splice(step.findIndex(p => p.stepNum === stepNUm), 1)
   }
-
 
   getStep(docId: number, stepNum: number): StepTreeTempl {
     return this.getDocById(docId).children.find(p => p.num === stepNum)

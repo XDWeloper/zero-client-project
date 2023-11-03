@@ -10,6 +10,7 @@ import {
 import {NestedTreeControl} from "@angular/cdk/tree";
 import {MatTreeNestedDataSource} from "@angular/material/tree";
 import {
+  ComponentMaket,
   DocumentTreeTempl,
   IceDocumentMaket,
   IceStepMaket,
@@ -132,7 +133,6 @@ export class DocumentComponent implements OnInit {
       next:(val => this.isModified = val )
     })
   }
-
 
   documentChange(doc: DocumentTreeTempl) {
     this.currentDocument = doc
@@ -271,7 +271,6 @@ export class DocumentComponent implements OnInit {
     this.isStepEdit = false
   }
 
-
   delStep(stepHover: StepTreeTempl) {
     this.isModified = true
 
@@ -336,6 +335,7 @@ export class DocumentComponent implements OnInit {
               docStep: res.docStep,
               isLoaded: true,
             })
+          //this.normalizeComponentId() Если в друг произошло задвоение ид компонентов(чего быть не должно!!!) можно это запустить для нормалиизации идешек.
         }),
       })
 
@@ -383,5 +383,36 @@ export class DocumentComponent implements OnInit {
 
   uploadCurrentMaket() {
     this.documentService.saveTemplate(this.currentDocument)
+  }
+
+  private normalizeComponentId() {
+    console.log("normalizeComponentId")
+    let componentIdArray = this.documentService.getTemplateByDocId(this.currentDocument.id).docStep.map(s => s.componentMaket).flat(1).map(c => c.componentID)
+    console.log(componentIdArray)
+
+    let dublArray = new Array(400)
+    dublArray.fill(0,0,199)
+
+    componentIdArray.forEach(id => {
+      dublArray[id] ++
+    })
+
+    let maxID = this.documentService.getMaxComponentID(this.currentDocument.id) + 1
+
+    for (let i = 0; i < dublArray.length; i++){
+      if(dublArray[i] > 1) {
+        console.log(i + " : " + dublArray[i])
+        let component: ComponentMaket[] = this.documentService.getTemplateByDocId(this.currentDocument.id).docStep.map(s => s.componentMaket).flat(1).filter(c => c.componentID === i)
+        console.log(component)
+        for(let c = 1; c < component.length; c++){
+          component[c].componentID = maxID ++
+        }
+      }
+    }
+
+    componentIdArray = this.documentService.getTemplateByDocId(this.currentDocument.id).docStep.map(s => s.componentMaket).flat(1).map(c => c.componentID)
+    console.log(componentIdArray)
+
+
   }
 }

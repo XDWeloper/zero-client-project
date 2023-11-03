@@ -27,6 +27,7 @@ export class EditTextComponent {
   text = new EventEmitter()
 
   set htmlContent(value: string) {
+    console.log("html: " + value)
     this._htmlContent = value;
     this.text.emit(value)
   }

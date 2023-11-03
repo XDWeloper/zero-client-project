@@ -28,6 +28,7 @@ import {BankDocumentListComponent} from "../bank-document-list/bank-document-lis
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {HistoryDialogComponent} from "../../../../component/history-dialog/history-dialog.component";
 import {ComponentType} from "@angular/cdk/overlay";
+import {DocumentService} from "../../../../services/document.service";
 
 @Component({
   selector: 'app-document-table',
@@ -63,16 +64,25 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
   docName: string
   createDate: Date
   docStatus: string
+  statusList:{status: string , name: string}[] = []
 
 
-  constructor(public backService: BackendService, private messageService: MessageService, tabService: TabService, public dialog: MatDialog,private changeDetection: ChangeDetectorRef) {
-    tabService.onTabChanged().subscribe(tabNum => {
+  constructor(public backService: BackendService,
+              private messageService: MessageService,
+              private tabService: TabService,
+              public dialog: MatDialog,
+              private changeDetection: ChangeDetectorRef,
+              private documentService: DocumentService) {
+  }
+
+
+  ngOnInit(): void {
+    this.statusList = this.documentService.getStatusListForSelect()
+    this.tabService.onTabChanged().subscribe(tabNum => {
       if (tabNum === TAB_DOCUMENT_LIST)
         this.refreshData()
     })
-  }
 
-  ngOnInit(): void {
   }
 
   clearFilter() {

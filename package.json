@@ -30,6 +30,7 @@
     "ngx-mask": "^15.1.0",
     "ngx-mat-select-search": "^7.0.2",
     "rxjs": "~7.5.0",
+    "string-strip-html": "^13.4.3",
     "tslib": "^2.3.0",
     "tw-elements": "^1.0.0-beta1",
     "zone.js": "~0.12.0"

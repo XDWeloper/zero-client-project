@@ -28,8 +28,9 @@ export class SpinnerInterceptor implements HttpInterceptor {
           },
           complete: () => {
             this.requestListSize --
-            if(this.requestListSize < 1)
+            if(this.requestListSize < 1) {
               this.spinnerService.hide()
+            }
           }
         })
       );

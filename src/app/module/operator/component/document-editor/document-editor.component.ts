@@ -41,7 +41,7 @@ import {
 import {
   InformationCompanyParticipantsTableComponent
 } from "../../../../component/dinamicComponent/tables/information-company-participants-table/information-company-participants-table.component";
-import {debounceTime, filter, Observable, Subscription} from "rxjs";
+import {debounceTime, filter, Observable, pipe, Subscription, takeLast} from "rxjs";
 import {ComponentService} from "../../../../services/component.service";
 import {BackendService} from "../../../../services/backend.service";
 import {MessageService} from "../../../../services/message.service";
@@ -491,7 +491,11 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   private docSaved(message: string, message2: string) {
-    this.tabChange$ = this.messageService.show(message, message2, INFO).subscribe(res => {
+    if(this.tabChange$)
+      this.tabChange$.unsubscribe()
+
+    this.tabChange$ = this.messageService.show(message, message2, INFO).subscribe(
+      res => {
       this.tabService.openTab(TAB_DOCUMENT_LIST)
       this.currentDocument = undefined
     })
