@@ -1,10 +1,11 @@
-import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, Output} from '@angular/core';
+import {ChangeDetectionStrategy, ChangeDetectorRef, Component, EventEmitter, OnDestroy, Output} from '@angular/core';
 import {FormControl} from "@angular/forms";
 import {Pageable, PlaceObject} from "../../interfaces/interfaces";
-import {debounceTime, filter, ReplaySubject, Subject, switchMap, takeUntil} from "rxjs";
+import {debounceTime, filter, ReplaySubject, Subject, switchMap, takeUntil, takeWhile} from "rxjs";
 import {tap} from "rxjs/operators";
 import {AddressService} from "../../services/address.service";
 import {MatDialogRef} from "@angular/material/dialog";
+import {SpinnerService} from "../../services/spinner.service";
 
 export interface LevelClass {
   "levelNum": number,
@@ -58,7 +59,7 @@ const levelHardDataCodes: LevelHardDataCode[] = [
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 
-export class ChangePlaceDialogComponent {
+export class ChangePlaceDialogComponent implements OnDestroy{
   @Output() placeList = new EventEmitter<{placeList: PlaceObject[], placeString: string}>()
 
   placeClassList: LevelClass[] = []
@@ -66,13 +67,15 @@ export class ChangePlaceDialogComponent {
   protected _onDestroy = new Subject<void>();
 
 
-  constructor(public addressService: AddressService,private changeDetection: ChangeDetectorRef,public dialogRef: MatDialogRef<ChangePlaceDialogComponent>) {
+  constructor(public addressService: AddressService,private changeDetection: ChangeDetectorRef,public dialogRef: MatDialogRef<ChangePlaceDialogComponent>, private spinner:SpinnerService) {
     this.createNewLevel([1])
   }
 
   private loadData(page: number, levelClass: LevelClass,) {
     let level = levelClass.levelNum < steadKey ? levelClass.levelNum : null
-    this.addressService.getAllRegion(page, level, levelClass.levelSorting, levelClass.parentObjId, levelClass.levelServiceName).subscribe({
+    this.addressService.getAllRegion(page, level, levelClass.levelSorting, levelClass.parentObjId, levelClass.levelServiceName).
+      pipe(takeUntil(this._onDestroy))
+      .subscribe({
       next: rez => {
         levelClass.levelData = rez
         rez.content.forEach(item => {

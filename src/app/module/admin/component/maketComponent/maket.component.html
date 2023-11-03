@@ -2,7 +2,7 @@
      [cdkDragFreeDragPosition]="dragPosition"
      [ngStyle]="{'height.px':height,'width.px':width}"
      [cdkDragDisabled]="isResized"
-     class=" mat-elevation-z2 absolute border border-primary-light hover:border-2 bg-white dark:bg-dark-background dark:text-white overflow-hidden cursor-move z-10 flex"
+     class=" mat-elevation-z2 absolute border border-solid border-primary-light hover:border-2 bg-white dark:bg-dark-background dark:text-white overflow-hidden cursor-move z-10 flex"
      [ngClass]="{
       'border-red-500 border-2' : isSelected,
       'z-10': !(isSelected && isDragged),

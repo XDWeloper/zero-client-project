@@ -125,7 +125,7 @@ export const editorConfig: AngularEditorConfig = {
   //uploadUrl: 'https://api.exapple.com/v1/image/upload',
   //upload: (file: File) => { return 'https://api.exapple.com/v1/image/upload'},
   uploadWithCredentials: false,
-  sanitize: true,
+  sanitize: false,
   toolbarPosition: 'top',
   // toolbarHiddenButtons: [
   //   ['bold', 'italic'],

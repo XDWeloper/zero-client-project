@@ -65,7 +65,6 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
 
     this.openDocType = doc.openType
     this.changeDocId = doc.rowId
-    console.log(this.openDocType)
     this.loadDocumentForEdit(doc.rowId)
   }
 

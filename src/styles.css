@@ -23,7 +23,7 @@
 }
 
 .toolBar-button-style{
-  @apply text-gray-200 font-semibold ml-2 border border-white duration-300 bg-primary-base rounded-md w-40 h-[90%] flex justify-center items-center px-1 text-white hover:bg-primary-dark dark:bg-dark-background dark:hover:bg-primary-light
+  @apply  text-gray-200 font-semibold ml-2 border border-white duration-300 bg-primary-base rounded-md w-40 h-[90%] flex justify-center items-center p-1 text-white hover:bg-primary-dark
 }
 .placeholder-style{
   @apply transform transition-all absolute top-0 left-2 h-full flex items-center pl-2 text-sm group-focus-within:text-xs peer-valid:text-xs group-focus-within:h-1/2 peer-valid:h-1/2 group-focus-within:-translate-y-full peer-valid:-translate-y-full group-focus-within:pl-0 peer-valid:pl-0 dark:text-gray-300 font-mono tracking-[1px]
@@ -54,7 +54,10 @@
 
 }
 
-
+* {
+  margin: 0;
+  padding: 0;
+}
 
 html, body { height: 100%; }
 body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

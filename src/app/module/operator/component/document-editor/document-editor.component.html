@@ -17,6 +17,13 @@
       <span class="ml-1">Заполнено</span>
     </button>
 
+    <div class="flex-auto flex justify-end">
+      <button (click)="print()" matTooltip="печать" class="toolBar-button-style ">
+        <mat-icon class="text-lime-300 font-bold">print</mat-icon>
+        <span class="ml-1">Печать</span>
+      </button>
+    </div>
+
     <div *ngIf="openType === 'VIEW' && (currentDocument && currentDocument.status !='CONTROL')" class="w-full text-center text-gray-200 font-semibold">
       Просмотр документа ({{ currentDocument.status | docStatus }})
     </div>

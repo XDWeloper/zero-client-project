@@ -1,5 +1,5 @@
   <div
-    class="relative w-full h-10 bg-primary-base dark:bg-dark-background text-center text-white text-lg border border-primary-base">
+    class="relative w-full h-10 bg-primary-base dark:bg-dark-background text-center text-white text-lg border border-solid border-primary-base">
     <mat-icon *ngIf="docPanelCurrentSize > docPanelOpenWidth / 2 && !addDocPanel" (click)="addDocPanel = true"
               class="absolute left-1 mt-1 text-yellow-300 text-2xl cursor-pointer hover:scale-125 duration-300"
               matTooltip="Добавить документ">
@@ -27,7 +27,7 @@
                      (mousemove)="isStepHover = true; stepHover = stepNode"
                      (mouseleave)="isStepHover = false"
                      [ngClass]=" stepNode.num != 0 ? 'flex justify-between items-center': 'flex justify-start items-center'"
-                     class=" relative text-black dark:text-white cursor-pointer border border-gray-200 dark:border-dark-background hover:border-primary-light dark:hover:border-primary-light"
+                     class=" relative text-black dark:text-white cursor-pointer border border-solid border-gray-200 dark:border-dark-background hover:border-primary-light dark:hover:border-primary-light"
                      *matTreeNodeDef="let stepNode"
                      matTreeNodeToggle>
 
@@ -60,7 +60,7 @@
 
       <mat-nested-tree-node *matTreeNodeDef="let docNode; when: hasChild">
         <div
-          class="flex justify-between items-center relative mat-tree-node dark:text-white cursor-pointer border border-gray-300 dark:border-dark-background hover:border-primary-light dark:hover:border-primary-light"
+          class="flex justify-between items-center relative mat-tree-node dark:text-white cursor-pointer border border-solid border-gray-300 dark:border-dark-background hover:border-primary-light dark:hover:border-primary-light"
           (mousemove)="isDocHover = true; docHover = docNode" (mouseleave)="isDocHover = false"
           (click)="documentChange(docNode)">
           <div class="flex justify-start items-center">
@@ -103,9 +103,9 @@
     </mat-tree>
 
     <div *ngIf="addDocPanel"
-         class="duration-300 absolute top-1 right-1 left-1  bg-white rounded-2xl text-black dark:text-white dark:bg-dark-background border border-primary-base">
+         class="duration-300 absolute top-1 right-1 left-1  bg-white rounded-2xl text-black dark:text-white dark:bg-dark-background border border-solid border-primary-base">
       <div
-        class="bg-primary-base dark:bg-dark-background text-center text-white text-lg rounded-t-2xl border border-primary-base">
+        class="bg-primary-base dark:bg-dark-background text-center text-white text-lg rounded-t-2xl border border-solid border-primary-base">
         Создать новый документ
       </div>
 
@@ -125,7 +125,7 @@
     </div>
   </div>
 
-<div *ngIf="isPanelOpen && (docPanelCurrentSize > docPanelOpenWidth / 2)" class="w-[24%] absolute left-2 bottom-6 border-t border-t-white py-1">
+<div *ngIf="isPanelOpen && (docPanelCurrentSize > docPanelOpenWidth / 2)" class="w-[24%] absolute left-2 bottom-6 border-t border-t-white border-solid py-1">
   <label for="file-download" class="text-white text-center bg-primary-base hover:bg-primary-light w-full inline-block
                 focus:ring-4 focus:outline-none focus:ring-primary-light font-medium rounded-lg text-sm px-4 py-2
                 dark:bg-primary-light dark:hover:bg-primary-light dark:focus:ring-primary-light cursor-pointer">

@@ -28,6 +28,7 @@ import {BankDocumentListComponent} from "../bank-document-list/bank-document-lis
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {ComponentType} from "@angular/cdk/overlay";
 import {HistoryDialogComponent} from "../../../../component/history-dialog/history-dialog.component";
+import {DocumentService} from "../../../../services/document.service";
 
 @Component({
   selector: 'app-document-table',
@@ -52,6 +53,7 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
   length = 50;
   pageSize = 10;
   pageSizeOptions = [10, 25, 50];
+  statusList:{status: string , name: string}[] = []
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
@@ -65,23 +67,21 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
   docStatus: string
 
 
-  constructor(public backService: BackendService, private messageService: MessageService, tabService: TabService, public dialog: MatDialog,private changeDetection: ChangeDetectorRef) {
-    tabService.onTabChanged().subscribe(tabNum => {
-      if (tabNum === TAB_DOCUMENT_LIST)
-        this.refreshData()
-    })
+  constructor(public backService: BackendService,
+              private messageService: MessageService,
+              private tabService: TabService,
+              public dialog: MatDialog,
+              private changeDetection: ChangeDetectorRef,
+              private documentService: DocumentService) {
   }
 
   ngOnInit(): void {
+    this.statusList = this.documentService.getStatusListForSelect()
+    this.tabService.onTabChanged().subscribe(tabNum => {
+       if (tabNum === TAB_DOCUMENT_LIST)
+         this.refreshData()
+    })
   }
-
-  clearFilter() {
-    this.docName = undefined
-    this.createDate = undefined
-    this.docStatus = undefined
-    this.changeDetection.detectChanges()
-  }
-
 
   ngAfterViewInit(): void {
     this.paginator._intl.itemsPerPageLabel = "размер страницы"
@@ -154,8 +154,16 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
     this.clearFilter()
     this.initRefresh()
     this.filterExpanded = false
-    this.changeDetection.detectChanges()
+    //this.changeDetection.detectChanges()
   }
+
+  clearFilter() {
+    this.docName = undefined
+    this.createDate = undefined
+    this.docStatus = undefined
+    //this.changeDetection.detectChanges()
+  }
+
 
   initRefresh() {
     let pgE = new PageEvent()

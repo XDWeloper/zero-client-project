@@ -4,13 +4,13 @@
 
   <div class="w-full text-center" >Значение</div>
   <div class="h-full mx-4 w-[98%] overflow-y-auto"> <!--тело таблицы-->
-      <input  *ngFor="let row of localOptionList" type="text" class="w-full p-1 border" [(ngModel)]="row.item"/>
+      <input  *ngFor="let row of localOptionList" type="text" class="w-full p-1 border border-solid" [(ngModel)]="row.item"/>
   </div>
 </div>
 
 <div class="absolute bottom-12 left-0 mx-4 w-[98%]" >
   <!--  Кнопки управления-->
-  <div class="flex justify-start items-center border bg-primary-light/50 " >
+  <div class="flex justify-start items-center border border-solid bg-primary-light/50 " >
     <mat-icon class="text-green-500 cursor-pointer" matTooltip="Добавить строку" (click)="addRow()">add</mat-icon>
     <mat-icon class="text-red-500 cursor-pointer" matTooltip="Удалить строку" (click)="removeRow()">remove</mat-icon>
     <mat-icon class="text-red-500 cursor-pointer" matTooltip="Очистить таблицу" (click)="clearTable()">close</mat-icon>

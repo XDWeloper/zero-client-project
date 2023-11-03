@@ -2,13 +2,13 @@
   <h3 class="text-center h-[5%] ">История изменения статусов</h3>
   <div class="h-[5%] pb-1 pl-1 z-100000">
     <label for="select">Фильтр по статусу: </label>
-    <select class="text-center bg-white border p-1 cursor-pointer" [(ngModel)]="docStatus" id="select">
+    <select class="text-center bg-white border border-solid p-1 cursor-pointer" [(ngModel)]="docStatus" id="select">
       <option *ngFor="let val of statusList" [value]=val.status>{{val.name}}</option>
     </select>
   </div>
 
   <div class="h-[80%]">
-    <div class=" h-[90%] overflow-auto border">
+    <div class=" h-[90%] overflow-auto border border-solid">
       <table mat-table [dataSource]="data" matSort matSortActive="id" matSortDisableClear matSortDirection="desc">
 
         <ng-container matColumnDef="createDate">
@@ -53,7 +53,7 @@
                      [pageSizeOptions]="pageSizeOptions"></mat-paginator>
     </div>
   </div>
-  <div class="border-t h-[5%]">
+  <div class="border-t h-[5%] border-solid">
     <button class="float-right button-style" (click)="dialogRef.close()">Ок</button>
   </div>
 </div>

@@ -5,7 +5,7 @@ import {
   Component,
   ComponentRef,
   ElementRef,
-  HostListener,
+  HostListener, Inject,
   Input,
   OnDestroy,
   OnInit,
@@ -41,7 +41,7 @@ import {
 import {
   InformationCompanyParticipantsTableComponent
 } from "../../../../component/dinamicComponent/tables/information-company-participants-table/information-company-participants-table.component";
-import {debounceTime, filter, Observable, Subscription} from "rxjs";
+import {debounceTime, filter, Observable, pipe, Subscription, takeLast} from "rxjs";
 import {ComponentService} from "../../../../services/component.service";
 import {BackendService} from "../../../../services/backend.service";
 import {MessageService} from "../../../../services/message.service";
@@ -52,6 +52,8 @@ import {SelectComponent} from "../../../../component/dinamicComponent/select/sel
 import {StepService} from "../../../../services/step.service";
 import {MatDialog} from "@angular/material/dialog";
 import {StatusReasonComponent} from "../../../../component/status-reason/status-reason.component";
+import {PDFDocObject, PrintService} from "../../../../services/print.service";
+import {AnketaScriptRule} from "../../../../data/anketaScriptRule";
 
 @Component({
   selector: 'app-document-editor',
@@ -67,8 +69,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   private updateDocument$: Subscription;
   private tabLabelNode: HTMLElement
   private _openType: OpenDocType = "EDIT"
-  $reason: Observable<string> = new Observable<string>()
-
 
   @Input() set currentDocument(value: IceDocument | undefined) {
     this._currentDocument = value;
@@ -127,14 +127,14 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   checkedText: string | undefined
   disabledStep: boolean = false
 
-
   constructor(private componentService: ComponentService,
               private backService: BackendService,
               private messageService: MessageService,
               private tabService: TabService,
               private changeDetection: ChangeDetectorRef,
               public dialog: MatDialog,
-              private stepService: StepService) {
+              private stepService: StepService,
+              private printService: PrintService) {
   }
 
   ngOnDestroy(): void {
@@ -491,7 +491,11 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   private docSaved(message: string, message2: string) {
-    this.tabChange$ = this.messageService.show(message, message2, INFO).subscribe(res => {
+    if(this.tabChange$)
+      this.tabChange$.unsubscribe()
+
+    this.tabChange$ = this.messageService.show(message, message2, INFO).subscribe(
+      res => {
       this.tabService.openTab(TAB_DOCUMENT_LIST)
       this.currentDocument = undefined
     })
@@ -531,5 +535,21 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         error: err => this.messageService.show(CHANGE_STATUS_ERROR, err.error.message, ERROR)
       }
     )
+  }
+
+  print() {
+    let docData = this.getDataForPdf()
+    if (docData && docData.length > 0) {
+      this.printService.createPDF(docData)
+    }
+  }
+
+  private getDataForPdf(): PDFDocObject[] {
+
+    let resultList: PDFDocObject[]
+    let asr = new AnketaScriptRule(this.currentDocument)
+    resultList = asr.getPrintRules()
+
+    return resultList
   }
 }

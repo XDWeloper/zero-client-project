@@ -23,6 +23,7 @@ export class MessageService {
 
   closeDialog(buttonType: DialogButtonType){
     this.onClose.next(buttonType)
+    this.onClose.complete()
     this.onClose.unsubscribe()
     this.onClose = new Subject<DialogButtonType>()
   }
