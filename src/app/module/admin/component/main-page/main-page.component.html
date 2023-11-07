@@ -1,7 +1,9 @@
 <div class="w-screen h-screen">
 
   <mat-toolbar class="bg-primary-base dark:bg-dark-background">
-    <span class="w-full text-center bg-primary-base dark:bg-dark-background text-white">Консоль администратора ({{user ? user.name : ""}})</span>
+    <span
+      class="w-full text-center bg-primary-base dark:bg-dark-background text-white">Консоль администратора ({{user ? user.name : ""}}
+      )</span>
     <div class="absolute right-2 mt-2" matTooltip="Выход">
       <h1 class="bg-gray-50 rounded-full h-8 w-8 flex justify-center items-center cursor-pointer">
         <i class="fa-solid fa-arrow-right-from-bracket" (click)="exit()"></i>
@@ -23,11 +25,10 @@
         <app-document [docPanelCurrentSize]="docPanelCurrentSize"
                       [docPanelOpenWidth]="docPanelOpenWidth"
                       (openPanel)="openDocPanel()"
-                      (currentDocAndStep)="setCurrentDocAndStep($event)"
-        ></app-document>
-
-
+                      (currentDocAndStep)="setCurrentDocAndStep($event)">
+        </app-document>
       </as-split-area>
+
       <as-split-area [size]="100 - docPanelCurrentSize - propPanelCurrentSize"
                      class="bg-gray-200 dark:bg-dark-background duration-300">
         <app-admin-tool-bar [ngClass]="currentDoc && currentStep ? 'visible' : 'invisible'"
