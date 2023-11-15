@@ -14,8 +14,8 @@ const pdfConfig = {
   checkBoxHeight: 5,
   checkBoxWidth: 5,
   tableHeaderFontSize: 8,
-  tableHeaderFontStyle: "MyFont"
-
+  tableHeaderFontStyle: "MyFont",
+  tabSize: 3
 };
 
 export type PDFObjectType = "text" | "table" | "space" | "line" | "image" | "checkBox"
@@ -34,7 +34,8 @@ export interface PDFDocObject {
   left?: number,
   colNum?: number,
   tableCol?: number,
-  frame?: boolean
+  frame?: boolean,
+  tabCount?: number
 }
 
 export interface PDFImageObject extends PDFDocObject {
@@ -62,7 +63,6 @@ const tableHeaderFillColor = colorGray
 const pdfDoc = new jsPDF()
 
 
-
 @Injectable({
   providedIn: 'root'
 })
@@ -76,7 +76,9 @@ export class PrintService {
   lastStringXPositionEnd = 0
   pageCount = 0
   stopCreateNewPage = false
-  heightCorrect = pdfConfig.checkBoxHeight/4
+  heightCorrect = pdfConfig.checkBoxHeight / 4
+  lockNewLine = false
+  tableRowCurrentHeight: number | undefined = undefined
 
   constructor() {
     this.addFont()
@@ -99,18 +101,18 @@ export class PrintService {
     this.currentHeight = pdfConfig.topBorder
   }
 
-  private clearPdfDoc(){
+  private clearPdfDoc() {
     try {
-      for(let i = this.pageCount + 1  ; i > 0; i--) {
+      for (let i = this.pageCount + 1; i > 0; i--) {
         pdfDoc.deletePage(i)
       }
-    } catch (e){
+    } catch (e) {
       console.log(e)
     }
   }
 
   createPDF(docData: PDFDocObject[]) {
-    if(pdfDoc.getNumberOfPages() < 1) {
+    if (pdfDoc.getNumberOfPages() < 1) {
       pdfDoc.addPage()
       this.addFont()
       this.resetCurrentHeight()
@@ -146,47 +148,112 @@ export class PrintService {
   }
 
   private addText(docObject: PDFDocObject) {
-    if(!docObject.value) return
+    if (!docObject.value === undefined) return
 
     pdfDoc.setFontSize(docObject.fontSize ? docObject.fontSize : pdfConfig.fontSize)
     pdfDoc.setTextColor(docObject.fontColor ? docObject.fontColor : defaultColor)
-    switch (docObject.fontStyle){
-      case "bold": pdfDoc.setFont("MyFont_bold", "bold")
+    switch (docObject.fontStyle) {
+      case "bold":
+        pdfDoc.setFont("MyFont_bold", "bold")
         break;
-      case "semiBold": pdfDoc.setFont("MyFont_semiBold", "normal")
+      case "semiBold":
+        pdfDoc.setFont("MyFont_semiBold", "normal")
         break;
-      case "italic": pdfDoc.setFont("MyFont_italic", "italic")
+      case "italic":
+        pdfDoc.setFont("MyFont_italic", "italic")
         break;
-      default: pdfDoc.setFont("MyFont", "normal")
+      default:
+        pdfDoc.setFont("MyFont", "normal")
 
     }
 
 
     let x = docObject.left ? docObject.left : pdfConfig.leftBorder
-    if (docObject.align) {
+
+
+    let newLine = docObject.newLine != undefined ? docObject.newLine : true
+    let charArr: string[] = [...(docObject.value as string)]
+    let isTable = docObject.tableCol != undefined && docObject.colNum != undefined
+    let stringWith = isTable ? this.docWorkWidth / docObject.tableCol : this.docWorkWidth
+    let resultArray = this.getNormalizeString(newLine, charArr, stringWith);
+
+
+    let firstLine = docObject.redLine
+
+    if (isTable) {
+      x = (this.docWorkWidth / docObject.tableCol) * (docObject.colNum - 1) + pdfConfig.leftBorder
+      if (!newLine)
+        this.currentHeight = this.tableRowCurrentHeight
+      else
+        this.tableRowCurrentHeight = this.currentHeight
+    }
+    let xPositionForRect = x
+    let yPositionForRect = this.currentHeight
+    let widthPositionForRect = stringWith
+    let align =  docObject.align  ? docObject.align : "left"
+
+    if (docObject.align ) {
       switch (docObject.align) {
         case "center":
-          x = this.docWidth / 2
+          x = isTable ? xPositionForRect + stringWith / 2 : this.docWidth / 2
           break
         case "right":
-          x = this.docWidth - pdfConfig.rightBorder
+          x = isTable ? xPositionForRect + stringWith :this.docWidth - pdfConfig.rightBorder
           break
       }
     }
-    let newLine =  docObject.newLine != undefined ? docObject.newLine : true
-    let text = docObject.value as string
-    let charArr: string[] = [...text]
-    let resultArray: string[] = []
+
+    console.log(resultArray)
+
+    resultArray.forEach(line => {
+      if (line.length < 1) return
+      if (newLine || isTable) {
+        this.addSpace(docObject)
+        this.checkNewPage()
+      }
+      let xPosition = firstLine ? pdfConfig.redLineBorder : x
+      let yPosition = this.currentHeight
+
+      console.log("newLine: ", newLine, "isTable: ", isTable)
+
+
+      if (!newLine && !isTable) {
+        xPosition = this.lastXPosition
+        yPosition = this.lastYPosition
+        newLine = true
+        isTable = false
+      }
+
+      console.log(xPosition, yPosition, "line",line)
+
+      xPosition += docObject.tabCount ? docObject.tabCount * pdfConfig.tabSize : 0
+
+      pdfDoc.text(line, xPosition, yPosition, {align:align});
+      this.lastXPosition = xPosition + pdfDoc.getTextWidth(line)
+      this.lastYPosition = this.currentHeight
+      firstLine = false
+    })
+    let heightPositionForRect = this.currentHeight - yPositionForRect + (docObject.subLineHeight ? docObject.subLineHeight : pdfConfig.subLineHeight) * (docObject.repeatLine ? docObject.repeatLine : 1)
+
+    if (docObject.frame === true) {
+      this.drawRect(xPositionForRect, yPositionForRect, widthPositionForRect, heightPositionForRect)
+    }
+
+
+  }
+
+  private getNormalizeString(newLine: boolean, charArr: string[], stringWith: number): string[] {
     let tempStr = ""
     let deltaStr = ""
     let lastBlankString = ""
     let deltaLastString = newLine ? 0 : this.lastStringXPositionEnd
+    let resultArray: string[] = []
 
     charArr.forEach(c => {
       tempStr += c
       deltaStr += c
 
-      if(c === "\n"){
+      if (c === "\n") {
         resultArray.push(tempStr)
         tempStr = ""
       }
@@ -196,48 +263,29 @@ export class PrintService {
         deltaStr = ""
       }
 
-      if ((pdfDoc.getTextWidth(tempStr) + deltaLastString) > this.docWorkWidth) {
+      if ((pdfDoc.getTextWidth(tempStr)) > stringWith) {
         resultArray.push(lastBlankString)
         tempStr = deltaStr
         deltaStr = ""
         deltaLastString = 0
       }
-
     })
 
-    if(tempStr.length > 0) {
+    if (tempStr.length > 0) {
       resultArray.push(tempStr)
       this.lastStringXPositionEnd = pdfDoc.getTextWidth(tempStr)
     }
 
-    let firstLine = docObject.redLine
-    resultArray.forEach(line => {
-      if(newLine)
-        this.addSpace(docObject)
-        this.checkNewPage()
-
-      let xPosition = firstLine ? pdfConfig.redLineBorder : x
-      let yPosition = this.currentHeight
-      if(!newLine){
-        xPosition = this.lastXPosition
-        yPosition = this.lastYPosition
-        newLine = true
-      }
-
-
-      pdfDoc.text(line,  xPosition  , yPosition,  {align: docObject.align});
-      this.lastXPosition = xPosition + pdfDoc.getTextWidth(line)
-      this.lastYPosition = this.currentHeight
-      firstLine = false
-    })
+    return resultArray;
   }
 
-  private drawRect(x: number,y: number, width: number, height: number){
-    pdfDoc.rect(x,y,width,height)
+  private drawRect(x: number, y: number, width: number, height: number) {
+    pdfDoc.rect(x, y, width, height)
   }
 
-  private checkNewPage(){
-    if (this.currentHeight > this.docHeight - pdfConfig.bottomBorder && !this.stopCreateNewPage) {
+  private checkNewPage() {
+
+    if (this.currentHeight > this.docHeight - pdfConfig.bottomBorder && !this.stopCreateNewPage && !this.lockNewLine) {
       this.resetCurrentHeight()
       pdfDoc.addPage()
       this.pageCount++
@@ -268,6 +316,10 @@ export class PrintService {
     this.currentHeight += (docObject.subLineHeight ? docObject.subLineHeight : pdfConfig.subLineHeight) * (docObject.repeatLine ? docObject.repeatLine : 1)
   }
 
+  private delSpace(docObject: PDFDocObject) {
+    this.currentHeight -= (docObject.subLineHeight ? docObject.subLineHeight : pdfConfig.subLineHeight) * (docObject.repeatLine ? docObject.repeatLine : 1)
+  }
+
   private addLine(docObject: PDFDocObject) {
     if (docObject.fontColor)
       pdfDoc.setDrawColor(docObject.fontColor)
@@ -289,17 +341,26 @@ export class PrintService {
 
   private addCheckBox(docObject: PDFCheckBoxObject) {
     let x = pdfConfig.leftBorder
-    if(docObject.tableCol && docObject.colNum){
-      x += (this.docWorkWidth/docObject.tableCol) * (docObject.colNum - 1)
+    let isTable = docObject.tableCol != undefined && docObject.colNum != undefined
+    if (isTable)
+      x += (this.docWorkWidth / docObject.tableCol) * (docObject.colNum - 1)
+
+
+    let left = docObject.redLine ? pdfConfig.redLineBorder : x
+    let src = docObject.value ? "assets/images/checked.webp" : "assets/images/unchecked.png"
+    let it = docObject.value ? "webp" : "png"
+
+    if (docObject.newLine === false)
+      this.currentHeight = this.lastYPosition - pdfConfig.subLineHeight + this.heightCorrect
+    if (docObject.newLine === false && !isTable)
+      left = this.lastXPosition
+    let tabCount = docObject.tabCount ? docObject.tabCount: 0
+    if( tabCount > 0){
+      left += tabCount * pdfConfig.tabSize
     }
 
-    let left = docObject.redLine ? pdfConfig.redLineBorder  : x
-    let src = docObject.value ? "assets/images/checked.webp" :  "assets/images/unchecked.png"
-    let it =  docObject.value ? "webp" :  "png"
 
-    if(docObject.newLine === false)
-      this.currentHeight = this.lastYPosition - pdfConfig.subLineHeight + this.heightCorrect
-
+    this.lockNewLine = true //Запретить перенос
     this.addImage({
       type: "image",
       top: this.currentHeight,
@@ -317,17 +378,18 @@ export class PrintService {
       fontSize: docObject.fontSize,
       fontStyle: docObject.fontStyle,
     })
+    this.lockNewLine = false
 
-    if(docObject.newLine === undefined || (docObject.newLine && docObject.newLine === true)
+    this.checkNewPage()
+
+    if (docObject.newLine === undefined || docObject.newLine === null || (docObject.newLine && docObject.newLine === true)
       || ((docObject.tableCol && docObject.colNum) && (docObject.tableCol === docObject.colNum))) {
       this.addSpace({})
     }
-    this.checkNewPage()
   }
 
   private createNestedTable(docObject: PDFTableObject) {
-
-   var nestedTableCell = {
+    var nestedTableCell = {
       content: '',
     }
 
@@ -335,13 +397,13 @@ export class PrintService {
     let subHead = docObject.subHead
     let body = docObject.body
     let columnWidth = this.docWorkWidth / head.length
-    let subHeaderColWidth = this.docWorkWidth/subHead.length
+    let subHeaderColWidth = this.docWorkWidth / subHead.length
 
 
     let isTableCreated = false
 
-    autoTable(pdfDoc,{
-      headStyles: {valign: "middle", halign: "center",fillColor: tableHeaderFillColor,textColor: "#ffffff"},
+    autoTable(pdfDoc, {
+      headStyles: {valign: "middle", halign: "center", fillColor: tableHeaderFillColor, textColor: "#ffffff"},
       theme: "plain",
       head: [head],
       rowPageBreak: "auto",
@@ -349,19 +411,23 @@ export class PrintService {
       startY: this.currentHeight,
       margin: {left: pdfConfig.leftBorder},
       tableWidth: this.docWorkWidth,
-      styles:{font: pdfConfig.tableHeaderFontStyle,fontSize: pdfConfig.tableHeaderFontSize,cellWidth: columnWidth},
+      styles: {font: pdfConfig.tableHeaderFontStyle, fontSize: pdfConfig.tableHeaderFontSize, cellWidth: columnWidth},
       didDrawCell: data => {
         if (data.row.index === 0 && data.row.section === 'body' && !isTableCreated) {
           isTableCreated = true
-          autoTable(pdfDoc,{
+          autoTable(pdfDoc, {
             headStyles: {valign: "middle", halign: "center", fillColor: tableHeaderFillColor},
             showHead: 'firstPage',
             theme: "grid",
-            head:[subHead],
-            startY:data.cell.y,
-            styles:{font: pdfConfig.tableHeaderFontStyle,fontSize: pdfConfig.tableHeaderFontSize,cellWidth: subHeaderColWidth},
-            bodyStyles:{font: pdfConfig.tableHeaderFontStyle},
-            margin: { left: data.cell.x },
+            head: [subHead],
+            startY: data.cell.y,
+            styles: {
+              font: pdfConfig.tableHeaderFontStyle,
+              fontSize: pdfConfig.tableHeaderFontSize,
+              cellWidth: subHeaderColWidth
+            },
+            bodyStyles: {font: pdfConfig.tableHeaderFontStyle},
+            margin: {left: data.cell.x},
             rowPageBreak: "auto",
             tableWidth: this.docWorkWidth,
             body: body,

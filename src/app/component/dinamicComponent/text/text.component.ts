@@ -2,6 +2,7 @@ import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core
 import {DomSanitizer} from "@angular/platform-browser";
 import {
   ComponentBound,
+  ComponentRuleForPDF,
   ControlPropType,
   IceComponent,
   MasterControl,
@@ -19,8 +20,12 @@ import {Subscription} from "rxjs";
 export class TextComponent implements OnInit, IceComponent, OnDestroy {
 
 
-  constructor(public sanitizer: DomSanitizer, private cellService: CellService,private componentService: ComponentService) {
+  constructor(public sanitizer: DomSanitizer, private cellService: CellService, private componentService: ComponentService) {
   }
+
+  checkedText?: string;
+    optionList?: string[];
+    printRule: ComponentRuleForPDF;
 
   masterControlList: MasterControl[];
 

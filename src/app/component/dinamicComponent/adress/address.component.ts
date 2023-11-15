@@ -1,6 +1,7 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy} from '@angular/core';
 import {
   ComponentBound,
+  ComponentRuleForPDF,
   ControlPropType,
   IceComponent,
   MasterControl, PlaceObject,
@@ -63,6 +64,9 @@ export class AddressComponent implements IceComponent, OnDestroy {
 
   constructor(private cellService: CellService, private componentService: ComponentService, private changeDetection: ChangeDetectorRef, public dialog: MatDialog) {
   }
+
+  optionList?: string[];
+    printRule: ComponentRuleForPDF;
 
   ngOnInit(): void {
     this.height = this.cellService.getClientCellHeight() * this.componentBound.heightScale

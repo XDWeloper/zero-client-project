@@ -28,11 +28,72 @@
       <option value="color">цвет</option>
     </select>
 
-    <p *ngIf="currentComponent.componentType === 'text'" class="col-span-2">Ссылка:</p>
-    <input *ngIf="currentComponent.componentType === 'text'" class="col-span-10 w-[92%] rounded-md dark:bg-slate-700" type="text" [(ngModel)]="currentComponent.inputType">
+    <!--    параметры печати-->
+    <mat-accordion
+      class="col-span-12 w-[95%] text-center rounded-md dark:bg-slate-700 bg-gray-200 border border-primary-light relative">
+      <mat-expansion-panel hideToggle expanded>
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <p>Параметры печати компонента</p>
+          </mat-panel-title>
+          <mat-icon class=""
+                    [ngClass]="(currentComponent.printRule && currentComponent.printRule.isPrint === true) ? 'text-primary-dark':'text-red-900'">
+            print
+          </mat-icon>
+        </mat-expansion-panel-header>
+        <div class="w-full border-t border-t-primary-light grid grid-cols-12 gap-y-0.5">
+          <div class="col-span-12 h-2"></div>
+          <span class="col-span-8 text-left">Печатаемый:</span>
+          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.isPrint">
+          <span class="col-span-8 text-left">Порядковый номер:</span>
+          <input class="col-span-4  border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.order">
+          <span class="col-span-8 text-left">С новой строки:</span>
+          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.newLine" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
+          <span class="col-span-8 text-left">Красная строка:</span>
+          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.redLine" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
+          <span class="col-span-8 text-left">Дефис:</span>
+          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.addDash" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
+          <span class="col-span-8 text-left">Рамка:</span>
+          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.frame" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
+          <span class="col-span-8 text-left">Количество отступов:</span>
+          <input class="col-span-4  border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.tabCount" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
+
+          <hr class="col-span-12">
+            <span class="col-span-8 text-left">Таблица кол-во колонок:</span>
+            <input class="col-span-4 border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.tableCol"  [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
+            <span class="col-span-8 text-left">Номер колонки:</span>
+            <input class="col-span-4 border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.colNum" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
+          <hr class="col-span-12">
+
+          <span class="col-span-8 text-left">Размер шрифта:</span>
+          <input class="col-span-4 border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.fontSize" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
+          <span class="col-span-8 text-left">Стиль шрифта:</span>
+          <select class="col-span-4 border border-primary-light" [(ngModel)]="currentComponent.printRule.fontStyle" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
+            <option value="undefined" selected></option>
+            <option value="normal">normal</option>
+            <option class="font-bold" value="bold">bold</option>
+            <option class="italic" value="italic">italic</option>
+            <option class="font-semibold" value="semiBold">semiBold</option>
+          </select>
+          <span class="col-span-8 text-left">Табуляция:</span>
+          <select class="col-span-4 border border-primary-light" [(ngModel)]="currentComponent.printRule.align" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
+            <option value="left" selected></option>
+            <option value="center">центер</option>
+            <option value="left">лево</option>
+            <option value="right">право</option>
+          </select>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
+
+
+    <p *ngIf="currentComponent.componentType === 'text'" class="col-span-2 mt-2">Ссылка:</p>
+    <input *ngIf="currentComponent.componentType === 'text'"
+           class="col-span-10 w-[92%] rounded-md dark:bg-slate-700 mt-2" type="text"
+           [(ngModel)]="currentComponent.inputType">
 
     <div *ngIf="currentComponent.inputType === 'text' || currentComponent.componentType === 'area'"
-         class="col-span-12 w-[95%] rounded-md border border-solid border-primary-light relative">
+         class="col-span-12 w-[95%] rounded-md border border-solid border-primary-light relative  mt-2">
       <p class=" text-center">Ограничения текста</p>
       <div class="w-full grid grid-cols-12 ml-1 mt-1 mr-2 items-baseline dark:text-white">
         <p class="col-span-8">Минимальная длинная:</p>
@@ -86,11 +147,13 @@
            class="col-span-2 w-[90%] text-center rounded-md dark:bg-slate-700 mt-4" type="checkbox"
            [(ngModel)]="currentComponent.required">
 
-    <span *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'|| currentComponent.componentType === 'select' || currentComponent.componentType === 'place'"
-          class="col-span-12 text-center">Текст компонента</span>
-    <textarea *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'|| currentComponent.componentType === 'select' || currentComponent.componentType === 'place'"
-              [(ngModel)]="currentComponent.placeHolder"
-              class="col-span-12 w-[95%] rounded-md dark:bg-slate-700"></textarea>
+    <span
+      *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'|| currentComponent.componentType === 'select' || currentComponent.componentType === 'place'"
+      class="col-span-12 text-center">Текст компонента</span>
+    <textarea
+      *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'|| currentComponent.componentType === 'select' || currentComponent.componentType === 'place'"
+      [(ngModel)]="currentComponent.placeHolder"
+      class="col-span-12 w-[95%] rounded-md dark:bg-slate-700"></textarea>
 
     <div *ngIf="currentComponent.componentType === 'text'"
          class="col-span-12 w-[95%] text-center rounded-md dark:bg-slate-700 border border-solid border-primary-light relative mt-2">
@@ -122,21 +185,22 @@
       </mat-button-toggle-group>
     </div>
 
+    <span
+      *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'|| currentComponent.componentType === 'select'"
+      class="col-span-12 text-center">Текст подсказки</span>
+    <textarea
+      *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'|| currentComponent.componentType === 'select'"
+      [(ngModel)]="currentComponent.notification"
+      class="col-span-12 w-[95%] rounded-md dark:bg-slate-700"></textarea>
 
-
-    <span *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'|| currentComponent.componentType === 'select'"
-          class="col-span-12 text-center">Текст подсказки</span>
-    <textarea *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'|| currentComponent.componentType === 'select'"
-              [(ngModel)]="currentComponent.notification"
-              class="col-span-12 w-[95%] rounded-md dark:bg-slate-700"></textarea>
-
-    <button *ngIf="currentComponent.componentType === 'select'" class="prop-button mat-elevation-z5 hover:border-primary-dark border-solid" (click)="openOptionsDialog()">
-      <mat-icon >list</mat-icon>
+    <button *ngIf="currentComponent.componentType === 'select'"
+            class="prop-button mat-elevation-z5 hover:border-primary-dark border-solid" (click)="openOptionsDialog()">
+      <mat-icon>list</mat-icon>
       <p>Список значений</p>
     </button>
 
     <button class="prop-button mat-elevation-z5 hover:border-primary-dark" (click)="openMasterControlDialog()">
-      <mat-icon >sync</mat-icon>
+      <mat-icon>sync</mat-icon>
       <p>Управление компонентом</p>
     </button>
 

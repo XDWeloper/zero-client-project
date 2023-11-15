@@ -7,8 +7,13 @@
     </button>
 
     <button (click)="buttonClick('watch')" matTooltip="Просмотр документа" class="toolBar-button-style">
-      <mat-icon class="text-white font-bold">face</mat-icon>
+      <mat-icon class="text-teal-300 font-bold">remove_red_eye</mat-icon>
       <span class="ml-1">Просмотр</span>
+    </button>
+
+    <button (click)="buttonClick('reordering')" matTooltip="Переупорядочить элементы для печати" class="toolBar-button-style">
+      <mat-icon class="text-red-900 font-bold">sync_problem</mat-icon>
+      <span class="ml-1">Порядок</span>
     </button>
   </div>
   <mat-slide-toggle *ngIf="currentStep" [(ngModel)]="currentStep.visible" (change)="change($event)">

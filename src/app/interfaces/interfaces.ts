@@ -1,5 +1,19 @@
 import {DocStat, IceComponentType} from "../constants";
 
+export interface ComponentRuleForPDF {
+  isPrint: boolean
+  tabCount?: number
+  addDash?: boolean
+  newLine?: boolean
+  colNum?: number
+  tableCol?: number
+  redLine?: boolean
+  frame?: boolean
+  fontSize?: number
+  fontStyle?: "normal" | "bold" | "italic" | "semiBold" | undefined
+  order?: number
+  align?: "left" | "right" | "center"
+}
 
 export interface BankFile {
   "id": string,
@@ -155,6 +169,7 @@ export interface ComponentMaket {
   optionList?: string[] | undefined
   enabled?: boolean
   visible?: boolean
+  printRule: ComponentRuleForPDF
 }
 
 export interface IceStepMaket {
@@ -201,6 +216,7 @@ export interface IceComponent {
   optionList?: string[] | undefined
   enabled?: boolean
   visible?: boolean
+  printRule: ComponentRuleForPDF
 }
 
 export class MasterControl{

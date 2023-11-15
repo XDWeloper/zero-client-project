@@ -262,6 +262,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       debounceTime(500),
     ).subscribe(item => {
       let currentComponent = this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === item.componentId)
+      if(!currentComponent) return
       currentComponent.value = item.value
       if (currentComponent.componentType === "upload") {//Если идет изменение загруженных файлов нужно сразу сохранять
         this.saveControl()
@@ -272,8 +273,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         this.checkAllStepsToRule()
         this.checkRequiredOnCurrentStep()
       }
-      //this.isStepRequiredFieldNotEmpty = this.steps[this.currentStepIndex].componentMaket.filter(i => i.checkedText && i.checkedText.length > 0).length < 1
-      //this.isStepRequiredFieldNotEmpty = this.currentDocument.docStep[this.currentStepIndex].componentMaket.filter(i => i.checkedText && i.checkedText.length > 0).length < 1
       this.componentService.setComponentValue({
         componentId: item.componentId,
         value: "NaN",
@@ -547,9 +546,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   private getDataForPdf(): PDFDocObject[] {
 
     let resultList: PDFDocObject[]
-    let asr = new AnketaScriptRule(this.currentDocument)
+    let asr = new AnketaScriptRule(this.currentDocument.docStep.flatMap(value => value.componentMaket).filter(p => p.printRule.isPrint)
+      .sort((a, b) => a.printRule.order < b.printRule.order ? -1 : 1))
     resultList = asr.getPrintRules()
-
     return resultList
   }
 }

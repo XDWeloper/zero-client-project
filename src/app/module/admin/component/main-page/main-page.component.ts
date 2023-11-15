@@ -27,7 +27,7 @@ import {IceMaketComponent} from "../../classes/icecomponentmaket";
 import {MaketComponent} from "../maketComponent/maket.component";
 import {MatDialog} from "@angular/material/dialog";
 import {EditTextComponent} from "../edit-text/edit-text.component";
-import {ComponentMaket, DocumentTreeTempl, StepTreeTempl} from "../../../../interfaces/interfaces";
+import {ComponentMaket, DocumentTreeTempl, MessageDialog, StepTreeTempl} from "../../../../interfaces/interfaces";
 import {DocumentService} from "../../../../services/document.service";
 import {WatchTemplateComponent} from "../watch-template/watch-template.component";
 import {ChangeTableComponent} from "../change-table/change-table.component";
@@ -36,6 +36,7 @@ import {BackendService} from "../../../../services/backend.service";
 import {Router} from "@angular/router";
 import {TimeService} from "../../../../services/time.service";
 import {KeycloakService} from "../../../../services/keycloak.service";
+import {MessageService} from "../../../../services/message.service";
 
 @Component({
   selector: 'app-main-page',
@@ -81,7 +82,8 @@ export class MainPageComponent implements OnInit, OnDestroy {
               private documentService: DocumentService,
               private backService: BackendService,
               private timeService: TimeService,
-              private keycloakService: KeycloakService) {
+              private keycloakService: KeycloakService,
+              private messageService: MessageService) {
 
     /**Разрешить обновление токенов*/
     timeService.isRefreshToken = true
@@ -183,7 +185,6 @@ export class MainPageComponent implements OnInit, OnDestroy {
     this.componentRef.instance.textPosition ={horizontal: 'left', vertical: 'top'}
     this.componentRef.instance.required= false
 
-
     if(compMaket != undefined){//Устанавливаем все параметры
       this.componentRef.instance.cellNumber = compMaket.cellNumber
       this.componentRef.instance.componentType = compMaket.componentType
@@ -207,11 +208,14 @@ export class MainPageComponent implements OnInit, OnDestroy {
       this.componentRef.instance.maxVal = compMaket.maxVal
       this.componentRef.instance.masterControlList = compMaket.masterControlList
       this.componentRef.instance.optionList = compMaket.optionList
-
     } else{
       this._modify = true
     }
-      this.componentService.addComponent(this.componentRef)
+
+    this.componentRef.instance.printRule = (compMaket && compMaket.printRule) ? compMaket.printRule : {isPrint: componentType != IceComponentType.TEXT,newLine: true,order: this.documentService.getLastOrder(this.currentDoc.id)}
+
+
+    this.componentService.addComponent(this.componentRef)
   }
 
   ngOnInit(): void {
@@ -272,7 +276,16 @@ export class MainPageComponent implements OnInit, OnDestroy {
         this.pushCurrentPage();
         this.openWatchDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration)
         break;
+      case 'reordering' :
 
+        this.messageService.show("Переупорядочивание компонентов для печати",
+          "Внимание! Выполнение данного действия приведет изменению порядка элементов при выводе на печать данного этапа.",
+          "INFO",["YES","CANCEL"]).subscribe(value => {
+            if(value === "YES") {
+              this.reOrderingComponentForPrint()
+            }
+        })
+        break;
     }
   }
 
@@ -356,6 +369,15 @@ export class MainPageComponent implements OnInit, OnDestroy {
   exit() {
     this.keycloakService.logoutAction().subscribe({
       complete:(() => this.router.navigate(["/"]))
+    })
+  }
+
+  private reOrderingComponentForPrint() {
+    let orderNum = 0
+    this.documentService.getTemplateByDocId(this.currentDoc.id).docStep.forEach(step => {
+      step.componentMaket.sort((a, b) => a.cellNumber <= b.cellNumber ? -1: 1).forEach(c => {
+        c.printRule.order = orderNum ++
+      })
     })
   }
 }

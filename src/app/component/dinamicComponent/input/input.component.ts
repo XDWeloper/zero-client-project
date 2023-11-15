@@ -1,6 +1,11 @@
 import {Component} from '@angular/core';
 import {CellService} from "../../../services/cell.service";
-import {ComponentBound,ControlPropType,IceComponent,MasterControl,TextPosition} from "../../../interfaces/interfaces";
+import {ComponentBound,ComponentRuleForPDF,
+  ControlPropType,
+  IceComponent,
+  MasterControl,
+  TextPosition
+} from "../../../interfaces/interfaces";
 import {AlertColor, IceComponentType} from "../../../constants";
 import {ComponentService} from "../../../services/component.service";
 import {Subscription} from "rxjs";
@@ -13,6 +18,9 @@ export class InputComponent implements IceComponent {
 
   constructor(private cellService: CellService, private componentSelectedService: ComponentService, private componentService: ComponentService) {
   }
+
+  optionList?: string[];
+    printRule: ComponentRuleForPDF;
 
   masterControlList: MasterControl[];
 

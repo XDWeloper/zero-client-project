@@ -15,7 +15,7 @@ import {CellService} from "../../../../services/cell.service";
 import {ComponentService} from "../../../../services/component.service";
 import {DomSanitizer} from "@angular/platform-browser";
 import {cellColl, collInRow, IceComponentType} from "../../../../constants";
-import {CdkDragEnd, CdkDragMove, CdkDragStart} from "@angular/cdk/drag-drop";
+import {CdkDragMove, CdkDragStart} from "@angular/cdk/drag-drop";
 import {DocumentService} from "../../../../services/document.service";
 
 
@@ -84,7 +84,6 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
     if(this.textPosition === undefined)
     this.textPosition = {vertical: 'top', horizontal: 'left'}
   }
-
 
   get isHover(): boolean {
     return this._isHover;

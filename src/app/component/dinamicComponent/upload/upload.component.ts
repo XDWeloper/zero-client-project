@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy} from '@angular/core';
 import {
-  ComponentBound,
+  ComponentBound, ComponentRuleForPDF,
   ControlPropType,
   DialogButtonType,
   IceComponent,
@@ -71,6 +71,7 @@ export class UploadComponent implements IceComponent, OnDestroy {
   private delFiles$: Subject<DialogButtonType>;
   private updateDocument$: Subscription;
   private allFilesIsUpLoaded$ = new Subject();
+  printRule: ComponentRuleForPDF;
 
   private changeValue$: Subscription
   enabled = true
@@ -115,6 +116,7 @@ export class UploadComponent implements IceComponent, OnDestroy {
 
   set value(value: any) {
     this._value = value;
+
     if (value) {
       let docArray = value as Array<UploadFile>
       docArray.filter(f => f.id).forEach(doc => this.files.push(doc))
@@ -205,7 +207,11 @@ export class UploadComponent implements IceComponent, OnDestroy {
         }
       }),
       error: (err => {
+        this.files[index].id = fileId
         this.delFiles$ = this.messageService.show(FILES_DELETE_ERROR, err.error.message, ERROR)
+        this.stepService.disabledAllStep(false)
+        this.isUpload = false
+        this.changeDetection.detectChanges()
       })
     })
 
@@ -249,20 +255,18 @@ export class UploadComponent implements IceComponent, OnDestroy {
             }
           }),
           error: (err => {
-            console.log(this.files)
               let errorFileIndex = this.files.findIndex(f => f.id === undefined)
-              console.log(errorFileIndex)
               let message = undefined
               if (errorFileIndex != -1) {
                 let errorFile = this.files[errorFileIndex]
-                console.log(errorFile)
                 message = `Ошибка загрузки файла ${errorFile.name}. Смотри доп. информацию.(Кликни на иконку информации.)`
                 this.files.splice(errorFileIndex,1)
               }
-              console.log("message: " + message)
               this.show$ = this.messageService.show(message ? message : FILES_LOAD_ERROR, err.error.message, ERROR)
               this.reCalculateSumSize()
               this.stepService.disabledAllStep(false)
+              this.isUpload = false
+              this.changeDetection.detectChanges()
             }
           )
         })

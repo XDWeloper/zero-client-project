@@ -3,7 +3,7 @@ import {ComponentService} from "../../../../services/component.service";
 import {Subscription} from "rxjs";
 import {MatDialog} from "@angular/material/dialog";
 import {MasterControlPropComponent} from "../master-control-prop/master-control-prop.component";
-import {dialogCloseAnimationDuration, dialogOpenAnimationDuration} from "../../../../constants";
+import {dialogCloseAnimationDuration, dialogOpenAnimationDuration, IceComponentType} from "../../../../constants";
 import {IceMaketComponent} from "../../classes/icecomponentmaket";
 import {ComponentType} from "@angular/cdk/overlay";
 import {OptionListComponent} from "../option-list/option-list.component";
@@ -48,14 +48,19 @@ export class PropertiesComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.selectedComponent$ = this.componentService.selectedComponent$.subscribe(c => {
-
       if (c === undefined)
         this.currentComponent = undefined
       else {
         this.currentComponent = <IceMaketComponent>this.componentService.getComponent(c)
         this.componentService.setModified(true)
+
+        if(this.currentComponent.printRule === undefined){
+          this.currentComponent.printRule = {isPrint: this.currentComponent.componentType != IceComponentType.TEXT,newLine: true}
+        }
       }
     })
+
+
   }
 
   openMasterControlDialog(){

@@ -1,6 +1,10 @@
 import { Component } from '@angular/core';
 import {CellService} from "../../../../services/cell.service";
-import {ComponentBound, IceComponent, MasterControl, TextPosition} from "../../../../interfaces/interfaces";
+import {ComponentBound, ComponentRuleForPDF,
+  IceComponent,
+  MasterControl,
+  TextPosition
+} from "../../../../interfaces/interfaces";
 import {IceComponentType} from "../../../../constants";
 import {ComponentService} from "../../../../services/component.service";
 
@@ -54,6 +58,10 @@ export class InformationCompanyParticipantsTableComponent implements IceComponen
 
   constructor(private cellService: CellService, private componentService: ComponentService) {
   }
+
+  checkedText?: string;
+    optionList?: string[];
+    printRule: ComponentRuleForPDF;
 
 
 

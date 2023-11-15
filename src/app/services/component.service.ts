@@ -32,9 +32,9 @@ export class ComponentService {
     return this._componentCollection;
   }
 
-  set componentCollection(value: ComponentRef<IceMaketComponent>[]) {
-    this._componentCollection = value;
-  }
+  // set componentCollection(value: ComponentRef<IceMaketComponent>[]) {
+  //   this._componentCollection = value;
+  // }
 
   addComponent(component: ComponentRef<IceMaketComponent>) {
     this._componentCollection.push(component)

@@ -1,24 +1,46 @@
-  <div class=" w-full h-10 bg-primary-base dark:bg-dark-background text-center text-white text-lg border border-primary-base">
-    <mat-icon *ngIf="docPanelCurrentSize > docPanelOpenWidth / 2 && !addDocPanel" (click)="addDocPanel = true"
-              class="absolute left-1 mt-1 text-yellow-300 text-2xl cursor-pointer hover:scale-125 duration-300"
-              matTooltip="Добавить документ">
-      add
-    </mat-icon>
+  <div class=" h-10 bg-primary-base text-center text-white text-lg border border-primary-base flex justify-between" >
+    <div>
+      <mat-icon *ngIf="docPanelCurrentSize > docPanelOpenWidth / 2 && !addDocPanel" (click)="addDocPanel = true"
+                class="mt-1 text-yellow-300 text-2xl cursor-pointer hover:scale-125 duration-300"
+                matTooltip="Добавить документ">
+        add
+      </mat-icon>
 
-    <mat-icon *ngIf="docPanelCurrentSize > docPanelOpenWidth / 2 && isModified" (click)="saveChanges()"
-              class="absolute left-8 mt-1 text-green-500 text-2xl cursor-pointer hover:scale-125 duration-300"
-              matTooltip="Сохранить изменения">
-      save
-    </mat-icon>
+      <mat-icon *ngIf="docPanelCurrentSize > docPanelOpenWidth / 2 && isModified" (click)="saveChanges()"
+                class=" mt-1 text-green-500 text-2xl cursor-pointer hover:scale-125 duration-300"
+                matTooltip="Сохранить изменения">
+        save
+      </mat-icon>
+    </div>
 
 
-    <p *ngIf="docPanelCurrentSize > docPanelOpenWidth / 2" class="inline-block bg-primary-base dark:bg-dark-background">
-      Документы</p>
-    <mat-icon class="mt-1 absolute text-white right-0.5" (click)="openPanel.emit(); isPanelOpen = !isPanelOpen">menu
-    </mat-icon>
+    <p *ngIf="docPanelCurrentSize > docPanelOpenWidth / 2" class="inline-block bg-primary-base dark:bg-dark-background">Документы</p>
+    <mat-icon class=" mt-1 text-white cursor-pointer" (click)="openPanel.emit(); isPanelOpen = !isPanelOpen">menu</mat-icon>
   </div>
 
-  <div class="h-[90%] w-full flex flex-col justify-between">
+  <div class="h-[90%] flex flex-col justify-items-stretch">
+
+    <div *ngIf="addDocPanel"
+         class="duration-300 bg-white rounded-2xl text-black border border-primary-base mt-1">
+      <div
+        class="bg-primary-base text-center text-white text-lg rounded-t-2xl border border-primary-base">
+        Создать новый документ
+      </div>
+
+      <mat-form-field class="w-full">
+        <mat-label>Наименование документа</mat-label>
+        <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="1"
+                  cdkAutosizeMaxRows="5" [(ngModel)]="newDocName" (keydown.enter)="addNewDoc()">
+      </textarea>
+      </mat-form-field>
+
+
+      <div class="h-10"></div>
+      <div class="flex justify-end items-center font-semibold py-2">
+        <button class="mx-2" (click)="addNewDoc()">Принять</button>
+        <button class="mx-2" (click)="closeDocPanel()">Отменить</button>
+      </div>
+    </div>
 
     <div class="max-h-[80%] overflow-auto" *ngIf="isPanelOpen && (docPanelCurrentSize > docPanelOpenWidth / 2)">
       <mat-tree [dataSource]="dataSource"
@@ -102,28 +124,6 @@
           </div>
         </mat-nested-tree-node>
       </mat-tree>
-
-      <div *ngIf="addDocPanel"
-           class="duration-300 absolute top-1 right-1 left-1  bg-white rounded-2xl text-black dark:text-white dark:bg-dark-background border border-primary-base">
-        <div
-          class="bg-primary-base dark:bg-dark-background text-center text-white text-lg rounded-t-2xl border border-primary-base">
-          Создать новый документ
-        </div>
-
-        <mat-form-field class="w-full">
-          <mat-label>Наименование документа</mat-label>
-          <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="1"
-                    cdkAutosizeMaxRows="5" [(ngModel)]="newDocName" (keydown.enter)="addNewDoc()">
-      </textarea>
-        </mat-form-field>
-
-
-        <div class="h-10"></div>
-        <div class="absolute left-0 bottom-0 w-full flex justify-end items-center font-semibold py-2">
-          <button class="mx-2" (click)="addNewDoc()">Принять</button>
-          <button class="mx-2" (click)="closeDocPanel()">Отменить</button>
-        </div>
-      </div>
     </div>
 
     <div class="mt-4 border ">
@@ -146,10 +146,3 @@
     </div>
 
   </div>
-
-
-
-<!--  <input class="text-white absolute left-2 bottom-4 bg-primary-base hover:bg-primary-light-->
-<!--                focus:ring-4 focus:outline-none focus:ring-primary-light font-medium rounded-lg text-sm px-4 py-2-->
-<!--                dark:bg-primary-light dark:hover:bg-primary-light dark:focus:ring-primary-light" type="file"-->
-<!--         (change)="handleFileSelect($event)">-->

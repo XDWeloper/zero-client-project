@@ -386,10 +386,7 @@ export class DocumentComponent implements OnInit {
   }
 
   private normalizeComponentId() {
-    console.log("normalizeComponentId")
     let componentIdArray = this.documentService.getTemplateByDocId(this.currentDocument.id).docStep.map(s => s.componentMaket).flat(1).map(c => c.componentID)
-    console.log(componentIdArray)
-
     let dublArray = new Array(400)
     dublArray.fill(0,0,199)
 
@@ -401,9 +398,7 @@ export class DocumentComponent implements OnInit {
 
     for (let i = 0; i < dublArray.length; i++){
       if(dublArray[i] > 1) {
-        console.log(i + " : " + dublArray[i])
         let component: ComponentMaket[] = this.documentService.getTemplateByDocId(this.currentDocument.id).docStep.map(s => s.componentMaket).flat(1).filter(c => c.componentID === i)
-        console.log(component)
         for(let c = 1; c < component.length; c++){
           component[c].componentID = maxID ++
         }
@@ -411,8 +406,5 @@ export class DocumentComponent implements OnInit {
     }
 
     componentIdArray = this.documentService.getTemplateByDocId(this.currentDocument.id).docStep.map(s => s.componentMaket).flat(1).map(c => c.componentID)
-    console.log(componentIdArray)
-
-
   }
 }

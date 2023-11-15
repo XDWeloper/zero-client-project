@@ -1,7 +1,7 @@
 import {AngularEditorConfig} from "@kolkov/angular-editor";
 
 
-export const APP_VERSION="1.2.12"
+export const APP_VERSION="2.0.1"
 
 export const MAKET_NAME_LOAD_ERROR = "Ошибка получения списка доступных макетов"
 export const MAKET_LOAD_ERROR = "Ошибка получения макета"

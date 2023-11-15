@@ -1,10 +1,14 @@
 import { Component } from '@angular/core';
 import { IceComponentType } from 'src/app/constants';
 import {CellService} from "../../../../services/cell.service";
-import {ComponentBound, IceComponent, MasterControl, TextPosition} from "../../../../interfaces/interfaces";
+import {ComponentBound, ComponentRuleForPDF,
+  IceComponent,
+  MasterControl,
+  TextPosition
+} from "../../../../interfaces/interfaces";
 import {ComponentService} from "../../../../services/component.service";
 
-interface TableRow{
+interface TableRow {
   field1: number | undefined
   field2: number | undefined
   field3: number | undefined
@@ -53,6 +57,10 @@ export class InformationMainCounterpartiesTableComponent implements IceComponent
 
   constructor(private cellService: CellService, private componentService: ComponentService) {
   }
+
+  checkedText?: string;
+    optionList?: string[];
+    printRule: ComponentRuleForPDF;
 
 
   ngOnInit(): void {

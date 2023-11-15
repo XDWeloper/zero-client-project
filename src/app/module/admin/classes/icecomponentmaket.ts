@@ -1,10 +1,14 @@
 import {IceComponentType} from "../../../constants";
-import {ComponentBound, ComponentMaket, MasterControl, TextPosition} from "../../../interfaces/interfaces";
+import {
+  ComponentBound,
+  ComponentMaket,
+  ComponentRuleForPDF,
+  MasterControl,
+  TextPosition
+} from "../../../interfaces/interfaces";
 import {BehaviorSubject} from "rxjs";
-import {DocumentService} from "../../../services/document.service";
 
 export class IceMaketComponent {
-  //static componentCounter: number = 0
 
   private _cellNumber: number | undefined
   private _componentType: IceComponentType
@@ -29,6 +33,7 @@ export class IceMaketComponent {
   private _notification: string | undefined
   private _checkText: string | undefined;
   private _optionList: string[] | undefined
+  private _printRule: ComponentRuleForPDF;
 
 
 
@@ -41,6 +46,14 @@ export class IceMaketComponent {
     //this._componentID = IceMaketComponent.componentCounter++
   }
 
+
+  get printRule(): ComponentRuleForPDF {
+    return this._printRule;
+  }
+
+  set printRule(value: ComponentRuleForPDF) {
+    this._printRule = value;
+  }
 
   get optionList(): string[] | undefined {
     return this._optionList;
@@ -241,6 +254,7 @@ export class IceMaketComponent {
 
   getCompanentMaket(): ComponentMaket {
     return {
+      printRule: this.printRule,
       cellNumber: this.cellNumber,
       componentType: this.componentType,
       componentName: this.componentName,

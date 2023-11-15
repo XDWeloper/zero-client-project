@@ -1,107 +1,107 @@
 import {PDFDocObject, PDFTableObject} from "../services/print.service";
-import {ComponentMaket, IceDocument} from "../interfaces/interfaces";
+import {ComponentMaket, ComponentRuleForPDF, IceComponent, IceDocument} from "../interfaces/interfaces";
 import {IceComponentType} from "../constants";
 import {stripHtml} from "string-strip-html";
-
-interface ComponentRuleForPDF {
-  id: number
-  tabCount?: number
-  addDash?: boolean
-  newLine?: boolean
-  colNum?: number
-  tableCol?: number
-  redLine?: boolean
-  frame?: boolean
-  fontSize?: number
-  fontStyle?: "normal" | "bold" | "italic" | "semiBold" | undefined
-}
+import {IceMaketComponent} from "../module/admin/classes/icecomponentmaket";
 
 const oneTab = 3 //пробелов у одного таба
-const PAY_TABLE_ID = -111 // Таблица безналичных расчетов(делаем в ручную)
+const PAY_TABLE_NAME = "pay_table" // Таблица безналичных расчетов(делаем в ручную)
 
-const componentListId: ComponentRuleForPDF[] = [
-  /**1 страница*/
-  {id: 25}, {id: 184, tabCount: 1}, {id: 27}, {id: 5}, {id: 7}, {id: 185},
-  /**2 страница*/
-  {id: 17}, {id: 11, redLine: true}, {id: 22}, {id: 21, redLine: true}, {id: 19, redLine: true}, {id: 70}, {
-    id: 214,
-    tabCount: 2
-  },
-  /**3 страница*/
-  {id: 30}, {id: 32}, {id: 34}, {id: 195}, {id: 38, tabCount: 2, addDash: true},
-  {id: 40, tabCount: 2, addDash: true}, {id: 42}, {id: 44},
-  /**4 страница*/
-  {id: 58}, {id: 60}, {id: 62}, {id: 64}, {id: 241}, {id: 73},
-  /**5 страница*/
-  {id: 254}, {id: 255},
-  /**6 страница*/
-  {id: 14}, {id: 250}, {id: 378}, {id: 379, redLine: true},
-  {id: 24, redLine: true}, {id: 249, tabCount: 2}, {id: 28}, {id: 382},
-  /**7 страница*/
-  {id: 384}, {id: 33}, {id: 36, redLine: true}, {id: 392, redLine: true}, {id: 394, redLine: true},
-  {id: 396, redLine: true}, {id: 398, redLine: true}, {id: 41, redLine: true}, {id: 387, redLine: true},
-  {id: 50, tabCount: 2}, {id: 51}, {id: 54, redLine: true}, {id: 53, redLine: true}, {id: 59, tabCount: 2},
-  /**8 страница*/
-  {id: 119}, {id: 120, redLine: true},
-  {id: 123, tableCol: 4, colNum: 1, redLine: false}, {id: 122, tableCol: 4, colNum: 2, redLine: false, newLine: false},
-  {id: 121, tableCol: 4, colNum: 3, redLine: false, newLine: false}, {
-    id: 127,
-    tableCol: 4,
-    colNum: 4,
-    redLine: false,
-    newLine: false
-  },
+// const componentListId: ComponentRuleForPDF[] = [
+//   /**1 страница*/
+//   {id: 25}, {id: 184, tabCount: 1}, {id: 27}, {id: 5}, {id: 7}, {id: 185},
+//   /**2 страница*/
+//   {id: 17}, {id: 11, redLine: true}, {id: 22}, {id: 21, redLine: true}, {id: 19, redLine: true}, {id: 70}, {
+//     id: 214,
+//     tabCount: 2
+//   },
+//   /**3 страница*/
+//   {id: 30}, {id: 32}, {id: 34}, {id: 195}, {id: 38, tabCount: 2, addDash: true},
+//   {id: 40, tabCount: 2, addDash: true}, {id: 42}, {id: 44},
 
-  {id: 129, tableCol: 4, colNum: 1, redLine: false}, {id: 130, tableCol: 4, colNum: 2, redLine: false, newLine: false},
-  {id: 131, tableCol: 4, colNum: 3, redLine: false, newLine: false}, {
-    id: 132,
-    tableCol: 4,
-    colNum: 4,
-    redLine: false,
-    newLine: false
-  },
+//   /**4 страница*/
+//   {id: 58}, {id: 60}, {id: 62}, {id: 64}, {id: 241}, {id: 73},
 
-  {id: 133, tableCol: 4, colNum: 1, redLine: false}, {id: 134, tableCol: 4, colNum: 2, redLine: false, newLine: false},
-  {id: 135, tableCol: 4, colNum: 3, redLine: false, newLine: false}, {
-    id: 136,
-    tableCol: 4,
-    colNum: 4,
-    redLine: false,
-    newLine: false
-  },
-  {id: 139, tabCount: 2}, {id: 383, redLine: true}, {id: 31, fontStyle: "italic", redLine: true},
-  {id: PAY_TABLE_ID}, {id: 408},
-  /**9 страница*/
-  {id: 407}, {id: 359}, {id: 360}, {id: 412}, {id: 362, tableCol: 3, colNum: 2, newLine: false}, {
-    id: 363,
-    tableCol: 3,
-    colNum: 3,
-    newLine: false
-  },
-  /**10 страница*/
-  {id: 416}, {id: 376}, {id: 377},
-  /**11 страница*/
-  {id: 77},
-  /**12 страница*/
-  {id: 178},
+//   /**5 страница*/
+//   {id: 254}, {id: 255},
 
-]
+//   /**6 страница*/
+//   {id: 14}, {id: 250}, {id: 378}, {id: 379, redLine: true},
+//   {id: 24, redLine: true}, {id: 249, tabCount: 2}, {id: 28}, {id: 382},
+
+//   /**7 страница*/
+//   {id: 384}, {id: 33}, {id: 36, redLine: true}, {id: 392, redLine: true}, {id: 394, redLine: true},
+//   {id: 396, redLine: true}, {id: 398, redLine: true}, {id: 41, redLine: true}, {id: 387, redLine: true},
+//   {id: 50, tabCount: 2}, {id: 51}, {id: 54, redLine: true}, {id: 53, redLine: true}, {id: 59, tabCount: 2},
+
+//   /**8 страница*/
+//   {id: 119}, {id: 120, redLine: true},
+//   {id: 123, tableCol: 4, colNum: 1, redLine: false}, {id: 122, tableCol: 4, colNum: 2, redLine: false, newLine: false},
+//   {id: 121, tableCol: 4, colNum: 3, redLine: false, newLine: false}, {
+//     id: 127,
+//     tableCol: 4,
+//     colNum: 4,
+//     redLine: false,
+//     newLine: false
+//   },
+//
+//   {id: 129, tableCol: 4, colNum: 1, redLine: false}, {id: 130, tableCol: 4, colNum: 2, redLine: false, newLine: false},
+//   {id: 131, tableCol: 4, colNum: 3, redLine: false, newLine: false}, {
+//     id: 132,
+//     tableCol: 4,
+//     colNum: 4,
+//     redLine: false,
+//     newLine: false
+//   },
+//
+//   {id: 133, tableCol: 4, colNum: 1, redLine: false}, {id: 134, tableCol: 4, colNum: 2, redLine: false, newLine: false},
+//   {id: 135, tableCol: 4, colNum: 3, redLine: false, newLine: false}, {
+//     id: 136,
+//     tableCol: 4,
+//     colNum: 4,
+//     redLine: false,
+//     newLine: false
+//   },
+//   {id: 139, tabCount: 2}, {id: 383, redLine: true}, {id: 31, fontStyle: "italic", redLine: true},
+//   {id: PAY_TABLE_NAME}, {id: 408},
+
+
+//   /**9 страница*/
+//   {id: 407}, {id: 359}, {id: 360}, {id: 412}, {id: 362, tableCol: 3, colNum: 2, newLine: false}, {
+//     id: 363,
+//     tableCol: 3,
+//     colNum: 3,
+//     newLine: false
+//   },
+
+
+//   /**10 страница*/
+//   {id: 416}, {id: 376}, {id: 377},
+//   /**11 страница*/
+//   {id: 77},
+//   /**12 страница*/
+//   {id: 178},
+//
+// ]
 
 /**Это ИД элементов котрые нужно отобразить на печать*/
 
 export class AnketaScriptRule {
   currentCrfPdf: ComponentRuleForPDF
 
-  constructor(private document: IceDocument) {
+  constructor(private documentComponent: ComponentMaket[]) {
   }
+
 
   getPrintRules(): PDFDocObject[] {
     let resRul = [...constRule]
+    //let resRul: PDFDocObject[] = []
 
-    componentListId.forEach(crfpdf => {
-      let comp = this.getComponentFromDoc(crfpdf.id)
-      this.currentCrfPdf = crfpdf
-      if (comp) {
+    this.documentComponent.filter(c => (c.printRule === undefined || (c.printRule && c.printRule.isPrint === true)))
+    .forEach(comp => {
+      this.currentCrfPdf = comp.printRule ? comp.printRule : {isPrint: comp.componentType != IceComponentType.TEXT}
+
+      if (comp && this.currentCrfPdf.isPrint) {
         if (comp.componentType === IceComponentType.AREA ||
           comp.componentType === IceComponentType.SELECT ||
           comp.componentType === IceComponentType.PLACE ||
@@ -114,12 +114,13 @@ export class AnketaScriptRule {
           resRul.push(...this.setPdfRuleForCheckBoxComponent(comp))
         if (comp.componentType === IceComponentType.TEXT)
           resRul.push(...this.setPdfRuleForTextComponent(comp))
-        if (comp.componentType === IceComponentType.TABLE)
+        if (comp.componentType === IceComponentType.TABLE) {
           resRul.push(...this.setPdfRuleForTableComponent(comp))
+        }
         if (comp.componentType === IceComponentType.UPLOAD)
           resRul.push(...this.setPdfRuleForUploadComponent(comp))
       }
-      if (crfpdf.id === PAY_TABLE_ID) {
+      if (comp.componentName === PAY_TABLE_NAME) {
         resRul.push(...this.createPayTableRule())
       }
     })
@@ -128,7 +129,8 @@ export class AnketaScriptRule {
   }
 
   private setPdfRuleForTextComponent(comp: ComponentMaket): PDFDocObject[] {
-    let string = stripHtml(comp.value ? comp.value : "").result
+    let string = stripHtml(comp.value ? comp.value : "",{skipHtmlDecoding:true}).result
+    string = string.replaceAll("&nbsp;", "\n")
     return this.setPdfRule(string, "")
   }
 
@@ -138,11 +140,12 @@ export class AnketaScriptRule {
       value: comp.value ? comp.value : false,
       lineText: comp.placeHolder,
       redLine: this.currentCrfPdf.redLine,
-      fontSize: 10,
-      fontStyle: "normal",
+      fontSize: this.currentCrfPdf.fontSize ? this.currentCrfPdf.fontSize : 10,
+      fontStyle: this.currentCrfPdf.fontStyle ? this.currentCrfPdf.fontStyle : "normal",
       colNum: this.currentCrfPdf.colNum,
       tableCol: this.currentCrfPdf.tableCol,
-      newLine: this.currentCrfPdf.newLine
+      newLine: this.currentCrfPdf.newLine,
+      tabCount: this.currentCrfPdf.tabCount
     } as PDFDocObject]
   }
 
@@ -150,25 +153,37 @@ export class AnketaScriptRule {
     if (this.currentCrfPdf.addDash) {
       label = "- " + label
     }
-    if (this.currentCrfPdf.tabCount) {
-      let tabSpaceString = ""
-      for (let i = 0; i < this.currentCrfPdf.tabCount * oneTab; i++) {
-        tabSpaceString += " "
-      }
-      label = tabSpaceString + label
-    }
-    return [{
-      redLine: this.currentCrfPdf.redLine,
-      fontSize: 10,
-      value: label,
-      fontStyle: this.currentCrfPdf.fontStyle ? this.currentCrfPdf.fontStyle : "bold",
-      frame: this.currentCrfPdf.frame,
-    },
-      {
+    let result: PDFDocObject[] = []
+
+    if(label.length > 0)
+      result.push({
+        value: label,
+        redLine: this.currentCrfPdf.redLine,
+        fontSize: this.currentCrfPdf.fontSize ? this.currentCrfPdf.fontSize : 10,
+        fontStyle: this.currentCrfPdf.fontStyle ? this.currentCrfPdf.fontStyle : "bold",
+        frame: this.currentCrfPdf.frame,
+        colNum: this.currentCrfPdf.colNum,
+        tableCol: this.currentCrfPdf.tableCol,
+        newLine: this.currentCrfPdf.newLine,
+        align: this.currentCrfPdf.align,
+        tabCount: this.currentCrfPdf.tabCount
+      })
+    if(value.length > 0)
+      result.push({
         value: value,
-        newLine: false,
-        fontStyle: "italic",
-      },
+        redLine: this.currentCrfPdf.redLine,
+        fontSize: this.currentCrfPdf.fontSize ? this.currentCrfPdf.fontSize : 10,
+        fontStyle: this.currentCrfPdf.fontStyle ? this.currentCrfPdf.fontStyle : "italic",
+        frame: this.currentCrfPdf.frame,
+        colNum: this.currentCrfPdf.colNum,
+        tableCol: this.currentCrfPdf.tableCol,
+        newLine: label.length > 0 ? false : this.currentCrfPdf.newLine,
+        align: this.currentCrfPdf.align,
+        tabCount: this.currentCrfPdf.tabCount
+      })
+
+    return [
+      ...result,
       {
         type: "space"
       }]
@@ -180,12 +195,11 @@ export class AnketaScriptRule {
       valueString = (comp.value && comp.value.placeString) ? comp.value.placeString : valueString
     else
       valueString = comp.value ? comp.value : valueString
-
-    return this.setPdfRule((comp.placeHolder ? comp.placeHolder : "") + ": ", valueString)
+    return this.setPdfRule((comp.placeHolder ? comp.placeHolder + ": " : "") , valueString)
   }
 
   getComponentFromDoc(id: number): ComponentMaket {
-    let component = this.document.docStep.flatMap(c => c.componentMaket).find(f => f.componentID === id)
+    let component = this.documentComponent.find(f => f.componentID === id)
     return component
   }
 
@@ -268,7 +282,7 @@ export class AnketaScriptRule {
   }
 
   private setPdfRuleForUploadComponent(comp: ComponentMaket): PDFDocObject[] {
-    console.log(comp)
+    if(!comp.value) return []
     let arr = comp.value as Array<{ name: string, size: number }>
     let header: string[] = ["Имя файла", "Размер"]
     let subHeader = [1, 2]

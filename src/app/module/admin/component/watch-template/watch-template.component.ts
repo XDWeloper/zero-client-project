@@ -2,7 +2,7 @@ import {AfterViewInit, Component, ComponentRef, ElementRef, OnInit, ViewChild, V
 import {cellColl, cellRow, CellType, collInRow, IceComponentType} from "../../../../constants";
 import {MatDialogRef} from "@angular/material/dialog";
 import {DocumentService} from "../../../../services/document.service";
-import {IceComponent, IceDocumentMaket} from "../../../../interfaces/interfaces";
+import {ComponentMaket, IceComponent, IceDocumentMaket} from "../../../../interfaces/interfaces";
 import {CellService} from "../../../../services/cell.service";
 import {MatStepper} from "@angular/material/stepper";
 import {TextComponent} from "../../../../component/dinamicComponent/text/text.component";
@@ -17,6 +17,8 @@ import {
 import {UploadComponent} from "../../../../component/dinamicComponent/upload/upload.component";
 import {AddressComponent} from "../../../../component/dinamicComponent/adress/address.component";
 import {SelectComponent} from "../../../../component/dinamicComponent/select/select.component";
+import {PDFDocObject, PrintService} from "../../../../services/print.service";
+import {AnketaScriptRule} from "../../../../data/anketaScriptRule";
 
 @Component({
   selector: 'app-watch-template',
@@ -43,6 +45,7 @@ export class WatchTemplateComponent implements OnInit,AfterViewInit {
   private itemsField: ViewContainerRef | undefined
 
   private componentRef: ComponentRef<IceComponent>
+  private componentRefStepList: ComponentRef<IceComponent>[] = []
   dialogCorrectX: number;
   dialogCorrectY: number;
   private _currentStepNum: number;
@@ -55,7 +58,8 @@ export class WatchTemplateComponent implements OnInit,AfterViewInit {
 
   constructor(public dialogRef: MatDialogRef<WatchTemplateComponent>,
               private documentService: DocumentService,
-              private cellService: CellService) {
+              private cellService: CellService,
+              private printService: PrintService) {
   }
 
   ngAfterViewInit() {
@@ -124,13 +128,31 @@ export class WatchTemplateComponent implements OnInit,AfterViewInit {
       compInstance.minVal = comp.minVal
       compInstance.regExp = comp.regExp
       compInstance.optionList = comp.optionList
+      compInstance.printRule = comp.printRule === undefined ? {isPrint: comp.componentType != IceComponentType.TEXT,newLine: true} : comp.printRule
+      this.componentRefStepList.push(this.componentRef)
     })
   }
 
 
   setCurrentStep(index: number) {
+    this.componentRefStepList.splice(0, this.componentRefStepList.length)
     this.itemsField.clear()
     this.currentStepIndex = index
     this.showComponentOnCurrentStep(index)
+  }
+
+  print() {
+    let docData = this.getDataForPdf()
+    if (docData && docData.length > 0) {
+      this.printService.createPDF(docData)
+    }
+  }
+
+  private getDataForPdf(): PDFDocObject[] {
+    let resultList: PDFDocObject[]
+    let asr = new AnketaScriptRule( this.componentRefStepList.map(c => c.instance as unknown as ComponentMaket).filter(p => p.printRule.isPrint)
+      .sort((a, b) => a.printRule.order < b.printRule.order ? -1 : 1))
+    resultList = asr.getPrintRules()
+    return resultList
   }
 }

@@ -3,6 +3,7 @@ import {ComponentService} from "../../../services/component.service";
 import {CellService} from "../../../services/cell.service";
 import {
   ComponentBound,
+  ComponentRuleForPDF,
   ControlPropType,
   IceComponent,
   MasterControl,
@@ -20,8 +21,8 @@ export class AreaComponent implements IceComponent, OnDestroy {
   constructor(private cellService: CellService, private componentService: ComponentService) {
   }
 
-
-
+  optionList?: string[];
+  printRule: ComponentRuleForPDF;
   masterControlList: MasterControl[];
 
   minLength: number;

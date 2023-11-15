@@ -34,11 +34,15 @@ export class DocumentService {
     return this.statusList
   }
 
-  calculateComponentId() {
-    this.lastComponentIndex = this.templateList
-      .map(item => item.docStep.map(i => i.componentMaket.length)
-      .reduce((r, i) => r += i, 0))
-      .reduce((r, i) => r += i, 0)
+  calculateComponentId(docId: number) {
+    // this.lastComponentIndex = this.templateList
+    //   .map(item => item.docStep.map(i => i.componentMaket.length)
+    //   .reduce((r, i) => r += i, 0))
+    //   .reduce((r, i) => r += i, 0)
+    let nextId = 0
+    this.getTemplateByDocId(docId).docStep.map(s => s.componentMaket).flat().forEach(c => nextId = c.componentID > nextId ? c.componentID : nextId)
+    this.lastComponentIndex = nextId
+      console.log(this.lastComponentIndex)
   }
 
   getMaketComponentList(docId: number,selfId: number){
@@ -79,7 +83,7 @@ export class DocumentService {
     let docMaket = this.docTree.find(p => p.id === maket.docId)
     if(docMaket)
       docMaket.children = childList
-    this.calculateComponentId()
+    this.calculateComponentId(maket.docId)
   }
 
   saveTemplate(dtt: DocumentTreeTempl){
@@ -122,7 +126,7 @@ export class DocumentService {
         docStep: [newStep]
       }
       this.templateList.push(newTempl)
-      this.calculateComponentId()
+      this.calculateComponentId(doc.id)
     } else { //Правим существующий
       isDocPresent.docName = doc.name
       let isStepPresent = isDocPresent.docStep.find(p => p.stepNum === step.num)
@@ -220,5 +224,13 @@ export class DocumentService {
     return nextId + 1
   }
 
+  getLastOrder(docId: number): number{
+    let result = 0
+    this.getTemplateByDocId(docId).docStep.map(s => s.componentMaket).flat().map(c => c.printRule.order).forEach(order => {
+      if(order > result)
+        result = order
+    })
+    return result
+  }
 
 }

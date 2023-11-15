@@ -30,6 +30,7 @@ import { MasterControlPropComponent } from './component/master-control-prop/mast
 import {MatSelectModule} from "@angular/material/select";
 import { OptionListComponent } from './component/option-list/option-list.component';
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
+import {MatExpansionModule} from "@angular/material/expansion";
 
 
 
@@ -73,6 +74,7 @@ import {MatSlideToggleModule} from "@angular/material/slide-toggle";
         MatButtonToggleModule,
         MatSelectModule,
         MatSlideToggleModule,
+        MatExpansionModule,
     ]
 
 })

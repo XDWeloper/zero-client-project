@@ -1,6 +1,11 @@
 import {Component} from '@angular/core';
 import {CellService} from "../../../services/cell.service";
-import {ComponentBound,ControlPropType,IceComponent,MasterControl,TextPosition} from "../../../interfaces/interfaces";
+import {ComponentBound,ComponentRuleForPDF,
+  ControlPropType,
+  IceComponent,
+  MasterControl,
+  TextPosition
+} from "../../../interfaces/interfaces";
 import {AlertColor, IceComponentType} from "../../../constants";
 import {ComponentService} from "../../../services/component.service";
 import {Subscription} from "rxjs";
@@ -13,6 +18,8 @@ export class SelectComponent implements IceComponent {
 
   constructor(private cellService: CellService, private componentSelectedService: ComponentService, private componentService: ComponentService) {
   }
+
+  printRule: ComponentRuleForPDF;
 
   masterControlList: MasterControl[];
 
@@ -114,7 +121,8 @@ export class SelectComponent implements IceComponent {
 
   set value(value: any) {
     if (value === undefined) {
-      this._value = -888888888888
+      //this._value = -888888888888
+      this._value = value
       return
     }
     this._value = value;
