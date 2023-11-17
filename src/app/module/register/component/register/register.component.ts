@@ -18,7 +18,6 @@ import {TimeService} from "../../../../services/time.service";
 @Component({
   selector: 'app-register',
   templateUrl: './register.component.html',
-  styleUrls: ['./register.component.css']
 })
 
 export class RegisterComponent implements OnDestroy {
@@ -53,6 +52,8 @@ export class RegisterComponent implements OnDestroy {
   isEMailTouched = false
   isPasswordTouched = false
   isDPasswordTouched = false
+  personalDataAgree: boolean = false;
+  isClicked: boolean = false;
 
 
 
@@ -192,6 +193,7 @@ export class RegisterComponent implements OnDestroy {
   }
 
   validateFields() {
+console.log("validateFields")
 
     if (this.phone != undefined  && !this.loginPattern.test(this.phone))
       this.phone_error = "Не верный логин"
@@ -224,7 +226,8 @@ export class RegisterComponent implements OnDestroy {
                             && (this.isLastNameTouched && this.lastName_error === undefined)
                             && (this.isEMailTouched && this.eMail_error === undefined)
                             && (this.isPasswordTouched && this.password_error === undefined)
-                            && (this.isDPasswordTouched && this.dPassword_error === undefined))
+                            && (this.isDPasswordTouched && this.dPassword_error === undefined)
+                            && this.personalDataAgree)
 
   }
 

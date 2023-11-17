@@ -6,6 +6,7 @@ import {MatInputModule} from "@angular/material/input";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NgxMaskDirective} from "ngx-mask";
 import {IceInputComponent} from "../share-component/ice-input/ice-input.component";
+import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 
 @NgModule({
     declarations: [
@@ -21,6 +22,7 @@ import {IceInputComponent} from "../share-component/ice-input/ice-input.componen
     NgxMaskDirective,
     ReactiveFormsModule,
     IceInputComponent,
+    MatSlideToggleModule,
   ]
 })
 export class RegisterModule { }

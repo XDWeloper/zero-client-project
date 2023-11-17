@@ -16,6 +16,10 @@
       <app-ice-input  label="Подтверждение пароля" (value)="dPassword = $event" [inputType]="'password'" [errorText]="dPassword_error"
                       [toolTip]="loginPasswordProperties ? loginPasswordProperties.passwordValidatorHint : ''"></app-ice-input>
 
+    <div class="mt-4 flex justify-between">
+      <a class="underline font-semibold font-sans" [ngClass]="isClicked ? 'text-red-500' : 'text-primary-base'" href="https://www.cmrbank.ru/" target="_blank" (click)="isClicked = true">Даю согласие на обработку персональных данных</a>
+      <mat-slide-toggle  [(ngModel)]="personalDataAgree" (click)="validateFields()" [color]="'primary'"></mat-slide-toggle>
+    </div>
 
     <button (click)="register()" [disabled]="isFieldsInvalid"
             class="mt-4 middle none center w-full rounded-lg bg-primary-base py-3 px-6 font-sans text-xs font-bold uppercase text-white
@@ -29,7 +33,7 @@
   <div *ngIf="pinResult != undefined"
        class="bg-white dark:bg-slate-900 border p-2 w-[30%] rounded-lg shadow-gray-500 shadow-2xl">
     <p class="text-center text-lg ">Введите пин-код</p>
-    <app-ice-input label="Пин-код" (value)="pinCode  = $event" type="'text'"></app-ice-input>
+    <app-ice-input label="Пин-код" (value)="pinCode  = $event" inputType="text"></app-ice-input>
     <button (click)="confirm()"
             class="mt-4 middle none center w-full rounded-lg bg-primary-base py-3 px-6 font-sans text-xs font-bold uppercase text-white
         shadow-md shadow-gray-500 transition-all hover:shadow-lg hover:shadow-gray-400 focus:opacity-[0.85] focus:shadow-none
