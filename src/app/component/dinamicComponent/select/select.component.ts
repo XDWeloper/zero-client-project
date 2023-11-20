@@ -19,6 +19,8 @@ export class SelectComponent implements IceComponent {
   constructor(private cellService: CellService, private componentSelectedService: ComponentService, private componentService: ComponentService) {
   }
 
+  tableType: number;
+
   printRule: ComponentRuleForPDF;
 
   masterControlList: MasterControl[];

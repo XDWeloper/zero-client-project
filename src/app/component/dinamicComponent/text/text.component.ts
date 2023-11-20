@@ -23,6 +23,8 @@ export class TextComponent implements OnInit, IceComponent, OnDestroy {
   constructor(public sanitizer: DomSanitizer, private cellService: CellService, private componentService: ComponentService) {
   }
 
+  tableType: number;
+
   checkedText?: string;
     optionList?: string[];
     printRule: ComponentRuleForPDF;

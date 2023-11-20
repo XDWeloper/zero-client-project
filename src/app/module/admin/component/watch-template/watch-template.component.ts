@@ -129,6 +129,7 @@ export class WatchTemplateComponent implements OnInit,AfterViewInit {
       compInstance.regExp = comp.regExp
       compInstance.optionList = comp.optionList
       compInstance.printRule = comp.printRule === undefined ? {isPrint: comp.componentType != IceComponentType.TEXT,newLine: true} : comp.printRule
+      compInstance.tableType = comp.tableType
       this.componentRefStepList.push(this.componentRef)
     })
   }

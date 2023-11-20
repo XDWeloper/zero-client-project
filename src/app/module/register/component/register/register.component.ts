@@ -193,8 +193,6 @@ export class RegisterComponent implements OnDestroy {
   }
 
   validateFields() {
-console.log("validateFields")
-
     if (this.phone != undefined  && !this.loginPattern.test(this.phone))
       this.phone_error = "Не верный логин"
     else

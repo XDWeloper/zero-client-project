@@ -59,6 +59,8 @@ export class InformationCompanyParticipantsTableComponent implements IceComponen
   constructor(private cellService: CellService, private componentService: ComponentService) {
   }
 
+  tableType: number;
+
   checkedText?: string;
     optionList?: string[];
     printRule: ComponentRuleForPDF;

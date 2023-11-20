@@ -95,6 +95,10 @@ export class UploadComponent implements IceComponent, OnDestroy {
               private stepService: StepService) {
   }
 
+  tableType: number;
+    checkedText?: string;
+    optionList?: string[];
+
   ngOnDestroy(): void {
     if (this.upload$)
       this.upload$.unsubscribe()

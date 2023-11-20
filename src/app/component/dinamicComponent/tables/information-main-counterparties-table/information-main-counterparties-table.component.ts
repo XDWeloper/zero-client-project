@@ -58,6 +58,8 @@ export class InformationMainCounterpartiesTableComponent implements IceComponent
   constructor(private cellService: CellService, private componentService: ComponentService) {
   }
 
+  tableType: number;
+
   checkedText?: string;
     optionList?: string[];
     printRule: ComponentRuleForPDF;

@@ -42,7 +42,6 @@ export class DocumentService {
     let nextId = 0
     this.getTemplateByDocId(docId).docStep.map(s => s.componentMaket).flat().forEach(c => nextId = c.componentID > nextId ? c.componentID : nextId)
     this.lastComponentIndex = nextId
-      console.log(this.lastComponentIndex)
   }
 
   getMaketComponentList(docId: number,selfId: number){

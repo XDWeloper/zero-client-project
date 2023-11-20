@@ -231,6 +231,7 @@ export class AnketaScriptRule {
   }
 
   private setPdfRuleForTableComponent(comp: ComponentMaket): PDFDocObject[] {
+    console.log("comp: ",comp.tableType)
     if (!comp.value)
       return [];
 

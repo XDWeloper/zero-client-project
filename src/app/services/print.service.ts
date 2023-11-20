@@ -203,8 +203,6 @@ export class PrintService {
       }
     }
 
-    console.log(resultArray)
-
     resultArray.forEach(line => {
       if (line.length < 1) return
       if (newLine || isTable) {
@@ -214,17 +212,12 @@ export class PrintService {
       let xPosition = firstLine ? pdfConfig.redLineBorder : x
       let yPosition = this.currentHeight
 
-      console.log("newLine: ", newLine, "isTable: ", isTable)
-
-
       if (!newLine && !isTable) {
         xPosition = this.lastXPosition
         yPosition = this.lastYPosition
         newLine = true
         isTable = false
       }
-
-      console.log(xPosition, yPosition, "line",line)
 
       xPosition += docObject.tabCount ? docObject.tabCount * pdfConfig.tabSize : 0
 
@@ -293,23 +286,7 @@ export class PrintService {
   }
 
   private addTable(docObject: PDFDocObject) {
-
     this.createNestedTable(docObject)
-
-    // autoTable(pdfDoc, {
-    //   head: docObject.value.head,
-    //   body: docObject.value.body,
-    //   rowPageBreak: "auto",
-    //   styles: {
-    //     font: "MyFont"
-    //   },
-    //   startY: this.currentHeight,
-    //   didDrawPage: data => {
-    //     console.log(data.cursor?.y)
-    //     this.currentHeight = data.cursor?.y!!
-    //   }
-    // })
-
   }
 
   private addSpace(docObject: PDFDocObject) {

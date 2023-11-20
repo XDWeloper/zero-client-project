@@ -204,6 +204,7 @@ export interface IceComponent {
   componentBound: ComponentBound
   required: boolean
   textPosition: TextPosition
+  tableType: number | undefined
   frameColor: string | undefined
   minLength: number | undefined
   maxLength: number | undefined

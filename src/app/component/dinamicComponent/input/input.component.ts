@@ -19,6 +19,8 @@ export class InputComponent implements IceComponent {
   constructor(private cellService: CellService, private componentSelectedService: ComponentService, private componentService: ComponentService) {
   }
 
+  tableType: number;
+
   optionList?: string[];
     printRule: ComponentRuleForPDF;
 

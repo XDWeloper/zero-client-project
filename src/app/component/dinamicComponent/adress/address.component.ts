@@ -65,6 +65,8 @@ export class AddressComponent implements IceComponent, OnDestroy {
   constructor(private cellService: CellService, private componentService: ComponentService, private changeDetection: ChangeDetectorRef, public dialog: MatDialog) {
   }
 
+  tableType: number;
+
   optionList?: string[];
     printRule: ComponentRuleForPDF;
 

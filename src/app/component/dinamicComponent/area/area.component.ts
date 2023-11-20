@@ -21,6 +21,8 @@ export class AreaComponent implements IceComponent, OnDestroy {
   constructor(private cellService: CellService, private componentService: ComponentService) {
   }
 
+  tableType: number;
+
   optionList?: string[];
   printRule: ComponentRuleForPDF;
   masterControlList: MasterControl[];

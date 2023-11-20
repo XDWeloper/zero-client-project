@@ -31,15 +31,12 @@
     <!--    параметры печати-->
     <mat-accordion
       class="col-span-12 w-[95%] text-center rounded-md dark:bg-slate-700 bg-gray-200 border border-primary-light relative">
-      <mat-expansion-panel hideToggle expanded>
+      <mat-expansion-panel hideToggle [expanded]="currentComponent.printRule.isPrint === true">
         <mat-expansion-panel-header>
           <mat-panel-title>
             <p>Параметры печати компонента</p>
           </mat-panel-title>
-          <mat-icon class=""
-                    [ngClass]="(currentComponent.printRule && currentComponent.printRule.isPrint === true) ? 'text-primary-dark':'text-red-900'">
-            print
-          </mat-icon>
+          <mat-icon [ngClass]="(currentComponent.printRule && currentComponent.printRule.isPrint === true) ? 'text-primary-dark':'text-red-900'">print</mat-icon>
         </mat-expansion-panel-header>
         <div class="w-full border-t border-t-primary-light grid grid-cols-12 gap-y-0.5">
           <div class="col-span-12 h-2"></div>
