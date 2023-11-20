@@ -37,6 +37,7 @@ import {Router} from "@angular/router";
 import {TimeService} from "../../../../services/time.service";
 import {KeycloakService} from "../../../../services/keycloak.service";
 import {MessageService} from "../../../../services/message.service";
+import {TablePropComponent} from "../table-prop/table-prop.component";
 
 @Component({
   selector: 'app-main-page',
@@ -337,6 +338,9 @@ export class MainPageComponent implements OnInit, OnDestroy {
       this.componentRef.instance.tableType = tableNum
       this.componentRef.instance.placeHolder = "Таблица - " + tableList.find(it => it.num === tableNum).text
       componentRef.close()
+
+      this.openTablePropDialog()
+
     })
 
   }
@@ -379,5 +383,10 @@ export class MainPageComponent implements OnInit, OnDestroy {
         c.printRule.order = orderNum ++
       })
     })
+  }
+
+  private openTablePropDialog() {
+    let componentRef = this.dialog.open(TablePropComponent, {enterAnimationDuration: dialogOpenAnimationDuration,exitAnimationDuration: dialogCloseAnimationDuration})
+
   }
 }

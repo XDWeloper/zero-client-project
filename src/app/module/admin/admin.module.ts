@@ -47,7 +47,7 @@ import {MatExpansionModule} from "@angular/material/expansion";
         ChangeTableComponent,
         CellComponent,
         MasterControlPropComponent,
-        OptionListComponent
+        OptionListComponent,
     ],
     exports: [
     ],

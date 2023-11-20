@@ -7,91 +7,11 @@ import {IceMaketComponent} from "../module/admin/classes/icecomponentmaket";
 const oneTab = 3 //пробелов у одного таба
 const PAY_TABLE_NAME = "pay_table" // Таблица безналичных расчетов(делаем в ручную)
 
-// const componentListId: ComponentRuleForPDF[] = [
-//   /**1 страница*/
-//   {id: 25}, {id: 184, tabCount: 1}, {id: 27}, {id: 5}, {id: 7}, {id: 185},
-//   /**2 страница*/
-//   {id: 17}, {id: 11, redLine: true}, {id: 22}, {id: 21, redLine: true}, {id: 19, redLine: true}, {id: 70}, {
-//     id: 214,
-//     tabCount: 2
-//   },
-//   /**3 страница*/
-//   {id: 30}, {id: 32}, {id: 34}, {id: 195}, {id: 38, tabCount: 2, addDash: true},
-//   {id: 40, tabCount: 2, addDash: true}, {id: 42}, {id: 44},
-
-//   /**4 страница*/
-//   {id: 58}, {id: 60}, {id: 62}, {id: 64}, {id: 241}, {id: 73},
-
-//   /**5 страница*/
-//   {id: 254}, {id: 255},
-
-//   /**6 страница*/
-//   {id: 14}, {id: 250}, {id: 378}, {id: 379, redLine: true},
-//   {id: 24, redLine: true}, {id: 249, tabCount: 2}, {id: 28}, {id: 382},
-
-//   /**7 страница*/
-//   {id: 384}, {id: 33}, {id: 36, redLine: true}, {id: 392, redLine: true}, {id: 394, redLine: true},
-//   {id: 396, redLine: true}, {id: 398, redLine: true}, {id: 41, redLine: true}, {id: 387, redLine: true},
-//   {id: 50, tabCount: 2}, {id: 51}, {id: 54, redLine: true}, {id: 53, redLine: true}, {id: 59, tabCount: 2},
-
-//   /**8 страница*/
-//   {id: 119}, {id: 120, redLine: true},
-//   {id: 123, tableCol: 4, colNum: 1, redLine: false}, {id: 122, tableCol: 4, colNum: 2, redLine: false, newLine: false},
-//   {id: 121, tableCol: 4, colNum: 3, redLine: false, newLine: false}, {
-//     id: 127,
-//     tableCol: 4,
-//     colNum: 4,
-//     redLine: false,
-//     newLine: false
-//   },
-//
-//   {id: 129, tableCol: 4, colNum: 1, redLine: false}, {id: 130, tableCol: 4, colNum: 2, redLine: false, newLine: false},
-//   {id: 131, tableCol: 4, colNum: 3, redLine: false, newLine: false}, {
-//     id: 132,
-//     tableCol: 4,
-//     colNum: 4,
-//     redLine: false,
-//     newLine: false
-//   },
-//
-//   {id: 133, tableCol: 4, colNum: 1, redLine: false}, {id: 134, tableCol: 4, colNum: 2, redLine: false, newLine: false},
-//   {id: 135, tableCol: 4, colNum: 3, redLine: false, newLine: false}, {
-//     id: 136,
-//     tableCol: 4,
-//     colNum: 4,
-//     redLine: false,
-//     newLine: false
-//   },
-//   {id: 139, tabCount: 2}, {id: 383, redLine: true}, {id: 31, fontStyle: "italic", redLine: true},
-//   {id: PAY_TABLE_NAME}, {id: 408},
-
-
-//   /**9 страница*/
-//   {id: 407}, {id: 359}, {id: 360}, {id: 412}, {id: 362, tableCol: 3, colNum: 2, newLine: false}, {
-//     id: 363,
-//     tableCol: 3,
-//     colNum: 3,
-//     newLine: false
-//   },
-
-
-//   /**10 страница*/
-//   {id: 416}, {id: 376}, {id: 377},
-//   /**11 страница*/
-//   {id: 77},
-//   /**12 страница*/
-//   {id: 178},
-//
-// ]
-
-/**Это ИД элементов котрые нужно отобразить на печать*/
-
 export class AnketaScriptRule {
   currentCrfPdf: ComponentRuleForPDF
 
   constructor(private documentComponent: ComponentMaket[]) {
   }
-
 
   getPrintRules(): PDFDocObject[] {
     let resRul = [...constRule]

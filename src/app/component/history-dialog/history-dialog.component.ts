@@ -22,7 +22,6 @@ import {DocStatus} from "../../interfaces/interfaces";
   standalone: true,
   imports: [CommonModule, DocStatusPipe, MatPaginatorModule, MatTableModule, MatSortModule, FormsModule],
   templateUrl: './history-dialog.component.html',
-  styleUrls: ['./history-dialog.component.css'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class HistoryDialogComponent implements OnInit, AfterViewInit {

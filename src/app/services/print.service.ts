@@ -3,6 +3,7 @@ import jsPDF from "jspdf";
 import {myFont, myFont_bold, myFont_italic, myFont_semiBold} from "../../assets/fonts/Open_sans";
 import autoTable from "jspdf-autotable";
 
+
 const pdfConfig = {
   fontSize: 14,
   subLineHeight: 5,
@@ -61,7 +62,6 @@ const defaultColor = "#000000";
 const colorGray = "#4d4e53";
 const tableHeaderFillColor = colorGray
 const pdfDoc = new jsPDF()
-
 
 @Injectable({
   providedIn: 'root'
@@ -378,7 +378,7 @@ export class PrintService {
 
 
     let isTableCreated = false
-
+    // @ts-ignore
     autoTable(pdfDoc, {
       headStyles: {valign: "middle", halign: "center", fillColor: tableHeaderFillColor, textColor: "#ffffff"},
       theme: "plain",
@@ -389,9 +389,10 @@ export class PrintService {
       margin: {left: pdfConfig.leftBorder},
       tableWidth: this.docWorkWidth,
       styles: {font: pdfConfig.tableHeaderFontStyle, fontSize: pdfConfig.tableHeaderFontSize, cellWidth: columnWidth},
-      didDrawCell: data => {
+      didDrawCell: (data: { row: { index: number; section: string; }; cell: { y: any; x: any; }; }) => {
         if (data.row.index === 0 && data.row.section === 'body' && !isTableCreated) {
           isTableCreated = true
+          // @ts-ignore
           autoTable(pdfDoc, {
             headStyles: {valign: "middle", halign: "center", fillColor: tableHeaderFillColor},
             showHead: 'firstPage',
@@ -408,7 +409,7 @@ export class PrintService {
             rowPageBreak: "auto",
             tableWidth: this.docWorkWidth,
             body: body,
-            didDrawPage: data => {
+            didDrawPage: (data: { cursor: { y: number; }; }) => {
               this.currentHeight = data.cursor?.y!!
             }
           })
