@@ -30,7 +30,7 @@
       </as-split-area>
 
       <as-split-area [size]="100 - docPanelCurrentSize - propPanelCurrentSize"
-                     class="bg-gray-200 dark:bg-dark-background duration-300">
+                     class="bg-gray-200 duration-300 overflow-y-hidden">
         <app-admin-tool-bar [ngClass]="currentDoc && currentStep ? 'visible' : 'invisible'"
                             [currentStep]="currentStep"
                             (clickButton)="toolBarButtonClick($event)"></app-admin-tool-bar>
@@ -39,8 +39,7 @@
                class=" text-center text-black dark:text-white font-mono text-lg">{{currentDoc.name }}
             - {{ currentStep.name}}</div>
         </div>
-
-        <div class="w-full flex ">
+        <div class="w-full flex">
           <div class="w-10 text-center" [ngClass]="currentDoc && currentStep ? 'visible' : 'invisible'">
             <mat-icon class="component-panel-button-style text-indigo-500" matTooltip="Текстовое поле"
                       [matTooltipPosition]="'right'" (click)="createComponent('text')">text_fields
@@ -66,10 +65,10 @@
           </div>
 
           <!--            это поле элементов-->
-          <div class="border border-solid border-primary-base w-[90%] m-auto mt-0 boundary overflow-hidden "
+          <div class="border border-solid border-primary-base w-[90%] m-auto mt-0 boundary"
                #splitMainContainer id="mainContainer">
             <ng-template #field></ng-template>
-            <div class="w-full grid grid-cols-12 overflow-hidden">
+            <div class="w-full grid grid-cols-12 overflow-y-auto">
               <div *ngFor="let item of cellRowList; let outCell = index " class="flex">
                 <app-cell class="flex-auto " *ngFor="let i of cellInnerList; let innerCell = index"
                           [cellType]="cellType"
@@ -88,6 +87,7 @@
 
         </app-right-click-menu>
       </as-split-area>
+
       <as-split-area class="bg-gray-200 dark:bg-dark-background duration-300"
                      [size]="propPanelCurrentSize"
                      [minSize]="propPanelCloseWidth"

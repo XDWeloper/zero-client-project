@@ -1,26 +1,30 @@
-<div     [ngStyle]="{'height.px':height,'width.px':width}"
-         [style.top.px]="top" [style.left.px]="left" [style.border-color]="localBorderColor"
-         [ngClass]="{'border':localBorderColor}" *ngIf="visible"
-         class="absolute z-10 flex justify-center items-center rounded-lg m-1" >
-  <input class="w-full h-full bg-white hover:border hover:border-primary-base dark:bg-slate-700 dark:text-white p-2 rounded-lg"
-         [maxlength]="maxLength" [minlength]="minLength" [max]="maxVal" [min]="minVal" [matTooltip]="checkedText"
-         *ngIf="inputType !== 'checkbox' && inputType !== 'number'"
-         [id]="componentID"
-         [disabled] ="!enabled"
+<div [ngStyle]="{'height.px':height,'width.px':width}"
+     [style.top.px]="top" [style.left.px]="left" [style.border-color]="localBorderColor"
+     [ngClass]="{'border':localBorderColor}" *ngIf="visible"
+     class="absolute z-10 flex justify-center items-center rounded-lg m-1">
+  <input
+    class="w-full h-full bg-white hover:border hover:border-primary-base dark:bg-slate-700 dark:text-white p-2 rounded-lg"
+    [maxlength]="maxLength" [minlength]="minLength" [max]="maxVal" [min]="minVal" [matTooltip]="checkedText"
+    *ngIf="inputType !== 'checkbox' && inputType !== 'number'"
+    [id]="componentID"
+    [disabled]="!enabled"
     type="{{inputType}}" placeholder="{{placeHolder}}" [(ngModel)]="value" (click)="select($event)" [mask]="regExp">
 
-  <input class="w-full h-full bg-white hover:border hover:border-primary-base dark:bg-slate-700 dark:text-white p-2 rounded-lg"
-         [maxlength]="maxLength" [minlength]="minLength" [max]="maxVal" [min]="minVal" [matTooltip]="checkedText"
-         *ngIf="inputType === 'number'"
-         [id]="componentID"
-         [disabled] ="!enabled"
-         onkeypress="return (event.charCode >= 48 && event.charCode <= 57);"
-         type="number" placeholder="{{placeHolder}}" [(ngModel)]="value" (click)="select($event)" [mask]="regExp">
+  <input
+    class="w-full h-full bg-white hover:border hover:border-primary-base dark:bg-slate-700 dark:text-white p-2 rounded-lg"
+    [maxlength]="maxLength" [minlength]="minLength" [max]="maxVal" [min]="minVal" [matTooltip]="checkedText"
+    *ngIf="inputType === 'number'"
+    [id]="componentID"
+    [disabled]="!enabled"
+    thousandSeparator=" "
+    decimalMarker=","
+  type="text" placeholder="{{placeHolder}}" [(ngModel)]="value" (click)="select($event)" [mask]="regExp">
 
 
-  <input class="w-full bg-white hover:border hover:border-primary-base dark:bg-slate-700 dark:text-white h-[50%] rounded-lg"
-          *ngIf="inputType === 'checkbox'" [disabled] ="!enabled" [matTooltip]="checkedText"
-          type="checkbox" (click)="select($event)" [checked]="checked">
+  <input
+    class="w-full bg-white hover:border hover:border-primary-base dark:bg-slate-700 dark:text-white h-[50%] rounded-lg"
+    *ngIf="inputType === 'checkbox'" [disabled]="!enabled" [matTooltip]="checkedText"
+    type="checkbox" (click)="select($event)" [checked]="checked">
   <span *ngIf="required && checkedText" class="absolute flex h-2 w-2 top-0 right-0">
     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-300 opacity-75"></span>
     <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
@@ -28,3 +32,4 @@
 
 </div>
 
+<!--onkeypress="return (event.charCode >= 48 && event.charCode <= 57);"-->
