@@ -68,7 +68,7 @@
           <div class="border border-solid border-primary-base w-[90%] m-auto mt-0 boundary"
                #splitMainContainer id="mainContainer">
             <ng-template #field></ng-template>
-            <div class="w-full grid grid-cols-12 overflow-y-auto">
+            <div class="w-full grid grid-cols-12">
               <div *ngFor="let item of cellRowList; let outCell = index " class="flex">
                 <app-cell class="flex-auto " *ngFor="let i of cellInnerList; let innerCell = index"
                           [cellType]="cellType"

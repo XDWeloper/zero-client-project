@@ -94,6 +94,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   }
 
   selected(event: CdkDragStart | CdkDragMove | MouseEvent) {
+    console.log("------------click")
     this.isSelected = true
     this.componentService.selectedComponent$.next(this.componentID)
   }
@@ -254,6 +255,8 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   }
 
   private initComponent() {
+    console.log(this.value)
+
     if(this.componentType !== IceComponentType.TEXT)
       this.value = undefined
   }
