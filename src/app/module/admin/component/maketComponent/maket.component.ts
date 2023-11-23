@@ -22,6 +22,7 @@ import {DocumentService} from "../../../../services/document.service";
 @Component({
   selector: 'app-maket',
   templateUrl: './maket.component.html',
+  styleUrls: ["./maket.component.css"],
   changeDetection:ChangeDetectionStrategy.OnPush
 })
 export class MaketComponent extends IceMaketComponent implements OnInit, OnDestroy, AfterContentInit {
@@ -94,7 +95,6 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   }
 
   selected(event: CdkDragStart | CdkDragMove | MouseEvent) {
-    console.log("------------click")
     this.isSelected = true
     this.componentService.selectedComponent$.next(this.componentID)
   }
@@ -220,7 +220,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
       }
     })
 
-    this.tableResizer$ = this.cellService.tableResizer$.subscribe(val => {
+    this.tableResizer$ = this.cellService.tableResizer$.subscribe(() => {
       this.correctToCellBound()
     })
   }
