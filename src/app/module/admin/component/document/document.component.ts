@@ -139,6 +139,11 @@ export class DocumentComponent implements OnInit {
   }
 
   stepChange(step: StepTreeTempl) {
+    if(step.num === 0) return
+    if(this.isStepEdit === true){
+      this.clearEditStepData();
+    }
+
     this.currentStep = step
     this.currentDocument = this.documentService.getDocById(step.parentId)
     this.currentDocAndStep.next(
@@ -266,8 +271,14 @@ export class DocumentComponent implements OnInit {
       this.currentEditStep.num = this.documentService.getNextStepNumber(this.currentEditDoc)
       this.refreshTree()
     }
+    this.clearEditStepData();
+  }
+
+  private clearEditStepData() {
+    this.currentEditStep.num = this.currentEditId
     this.currentEditDoc = undefined
     this.currentEditStep = undefined
+    this.currentEditId = undefined
     this.isStepEdit = false
   }
 
@@ -295,6 +306,7 @@ export class DocumentComponent implements OnInit {
 
   editStep(stepHover: StepTreeTempl) {
     this.isStepEdit = true
+    this.currentEditStep = stepHover
     this.currentEditId = stepHover.num
     this.newStepName = stepHover.name
     stepHover.num = 0

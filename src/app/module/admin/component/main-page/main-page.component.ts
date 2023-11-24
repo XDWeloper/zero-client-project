@@ -342,6 +342,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
   }
 
   setCurrentDocAndStep(docAndStep: any) {
+   // console.log(docAndStep)
 
     this.componentService.selectedComponent$.next(undefined)
     this.pushCurrentPage();

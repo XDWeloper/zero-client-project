@@ -255,8 +255,6 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   }
 
   private initComponent() {
-    console.log(this.value)
-
     if(this.componentType !== IceComponentType.TEXT)
       this.value = undefined
   }

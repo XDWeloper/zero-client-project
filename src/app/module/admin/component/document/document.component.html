@@ -56,7 +56,7 @@
                      *matTreeNodeDef="let stepNode"
                      matTreeNodeToggle>
 
-        <mat-form-field *ngIf="stepNode.num == 0" class="w-full absolute left-0 -top-1">
+        <mat-form-field *ngIf="stepNode.num === 0" class="w-full absolute left-0 -top-1">
           <mat-label>Наименование шага</mat-label>
           <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="1"
                     cdkAutosizeMaxRows="5" [(ngModel)]="newStepName" (keydown.enter)="enterStep(stepNode)"></textarea>
@@ -71,8 +71,9 @@
           <div>{{stepNode.name}}</div>
         </div>
 
-        <div *ngIf="isStepHover && stepHover == stepNode && stepNode.num != 0"
-             class="bg-dark-background flex p-2 rounded-md">
+        <div *ngIf="isStepHover && stepHover == stepNode && stepNode.num != 0 && currentEditId === undefined"
+             class="flex p-2 rounded-md">
+<!--             class="bg-dark-background flex p-2 rounded-md">-->
           <mat-icon class="text-blue-500 mr-1 hover:scale-125 duration-300 flex-auto" (click)="editStep(stepNode)"
                     matTooltip="Редактировать название">edit
           </mat-icon>
@@ -102,7 +103,8 @@
               [ngClass]="{'text-green-600': (docNode.isModified != undefined && docNode.isModified) }">{{ docNode.name }}</div>
           </div>
           <div *ngIf="isDocHover && docHover == docNode && currentEditDoc === undefined"
-               class="bg-dark-background flex p-2 rounded-md">
+               class="flex p-2 rounded-md">
+<!--               class="bg-dark-background flex p-2 rounded-md">-->
             <mat-icon (click)="addStep(docNode); treeControl.expand(docNode)"
                       class="text-green-500 mr-1 hover:scale-125 duration-300 flex-auto"
                       matTooltip="Добавить шаг">
