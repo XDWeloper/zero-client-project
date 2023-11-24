@@ -20,7 +20,6 @@ export class AnketaScriptRule {
     this.documentComponent.filter(c => (c.printRule === undefined || (c.printRule && c.printRule.isPrint === true)))
     .forEach(comp => {
       this.currentCrfPdf = comp.printRule ? comp.printRule : {isPrint: comp.componentType != IceComponentType.TEXT}
-
       if (comp && this.currentCrfPdf.isPrint) {
         if (comp.componentType === IceComponentType.AREA ||
           comp.componentType === IceComponentType.SELECT ||
@@ -39,9 +38,6 @@ export class AnketaScriptRule {
         }
         if (comp.componentType === IceComponentType.UPLOAD)
           resRul.push(...this.setPdfRuleForUploadComponent(comp))
-      }
-      if (comp.componentName === PAY_TABLE_NAME) {
-        resRul.push(...this.createPayTableRule())
       }
     })
 
@@ -123,46 +119,20 @@ export class AnketaScriptRule {
     return component
   }
 
-  private createPayTableRule(): PDFTableObject[] {
-    let header: string[] = [
-      stripHtml(this.getComponentFromDoc(31).value).result,
-      stripHtml(this.getComponentFromDoc(385).value).result,
-      stripHtml(this.getComponentFromDoc(386).value).result
-    ]
-    let subHeader = [
-      stripHtml(this.getComponentFromDoc(388).value).result, stripHtml(this.getComponentFromDoc(390).value).result,
-      stripHtml(this.getComponentFromDoc(391).value).result, stripHtml(this.getComponentFromDoc(393).value).result,
-      stripHtml(this.getComponentFromDoc(395).value).result, stripHtml(this.getComponentFromDoc(397).value).result
-    ]
-    let body = [[
-      this.getComponentFromDoc(399).value, this.getComponentFromDoc(400).value,
-      this.getComponentFromDoc(402).value, this.getComponentFromDoc(403).value,
-      this.getComponentFromDoc(405).value, this.getComponentFromDoc(406).value
-    ]]
-
-    return [{
-      type: "table",
-      head: header,
-      subHead: subHeader,
-      body: body
-    }, {
-      type: "space"
-    }]
-  }
-
   private setPdfRuleForTableComponent(comp: ComponentMaket): PDFDocObject[] {
     console.log("comp: ",comp.tableType)
     if (!comp.value)
       return [];
 
     let header: string[]
-    let subHeader: string[] = []
-    let body: [][] = []
+    let subHeader: string[][] = []
+    let body: string[][][] = []
     let tableTitle = comp.tableType === 1 ? "Сведения об основных контрагентах, планируемых плательщиках и получателях денежных средств" : "Сведения об участниках общества, размерах их долей в уставном капитале и их оплате"
 
     if (comp.tableType === 1) {
       header = ["Плательщики", "Получатели"]
-      subHeader = ["Наименование", "Местонахождение (страна, город)", "Наименование", "Местонахождение (страна, город)"]
+      //subHeader = [["Наименование", "Вторая колонка","Местонахождение (страна, город)"],["Наименование", "Местонахождение (страна, город)"]]
+      subHeader = [["Наименование", "Вторая колонка","Местонахождение (страна, город)"],["Наименование", "Местонахождение (страна, город)"]]
     }
 
     if (comp.tableType === 2) {
@@ -173,13 +143,18 @@ export class AnketaScriptRule {
         "Размер доли в уставном капитале общества",
         "Сведения об оплате доли"
       ]
-      subHeader = ["1", "2", "3", "4", "5"]
+      subHeader = [["1"], ["2"], ["3"], ["4"], ["5"]]
     }
 
-    (comp.value as [{}]).forEach(row => {
-      let valArray: [] = Object.values(row) as []
-      body.push(valArray)
-    })
+    // (comp.value as [{}]).forEach(row => {
+    //   let valArray: [] = Object.values(row) as []
+    //   body.push(valArray)
+    // })
+
+    body.push([["1","2","3"],["444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444","5","6"],["7","8","9"]])
+    body.push([["111111111111111111111111111111111111111111111111","2"],["3","44444444444444444444444444444444444444444444444444"],["5","6"]])
+
+    console.log("body: ", body)
 
     return [
       {

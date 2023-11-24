@@ -14,7 +14,6 @@
          *ngIf="inputType === 'number'"
          [id]="componentID"
          [disabled] ="!enabled"
-         onkeypress="return (event.charCode >= 48 && event.charCode <= 57);"
          type="number" placeholder="{{placeHolder}}" [(ngModel)]="value" (click)="select($event)" [mask]="regExp">
 
 
