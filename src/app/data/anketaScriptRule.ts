@@ -3,12 +3,16 @@ import {ComponentMaket, ComponentRuleForPDF, IceComponent, IceDocument} from "..
 import {IceComponentType} from "../constants";
 import {stripHtml} from "string-strip-html";
 import {IceMaketComponent} from "../module/admin/classes/icecomponentmaket";
+import {from, Observable, take} from "rxjs";
+import {fromArrayLike} from "rxjs/internal/observable/innerFrom";
+import {tap} from "rxjs/operators";
 
 const oneTab = 3 //пробелов у одного таба
 const PAY_TABLE_NAME = "pay_table" // Таблица безналичных расчетов(делаем в ручную)
 
 export class AnketaScriptRule {
   currentCrfPdf: ComponentRuleForPDF
+  private predIndex: number = 0;
 
   constructor(private documentComponent: ComponentMaket[]) {
   }
@@ -120,7 +124,6 @@ export class AnketaScriptRule {
   }
 
   private setPdfRuleForTableComponent(comp: ComponentMaket): PDFDocObject[] {
-    console.log("comp: ",comp.tableType)
     if (!comp.value)
       return [];
 
@@ -131,8 +134,7 @@ export class AnketaScriptRule {
 
     if (comp.tableType === 1) {
       header = ["Плательщики", "Получатели"]
-      //subHeader = [["Наименование", "Вторая колонка","Местонахождение (страна, город)"],["Наименование", "Местонахождение (страна, город)"]]
-      subHeader = [["Наименование", "Вторая колонка","Местонахождение (страна, город)"],["Наименование", "Местонахождение (страна, город)"]]
+      subHeader = [["Наименование", "Местонахождение (страна, город)"],["Наименование", "Местонахождение (страна, город)"]]
     }
 
     if (comp.tableType === 2) {
@@ -146,15 +148,16 @@ export class AnketaScriptRule {
       subHeader = [["1"], ["2"], ["3"], ["4"], ["5"]]
     }
 
-    // (comp.value as [{}]).forEach(row => {
-    //   let valArray: [] = Object.values(row) as []
-    //   body.push(valArray)
-    // })
-
-    body.push([["1","2","3"],["444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444","5","6"],["7","8","9"]])
-    body.push([["111111111111111111111111111111111111111111111111","2"],["3","44444444444444444444444444444444444444444444444444"],["5","6"]])
-
-    console.log("body: ", body)
+    subHeader.map(val=> val.length).forEach(arrLenght => {
+      let resArr:[][] = [];
+      (comp.value as [{}]).map(row => Object.values(row) as []).forEach(val => {
+        let resultArr:[] | undefined = val.filter((value, index) => this.predIndex <= index && index < (arrLenght + this.predIndex)) as []
+        if(resultArr)
+          resArr.push(resultArr)
+      })
+      this.predIndex = arrLenght
+      body.push(resArr)
+    })
 
     return [
       {

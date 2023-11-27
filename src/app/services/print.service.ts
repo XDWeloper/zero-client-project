@@ -381,12 +381,8 @@ export class PrintService {
   private createNestedTable(docObject: PDFTableObject) {
     this.tableLineMaxHeight = new Array(docObject.body[0].length + 1).fill(0)
     this.createdTable(docObject, prePdfDoc, false)
-    //prePdfDoc.output('dataurlnewwindow')
-    console.log(this.tableLineMaxHeight)
-    //prePdfDoc.deletePage(0)
+    prePdfDoc.deletePage(0)
     this.createdTable(docObject, pdfDoc, true)
-
-
   }
 
   private createdTable(docObject: PDFTableObject, doc: jsPDF, isVisible: boolean) {
@@ -395,13 +391,9 @@ export class PrintService {
     };
     let head = docObject.head
     let subHead = docObject.subHead
-    let subHeaderNormalize = subHead.flat()
     let body = docObject.body
     let headColumnWidth = this.docWorkWidth / head.length
-    //let subHeaderColWidth = this.docWorkWidth / subHeaderNormalize.length
     let isTableCreated = false
-    let currentHeadColumnNumber = 0
-    let maxHeight = 0
 
     autoTable(doc, {
       headStyles: {valign: "middle", halign: "center", fillColor: tableHeaderFillColor, textColor: "#ffffff"},
@@ -451,26 +443,7 @@ export class PrintService {
       },
     })
   }
-
-
-
 }
-
-
-
-
-
-
-// let headerColNum = 0
-// let lastIndex = 0
-// subHead.forEach((a, index) =>{
-//   if(lastIndex <= data1.column.index && data1.column.index < (a.length + lastIndex)){
-//     headerColNum = index
-//   }
-//   lastIndex += a.length
-// })
-
-
 
 
 
