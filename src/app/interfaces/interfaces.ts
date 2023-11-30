@@ -170,6 +170,55 @@ export interface ComponentMaket {
   enabled?: boolean
   visible?: boolean
   printRule: ComponentRuleForPDF
+  tableProp?: TableProperties
+}
+
+export type FontWeight = "normal" | "bold" | "semiBold"
+
+export class TableProperties {
+  header: Header[]
+}
+export class Header{
+  title: string
+  order: number
+  bgColor?: string
+  textColor?: string
+  fontSize?: number
+  fontWeight?: FontWeight | undefined
+  fontItalic?: boolean
+  subHeader: SubHeader[]
+}
+
+export class SubHeader {
+  title?: string
+  order: number
+  bgColor?: string
+  textColor?: string
+  fontSize?: number
+  fontWeight?: FontWeight | undefined
+  fontItalic?: boolean
+  column: TableColumn
+}
+
+export class TableColumn {
+  columnType?: "area" | "input"
+  columnMask?: string
+  defaultValue?: string
+}
+
+export interface ColumnProperties {
+  title: string
+  subHeader?: string[]
+  columnType: "area" | "input"[]
+  columnMask: string[]
+  headerBgColor?: string
+  headerTextColor?: string
+  subHeaderColor?: string
+  subHeaderTextColor?: string
+  headerFontSize?: number
+  subHeaderFontSize?: number
+  headerFontStyle?: "normal" | "bold" | "italic" | "semiBold" | undefined
+  subHeaderFontStyle?: "normal" | "bold" | "italic" | "semiBold" | undefined
 }
 
 export interface IceStepMaket {
@@ -218,6 +267,8 @@ export interface IceComponent {
   enabled?: boolean
   visible?: boolean
   printRule: ComponentRuleForPDF
+  tableProp?: TableProperties
+
 }
 
 export class MasterControl{

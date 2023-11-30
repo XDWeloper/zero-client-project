@@ -19,6 +19,7 @@ import {AddressComponent} from "../../../../component/dinamicComponent/adress/ad
 import {SelectComponent} from "../../../../component/dinamicComponent/select/select.component";
 import {PDFDocObject, PrintService} from "../../../../services/print.service";
 import {AnketaScriptRule} from "../../../../data/anketaScriptRule";
+import {TableComponent} from "../../../../component/dinamicComponent/tables/table/table.component";
 
 @Component({
   selector: 'app-watch-template',
@@ -103,6 +104,7 @@ export class WatchTemplateComponent implements OnInit,AfterViewInit {
         switch (comp.tableType){
           case 1: this.componentRef = this.itemsField.createComponent(InformationMainCounterpartiesTableComponent); break;
           case 2: this.componentRef = this.itemsField.createComponent(InformationCompanyParticipantsTableComponent); break;
+          default: this.componentRef = this.itemsField.createComponent(TableComponent);
         }
       }
 
@@ -130,7 +132,9 @@ export class WatchTemplateComponent implements OnInit,AfterViewInit {
       compInstance.optionList = comp.optionList
       compInstance.printRule = comp.printRule === undefined ? {isPrint: comp.componentType != IceComponentType.TEXT,newLine: true} : comp.printRule
       compInstance.tableType = comp.tableType
+      compInstance.tableProp = comp.tableProp
       this.componentRefStepList.push(this.componentRef)
+
     })
   }
 

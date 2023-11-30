@@ -1,7 +1,8 @@
 import {Injectable} from '@angular/core';
 import jsPDF from "jspdf";
 import {myFont, myFont_bold, myFont_italic, myFont_semiBold} from "../../assets/fonts/Open_sans";
-import autoTable from "jspdf-autotable";
+import autoTable, {CellHook, CellHookData} from "jspdf-autotable";
+
 
 const pdfConfig = {
   fontSize: 14,
@@ -53,14 +54,15 @@ export interface PDFCheckBoxObject extends PDFDocObject {
 
 export interface PDFTableObject extends PDFDocObject {
   head?: string[]
-  subHead?: string[]
-  body?: any[]
+  subHead?: string[][]
+  body?: string[][][]
 }
 
 const defaultColor = "#000000";
 const colorGray = "#4d4e53";
 const tableHeaderFillColor = colorGray
 const pdfDoc = new jsPDF()
+const prePdfDoc = new jsPDF()
 
 
 @Injectable({
@@ -79,6 +81,7 @@ export class PrintService {
   heightCorrect = pdfConfig.checkBoxHeight / 4
   lockNewLine = false
   tableRowCurrentHeight: number | undefined = undefined
+  tableLineMaxHeight: number[] = []
 
   constructor() {
     this.addFont()
@@ -95,6 +98,16 @@ export class PrintService {
     pdfDoc.addFont("MyFont_italic.ttf", "MyFont_italic", "italic");
     pdfDoc.addFileToVFS("MyFont_semiBold.ttf", myFont_semiBold);
     pdfDoc.addFont("MyFont_semiBold.ttf", "MyFont_semiBold", "normal");
+
+    prePdfDoc.addFileToVFS("MyFont.ttf", myFont);
+    prePdfDoc.addFont("MyFont.ttf", "MyFont", "normal");
+    prePdfDoc.addFileToVFS("MyFont_bold.ttf", myFont_bold);
+    prePdfDoc.addFont("MyFont_bold.ttf", "MyFont_bold", "bold");
+    prePdfDoc.addFileToVFS("MyFont_italic.ttf", myFont_italic);
+    prePdfDoc.addFont("MyFont_italic.ttf", "MyFont_italic", "italic");
+    prePdfDoc.addFileToVFS("MyFont_semiBold.ttf", myFont_semiBold);
+    prePdfDoc.addFont("MyFont_semiBold.ttf", "MyFont_semiBold", "normal");
+
   }
 
   private resetCurrentHeight() {
@@ -366,20 +379,23 @@ export class PrintService {
   }
 
   private createNestedTable(docObject: PDFTableObject) {
-    var nestedTableCell = {
-      content: '',
-    }
+    this.tableLineMaxHeight = new Array(docObject.body[0].length + 1).fill(0)
+    this.createdTable(docObject, prePdfDoc, false)
+    prePdfDoc.deletePage(0)
+    this.createdTable(docObject, pdfDoc, true)
+  }
 
+  private createdTable(docObject: PDFTableObject, doc: jsPDF, isVisible: boolean) {
+    const nestedTableCell = {
+      content: '',
+    };
     let head = docObject.head
     let subHead = docObject.subHead
     let body = docObject.body
-    let columnWidth = this.docWorkWidth / head.length
-    let subHeaderColWidth = this.docWorkWidth / subHead.length
-
-
+    let headColumnWidth = this.docWorkWidth / head.length
     let isTableCreated = false
 
-    autoTable(pdfDoc, {
+    autoTable(doc, {
       headStyles: {valign: "middle", halign: "center", fillColor: tableHeaderFillColor, textColor: "#ffffff"},
       theme: "plain",
       head: [head],
@@ -388,39 +404,46 @@ export class PrintService {
       startY: this.currentHeight,
       margin: {left: pdfConfig.leftBorder},
       tableWidth: this.docWorkWidth,
-      styles: {font: pdfConfig.tableHeaderFontStyle, fontSize: pdfConfig.tableHeaderFontSize, cellWidth: columnWidth},
-      didDrawCell: data => {
-        if (data.row.index === 0 && data.row.section === 'body' && !isTableCreated) {
+      styles: {font: pdfConfig.tableHeaderFontStyle, fontSize: pdfConfig.tableHeaderFontSize, cellWidth: headColumnWidth},
+      didDrawCell: (data: CellHookData) => {
+        if (data.row.index === 0 && data.row.section === 'body' /*&& !isTableCreated*/) {
           isTableCreated = true
-          autoTable(pdfDoc, {
-            headStyles: {valign: "middle", halign: "center", fillColor: tableHeaderFillColor},
+          autoTable(doc, {
+            headStyles: {valign: "middle", halign: "center", fillColor: tableHeaderFillColor, minCellHeight: this.tableLineMaxHeight[0]},
             showHead: 'firstPage',
             theme: "grid",
-            head: [subHead],
+            head: [subHead[data.column.index]],
             startY: data.cell.y,
             styles: {
               font: pdfConfig.tableHeaderFontStyle,
               fontSize: pdfConfig.tableHeaderFontSize,
-              cellWidth: subHeaderColWidth
+              minCellHeight: this.tableLineMaxHeight[1],
+              cellWidth: headColumnWidth/subHead[data.column.index].length
             },
             bodyStyles: {font: pdfConfig.tableHeaderFontStyle},
             margin: {left: data.cell.x},
             rowPageBreak: "auto",
-            tableWidth: this.docWorkWidth,
-            body: body,
-            didDrawPage: data => {
-              this.currentHeight = data.cursor?.y!!
+            tableWidth: headColumnWidth,
+            body: body[data.column.index],
+            willDrawCell: (data1: CellHookData) => {
+              let arrIndex =  data1.row.section === "head" ? 0 : data1.row.index + 1
+              let value = data1.row.section === "head" ? subHead[data.column.index][data1.column.index] : body[data.column.index][data1.row.index][data1.column.index]
+              if(data1.cell.height > this.tableLineMaxHeight[arrIndex]) {
+                this.tableLineMaxHeight[arrIndex] = data1.cell.height
+              }
+              data1.row.height = this.tableLineMaxHeight[arrIndex]
+              data1.cell.height = this.tableLineMaxHeight[arrIndex]
+            },
+            didDrawPage: (data: { cursor: { y: number; }; }) => {
+              if(isVisible)
+                this.currentHeight = data.cursor?.y!!
             }
           })
         }
       },
-
     })
   }
 }
-
-
-
 
 
 

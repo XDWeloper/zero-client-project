@@ -51,6 +51,7 @@ import {StatusReasonComponent} from "../../../../component/status-reason/status-
 import {MatDialog} from "@angular/material/dialog";
 import {PDFDocObject, PDFImageObject, PrintService} from "../../../../services/print.service";
 import {AnketaScriptRule} from "../../../../data/anketaScriptRule";
+import {TableComponent} from "../../../../component/dinamicComponent/tables/table/table.component";
 
 @Component({
   selector: 'app-document-editor',
@@ -88,7 +89,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       }
 
       this.steps = value.docStep.filter(i => i.visible)
-      this.currentStepIndex = 0
+      //this.currentStepIndex = 0
     } else {
       if (this.itemsField)
         this.itemsField.clear()
@@ -295,7 +296,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     this.cellColl = cellColl
     this.cellRowList = new Array(collInRow * cellRow).fill(null).map((_, i) => i + 1);
     this.cellInnerList = new Array(cellColl).fill(null).map((_, i) => i + 1);
-    this.currentStepIndex = this.currentStepIndex
+    //console.log("3")
+    //this.currentStepIndex = this.currentStepIndex
 
     this.stepService.disabledAllStep$.subscribe({
       next: value => {
@@ -331,6 +333,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       if (comp.componentType === IceComponentType.AREA)
         this.componentRef = this.itemsField.createComponent(AreaComponent);
       if (comp.componentType === IceComponentType.TABLE) {
+        console.log("comp.tableType ",comp.tableType)
         switch (comp.tableType) {
           case 1:
             this.componentRef = this.itemsField.createComponent(InformationMainCounterpartiesTableComponent);
@@ -338,6 +341,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
           case 2:
             this.componentRef = this.itemsField.createComponent(InformationCompanyParticipantsTableComponent);
             break;
+          default:
+            this.componentRef = this.itemsField.createComponent(TableComponent);
         }
       }
 
@@ -366,6 +371,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       compInstance.masterControlList = comp.masterControlList
       compInstance.checkedText = comp.checkedText
       compInstance.optionList = comp.optionList
+      compInstance.tableProp = comp.tableProp
 
       if (this.openType === "EDIT")
         compInstance.enabled = true

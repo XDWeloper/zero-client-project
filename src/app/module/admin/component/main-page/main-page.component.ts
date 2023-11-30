@@ -14,29 +14,30 @@ import {
   cellColl,
   cellRow,
   CellType,
-  collInRow, dialogCloseAnimationDuration, dialogOpenAnimationDuration,
+  collInRow,
+  dialogCloseAnimationDuration,
+  dialogOpenAnimationDuration,
   docPanelCloseWidth,
   docPanelOpenWidth,
   IceComponentType,
   propPanelCloseWidth,
-  propPanelOpenWidth,
-  tableList
+  propPanelOpenWidth
 } from "../../../../constants";
 import {Subscription} from "rxjs";
 import {IceMaketComponent} from "../../classes/icecomponentmaket";
 import {MaketComponent} from "../maketComponent/maket.component";
 import {MatDialog} from "@angular/material/dialog";
 import {EditTextComponent} from "../edit-text/edit-text.component";
-import {ComponentMaket, DocumentTreeTempl, MessageDialog, StepTreeTempl} from "../../../../interfaces/interfaces";
+import {ComponentMaket, DocumentTreeTempl, StepTreeTempl} from "../../../../interfaces/interfaces";
 import {DocumentService} from "../../../../services/document.service";
 import {WatchTemplateComponent} from "../watch-template/watch-template.component";
-import {ChangeTableComponent} from "../change-table/change-table.component";
 import {User} from "../../../../model/User";
 import {BackendService} from "../../../../services/backend.service";
 import {Router} from "@angular/router";
 import {TimeService} from "../../../../services/time.service";
 import {KeycloakService} from "../../../../services/keycloak.service";
 import {MessageService} from "../../../../services/message.service";
+import {TablePropComponent} from "../table-prop/table-prop.component";
 
 @Component({
   selector: 'app-main-page',
@@ -74,6 +75,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
   cellType: CellType = CellType.admin
   user: User
   private _modify: boolean = false
+  isBlock: boolean = false;
 
   constructor(private cellService: CellService,
               private router: Router,
@@ -90,13 +92,13 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
     backService.requestUserProfile().subscribe({
       next: value => {
-        if(value && (value.roles as Array<string>).includes("ROLE_admin")) return
+        if (value && (value.roles as Array<string>).includes("ROLE_admin")) return
         this.router.navigate(["/"])
-          },
+      },
       error: (() => this.router.navigate(["/"]))
     })
     let userString = localStorage.getItem("user")
-    if(userString)
+    if (userString)
       this.user = JSON.parse(userString)
   }
 
@@ -144,7 +146,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  createComponent(componentType: string, compMaket?: ComponentMaket)  {
+  createComponent(componentType: string, compMaket?: ComponentMaket) {
     this.componentRef = this.itemsField?.createComponent(MaketComponent);
 
     switch (componentType) {
@@ -158,10 +160,10 @@ export class MainPageComponent implements OnInit, OnDestroy {
         this.componentRef.instance.inputType = 'text'
         break;
       case "table":
-        if(compMaket === undefined) {
+        if (compMaket === undefined) {
           this.componentRef.instance.componentType = IceComponentType.TABLE;
-          this.componentRef.instance.placeHolder = "Таблица тип не определен"
-          this.openTablesDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration)
+          this.componentRef.instance.placeHolder = "Таблица"
+          this.openTablePropDialog(this.componentRef.instance)
         }
         break;
       case "area":
@@ -178,14 +180,14 @@ export class MainPageComponent implements OnInit, OnDestroy {
         break;
       case "upload":
         this.componentRef.instance.componentType = IceComponentType.UPLOAD;
-         this.componentRef.instance.placeHolder = " "
+        this.componentRef.instance.placeHolder = " "
         break;
     }
 
-    this.componentRef.instance.textPosition ={horizontal: 'left', vertical: 'top'}
-    this.componentRef.instance.required= false
+    this.componentRef.instance.textPosition = {horizontal: 'left', vertical: 'top'}
+    this.componentRef.instance.required = false
 
-    if(compMaket != undefined){//Устанавливаем все параметры
+    if (compMaket != undefined) {//Устанавливаем все параметры
       this.componentRef.instance.cellNumber = compMaket.cellNumber
       this.componentRef.instance.componentType = compMaket.componentType
       this.componentRef.instance.inputType = compMaket.inputType
@@ -208,11 +210,17 @@ export class MainPageComponent implements OnInit, OnDestroy {
       this.componentRef.instance.maxVal = compMaket.maxVal
       this.componentRef.instance.masterControlList = compMaket.masterControlList
       this.componentRef.instance.optionList = compMaket.optionList
-    } else{
+      this.componentRef.instance.tableProp = compMaket.tableProp
+
+    } else {
       this._modify = true
     }
 
-    this.componentRef.instance.printRule = (compMaket && compMaket.printRule) ? compMaket.printRule : {isPrint: componentType != IceComponentType.TEXT,newLine: true,order: this.documentService.getLastOrder(this.currentDoc.id)}
+    this.componentRef.instance.printRule = (compMaket && compMaket.printRule) ? compMaket.printRule : {
+      isPrint: componentType != IceComponentType.TEXT,
+      newLine: true,
+      order: this.documentService.getLastOrder(this.currentDoc.id)
+    }
 
 
     this.componentService.addComponent(this.componentRef)
@@ -255,14 +263,17 @@ export class MainPageComponent implements OnInit, OnDestroy {
       this.componentService.removeComponent(this.currentComponentID)
       this._modify = true
     }
-     if ($event === 'edit') {
-       this.openEditTextDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration)
-     }
+    if ($event === 'edit') {
+      if (this.currCompType === IceComponentType.TABLE)
+        this.openTablePropDialog(this.componentService.getComponent(this.currentComponentID))
+      else
+        this.openEditTextDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration)
+    }
 
   }
 
   toolBarButtonClick($event: string) {
-    switch ($event){
+    switch ($event) {
       case 'clear' :
         this.componentService.clearComponentList();
         this.modify = true
@@ -280,10 +291,10 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
         this.messageService.show("Переупорядочивание компонентов для печати",
           "Внимание! Выполнение данного действия приведет изменению порядка элементов при выводе на печать данного этапа.",
-          "INFO",["YES","CANCEL"]).subscribe(value => {
-            if(value === "YES") {
-              this.reOrderingComponentForPrint()
-            }
+          "INFO", ["YES", "CANCEL"]).subscribe(value => {
+          if (value === "YES") {
+            this.reOrderingComponentForPrint()
+          }
         })
         break;
     }
@@ -297,24 +308,25 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
   openEditTextDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
     let componentRef = this.dialog.open(EditTextComponent, {
-      width: '' + (window.innerWidth - (window.innerWidth/2)) + 'px',
-      enterAnimationDuration,exitAnimationDuration});
+      width: '' + (window.innerWidth - (window.innerWidth / 2)) + 'px',
+      enterAnimationDuration, exitAnimationDuration
+    });
 
     let currentComponent = this.componentService.getComponent(this.currentComponentID)
     componentRef.componentInstance.startValue = currentComponent.value
 
-    componentRef.componentInstance.text.subscribe(value =>{
-      if(currentComponent.componentType === IceComponentType.TEXT)
+    componentRef.componentInstance.text.subscribe(value => {
+      if (currentComponent.componentType === IceComponentType.TEXT)
         currentComponent.setValue(value)
-        this._modify = true
-  })
+      this._modify = true
+    })
   }
 
   openWatchDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
 
     let componentRef = this.dialog.open(WatchTemplateComponent, {
-      width: '' + (window.innerWidth - (window.innerWidth/5)) + 'px',
-      height: '' + (window.innerHeight - (window.innerHeight/10)) + 'px',
+      width: '' + (window.innerWidth - (window.innerWidth / 5)) + 'px',
+      height: '' + (window.innerHeight - (window.innerHeight / 10)) + 'px',
       enterAnimationDuration,
       exitAnimationDuration,
       panelClass: 'bg-color'
@@ -323,23 +335,26 @@ export class MainPageComponent implements OnInit, OnDestroy {
     componentRef.componentInstance.currentDocumentId = this.currentDoc.id
     componentRef.componentInstance.currentStepNum = this.currentStep.num
 
-    componentRef.componentInstance.dialogCorrectX = window.innerWidth/5/2
-    componentRef.componentInstance.dialogCorrectY = window.innerHeight/10/2
+    componentRef.componentInstance.dialogCorrectX = window.innerWidth / 5 / 2
+    componentRef.componentInstance.dialogCorrectY = window.innerHeight / 10 / 2
   }
 
-  openTablesDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
-    let componentRef = this.dialog.open(ChangeTableComponent, {
-      enterAnimationDuration,
-      exitAnimationDuration,
-    })
-
-    componentRef.componentInstance.tableNum.subscribe(tableNum => {
-      this.componentRef.instance.tableType = tableNum
-      this.componentRef.instance.placeHolder = "Таблица - " + tableList.find(it => it.num === tableNum).text
-      componentRef.close()
-    })
-
-  }
+  // openTablesDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
+  //   let componentRef = this.dialog.open(ChangeTableComponent, {
+  //     enterAnimationDuration,
+  //     exitAnimationDuration,
+  //   })
+  //
+  //   componentRef.componentInstance.tableNum.subscribe(tableNum => {
+  //     this.componentRef.instance.tableType = tableNum
+  //     this.componentRef.instance.placeHolder = "Таблица - " + tableList.find(it => it.num === tableNum).text
+  //     componentRef.close()
+  //
+  //     this.openTablePropDialog()
+  //
+  //   })
+  //
+  // }
 
   setCurrentDocAndStep(docAndStep: any) {
    // console.log(docAndStep)
@@ -350,10 +365,10 @@ export class MainPageComponent implements OnInit, OnDestroy {
     this.componentService.clearComponentList()
     this.currentDocAndStep = docAndStep
     this.currentDoc = this.documentService.getDocById(docAndStep.currentDocumentId)
-    if(this.currentDoc !== undefined)
+    if (this.currentDoc !== undefined)
       this.currentStep = this.currentDoc.children.find(p => p.num === docAndStep.currentStepNum)
 
-    if(this.currentDoc && this.currentStep) {
+    if (this.currentDoc && this.currentStep) {
       this.transEnd()
       this.restoreComponents(this.documentService.getComponentCollections(this.currentDoc, this.currentStep))
       this.currentStep.visible = this.documentService.getTemplateByDocId(this.currentDoc.id).docStep.find(s => s.stepNum === this.currentStep.num).visible
@@ -361,24 +376,43 @@ export class MainPageComponent implements OnInit, OnDestroy {
   }
 
   private restoreComponents(componentCollections: ComponentMaket[]) {
-    if(componentCollections.length < 1) return
+    if (componentCollections.length < 1) return
     componentCollections.forEach(c => {
-      this.createComponent(c.componentType.toString(),c)
+      this.createComponent(c.componentType.toString(), c)
     })
   }
 
   exit() {
     this.keycloakService.logoutAction().subscribe({
-      complete:(() => this.router.navigate(["/"]))
+      complete: (() => this.router.navigate(["/"]))
     })
   }
 
   private reOrderingComponentForPrint() {
     let orderNum = 0
     this.documentService.getTemplateByDocId(this.currentDoc.id).docStep.forEach(step => {
-      step.componentMaket.sort((a, b) => a.cellNumber <= b.cellNumber ? -1: 1).forEach(c => {
-        c.printRule.order = orderNum ++
+      step.componentMaket.sort((a, b) => a.cellNumber <= b.cellNumber ? -1 : 1).forEach(c => {
+        c.printRule.order = orderNum++
       })
     })
   }
+
+  private openTablePropDialog(currentTableComponent: IceMaketComponent) {
+    this.isBlock = true
+    let componentRef = this.dialog.open(TablePropComponent, {
+      enterAnimationDuration: dialogOpenAnimationDuration,
+      exitAnimationDuration: dialogCloseAnimationDuration
+    })
+    this.currentComponentID = currentTableComponent.componentID
+    componentRef.componentInstance.currentTableComponent = currentTableComponent
+    componentRef.afterClosed().subscribe(value => {
+        this.isBlock = false
+        if(value === -1 && currentTableComponent.tableProp === undefined){
+          this.selectMenu("delete")
+        }
+      }
+    )
+
+  }
+
 }

@@ -1,0 +1,179 @@
+<div class="table-prop-dialog flex flex-col p-1">
+
+  <div class="title-text h-10 flex-none">
+    <p>Настройка таблицы</p>
+    <mat-icon class="absolute top-1 right-1 bg-red-500 text-white cursor-pointer" (click)="closeDialog()">close
+    </mat-icon>
+  </div>
+
+  <div class="flex-1 w-full">
+    <ng-container [ngTemplateOutlet]="TableTemplate"></ng-container>
+  </div>
+
+  <div class="border-t border-t-primary-dark flex-1 w-full">
+    <div class="h-full flex flex-col mt-1">
+      <div class="flex-1 flex flex-row">
+        <div class="flex-1 h-full border flex p-0.5">
+          <div class="flex-1 h-full border" *ngFor="let column of tableProp.header" (click)="currentHeader = column"
+               [ngClass]="currentHeader && currentHeader.order === column.order ? 'border-primary-dark' : ''">
+            <div class="h-2 bg-yellow-500 cursor-pointer hover:bg-yellow-700 duration-300"
+                 (click)="currentHeader = column; currentSubHeader = undefined"
+                 [ngClass]="currentHeader &&  currentHeader.order === column.order ? 'bg-yellow-700' : 'bg-yellow-500'"></div>
+            <textarea class="text-center w-full border mt-0.5" placeholder="{{ column.title }}"
+                      (click)="currentHeader = column; currentSubHeader = undefined"
+                      [(ngModel)]="column.title"></textarea>
+
+            <div class="flex-1 flex">
+              <div class="border w-full" *ngFor="let subTitleColumn of column.subHeader">
+                <div class="h-2 bg-yellow-500 cursor-pointer hover:bg-yellow-700 duration-300"
+                     (click)="currentSubHeader = subTitleColumn; currentHeader = column"
+                     [ngClass]="(currentSubHeader && currentSubHeader.order === subTitleColumn.order && currentHeader && currentHeader.order === column.order) ? 'bg-yellow-700' : 'bg-yellow-500'"></div>
+                <textarea class="text-center w-full border mt-0.5" placeholder="{{ subTitleColumn.title }}"
+                          (click)="currentSubHeader = subTitleColumn" [(ngModel)]="subTitleColumn.title"></textarea>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="flex-wrap h-full p-1 ">
+          <mat-icon class="text-green-500 cursor-pointer block" matTooltip="Добавить заголовок" (click)="addColumn()">add_circle</mat-icon>
+          <mat-icon *ngIf="currentHeader" class="text-red-500 mt-1  cursor-pointer block" matTooltip="Удалить заголовок" (click)="removeColumn()">remove_circle
+          </mat-icon>
+          <div class="border-t w-full h-4 mt-4"></div>
+          <mat-icon *ngIf="currentHeader && currentSubHeader === undefined " class="text-green-500 cursor-pointer block" matTooltip="Добавить подзаголовок" (click)="addSubHeader()">add_circle</mat-icon>
+          <mat-icon *ngIf="currentHeader && currentSubHeader" class="text-red-500 cursor-pointer block" matTooltip="Удалить подзаголовок" (click)="removeSubHeader()">remove_circle</mat-icon>
+        </div>
+      </div>
+      <div class="flex-initial h-20">
+        <ng-container *ngIf="currentHeader"
+                      [ngTemplateOutlet]=" currentSubHeader ? SubHeaderPropertiesTemplate : HeaderPropertiesTemplate"></ng-container>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex-none h-10 w-full border-t border-t-primary-dark">
+    <button class="button-style bottom-1" (click)="SaveAndClose()">Сохранить</button>
+  </div>
+
+  <div class="absolute h-[99%] w-[99%] flex justify-center items-center" *ngIf="errorMessage">
+    <div class="h-[20%] w-[40%] border border-primary-dark rounded-md bg-white flex flex-col">
+      <p class="h-8 flex-none bg-primary-dark text-white text-center">Информация</p>
+      <div class="flex-1 p-2">
+        <p class="text-center">{{ errorMessage }}</p>
+      </div>
+      <div class="h-8 flex-none flex justify-center items-center">
+        <button class="button-style relative" (click)="errorMessage = undefined">Понятно</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<ng-template #HeaderPropertiesTemplate>
+  <div class="flex flex-wrap gap-4 mt-2">
+    <div class="">
+      <input type="color" class="h-6 w-full" [(ngModel)]="currentHeader.bgColor">
+      <div class="text-center -mt-1.5">Цвет фона заголовка</div>
+    </div>
+    <div class="">
+      <input type="color" class="h-6 w-full" [(ngModel)]="currentHeader.textColor">
+      <span class="text-center -mt-1.5">Цвет текста заголовка</span>
+    </div>
+    <div class="">
+      <select class="h-6 w-full border border-primary-dark" [(ngModel)]="currentHeader.fontWeight">
+        <option value="normal">normal</option>
+        <option value="bold">bold</option>
+        <option value="semiBold">semiBold</option>
+      </select>
+      <div class="text-center">Стиль текста заголовка</div>
+    </div>
+    <mat-checkbox class="-mt-2" [(ngModel)]="currentHeader.fontItalic">Italic</mat-checkbox>
+    <div class="">
+      <input type="number" class="h-6 w-full border border-primary-dark" [mask]="fontSizeMask"
+             [(ngModel)]="currentHeader.fontSize">
+      <div class="text-center">Размер текста заголовка</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #SubHeaderPropertiesTemplate>
+  <div class="flex gap-4 mt-2">
+    <div class="">
+      <input type="color" class="w-full h-6" [(ngModel)]="currentSubHeader.bgColor">
+      <div class="text-center -mt-1.5">Цвет фона подзаголовка</div>
+    </div>
+    <div class="">
+      <input type="color" class="w-full h-6" [(ngModel)]="currentSubHeader.textColor">
+      <div class="text-center -mt-1.5">Цвет текста подзаголовка</div>
+    </div>
+    <div class="">
+      <select class="w-full h-6" [(ngModel)]="currentSubHeader.fontWeight">
+        <option value="normal">normal</option>
+        <option value="bold">bold</option>
+        <option value="italic">italic</option>
+        <option value="semiBold">semiBold</option>
+      </select>
+      <div class="text-center">Стиль текста подзаголовка</div>
+    </div>
+    <mat-checkbox class="-mt-2" [(ngModel)]="currentSubHeader.fontItalic">Italic</mat-checkbox>
+    <div class="">
+      <input type="number" class="w-full h-6 border border-primary-dark" [mask]="fontSizeMask"
+             [(ngModel)]="currentSubHeader.fontSize">
+      <div class="text-center">Размер текста подзаголовка</div>
+    </div>
+    <div class="">
+      <select class="w-full h-6" [(ngModel)]="currentSubHeader.column.columnType">
+        <option value="area">area</option>
+        <option value="input">input</option>
+      </select>
+      <div class="text-center">Тип ввода</div>
+    </div>
+    <div class="font-[20]">
+      <input type="text" class="w-full h-6 border border-primary-dark"
+             [(ngModel)]="currentSubHeader.column.columnMask">
+      <div class="text-center">Маска ввода</div>
+    </div>
+    <div class="">
+      <input type="text" class="w-full h-6 border border-primary-dark"
+             [(ngModel)]="currentSubHeader.column.defaultValue">
+      <div class="text-center">Значение по умолчанию</div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #TableTemplate>
+  <div class="flex flex-row headerContainerClass" >
+    <div class="flex-1 border border-black" *ngFor="let header of tableProp.header" >
+      <div class="text-center break-all border-b border-b-black headClass"
+           [innerHTML]="sanitizer.bypassSecurityTrustHtml(getNormalizeText(header))"
+           [ngStyle]="{
+           'color': header.textColor,
+           'background-color': header.bgColor,
+           'font-weight': header.fontWeight === 'normal' ? 400 : header.fontWeight === 'bold' ? 700 : 500,
+           'font-style': header.fontItalic ? 'italic' : 'normal',
+           'font-size': header.fontSize + 'px',
+           'min-height': headerMaxHeight + 'px'}"></div>
+      <div class="flex">
+        <div class=" flex-1" *ngFor="let subHeader of header.subHeader; let i = index">
+          <div class="text-center break-words border-b border-b-black subHeadClass"
+               [ngClass]="{'border-r border-r-black': header.subHeader.length > (i + 1)  }"
+               [innerHTML]="sanitizer.bypassSecurityTrustHtml(getNormalizeText(subHeader))"
+               [ngStyle]="{
+           'color': subHeader.textColor,
+           'background-color': subHeader.bgColor,
+           'font-weight': subHeader.fontWeight === 'normal' ? 400 : subHeader.fontWeight === 'bold' ? 700 : 500,
+           'font-style': subHeader.fontItalic ? 'italic' : 'normal',
+           'font-size': subHeader.fontSize + 'px',
+           'min-height': subHeaderMaxHeight + 'px'}"></div>
+          <div [ngSwitch]="subHeader.column.columnType"  class="" [ngClass]="{'border-r border-r-black': header.subHeader.length > (i + 1)  }">
+            <ng-template ngSwitchCase="area"><textarea class="w-full h-full border"
+                                                       [value]="subHeader.column.defaultValue"
+                                                       [mask]="subHeader.column.columnMask"></textarea></ng-template>
+            <ng-template ngSwitchCase="input"><input class="w-full h-full border"
+                                                     [value]="subHeader.column.defaultValue"
+                                                     [mask]="subHeader.column.columnMask"/></ng-template>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</ng-template>
