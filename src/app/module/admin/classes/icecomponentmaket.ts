@@ -3,7 +3,7 @@ import {
   ComponentBound,
   ComponentMaket,
   ComponentRuleForPDF,
-  MasterControl,
+  MasterControl, TableProperties,
   TextPosition
 } from "../../../interfaces/interfaces";
 import {BehaviorSubject} from "rxjs";
@@ -34,8 +34,16 @@ export class IceMaketComponent {
   private _checkText: string | undefined;
   private _optionList: string[] | undefined
   private _printRule: ComponentRuleForPDF;
+  private _tableProp?: TableProperties
 
 
+  get tableProp(): TableProperties {
+    return this._tableProp;
+  }
+
+  set tableProp(value: TableProperties) {
+    this._tableProp = value;
+  }
 
   private _masterControlList: MasterControl[] | undefined
   numberObserve$ = new BehaviorSubject<number>(0)
@@ -277,7 +285,8 @@ export class IceMaketComponent {
       notification: this.notification,
       masterControlList: this.masterControlList,
       checkedText: this.checkText,
-      optionList: this.optionList
+      optionList: this.optionList,
+      tableProp: this.tableProp
   }
   }
 }

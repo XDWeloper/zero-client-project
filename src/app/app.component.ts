@@ -19,6 +19,7 @@ export class AppComponent implements OnInit {
   isSpiner = false
   spinnerService$: Subscription
   app_version = APP_VERSION
+  isBlock: boolean = false;
 
   constructor(private keycloakService: KeycloakService,
               private router: Router,

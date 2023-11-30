@@ -354,6 +354,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       compInstance.masterControlList = comp.masterControlList
       compInstance.checkedText = comp.checkedText
       compInstance.optionList = comp.optionList
+      compInstance.tableProp = comp.tableProp
 
       if (this.openType === "EDIT")
         compInstance.enabled = true

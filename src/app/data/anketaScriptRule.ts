@@ -132,12 +132,12 @@ export class AnketaScriptRule {
     let body: string[][][] = []
     let tableTitle = comp.tableType === 1 ? "Сведения об основных контрагентах, планируемых плательщиках и получателях денежных средств" : "Сведения об участниках общества, размерах их долей в уставном капитале и их оплате"
 
-    if (comp.tableType === 1) {
+    if (comp.tableType && comp.tableType === 1) {
       header = ["Плательщики", "Получатели"]
       subHeader = [["Наименование", "Местонахождение (страна, город)"],["Наименование", "Местонахождение (страна, город)"]]
     }
 
-    if (comp.tableType === 2) {
+    if (comp.tableType && comp.tableType === 2) {
       header = [
         "Сведения об участнике общества (Ф.И.О, дата и место рождения (организационно-правовая форма и наименование юридического лица)",
         "Вид, номер, серия, дата и место выдачи документа, удостоверяющего личность, орган, выдавший документ (номер гос. регистрации, наименование органа, осуществившего регистрацию, дата регистрации)",
@@ -148,16 +148,33 @@ export class AnketaScriptRule {
       subHeader = [["1"], ["2"], ["3"], ["4"], ["5"]]
     }
 
-    subHeader.map(val=> val.length).forEach(arrLenght => {
-      let resArr:[][] = [];
-      (comp.value as [{}]).map(row => Object.values(row) as []).forEach(val => {
-        let resultArr:[] | undefined = val.filter((value, index) => this.predIndex <= index && index < (arrLenght + this.predIndex)) as []
-        if(resultArr)
-          resArr.push(resultArr)
+    if(comp.tableType === undefined){
+      header = comp.tableProp.header.map(value => value.title)
+      subHeader = comp.tableProp.header.map(value => value.subHeader.map(value1 => value1.title))
+
+      subHeader.map(val=> val.length).forEach(arrLenght => {
+        let resArr:[][] = [];
+        comp.value.forEach((val: any[]) => {
+          let resultArr:[] | undefined = val.filter((value, index) => this.predIndex <= index && index < (arrLenght + this.predIndex)) as []
+          if(resultArr)
+            resArr.push(resultArr)
+        })
+        this.predIndex = arrLenght
+        body.push(resArr)
       })
-      this.predIndex = arrLenght
-      body.push(resArr)
-    })
+
+    }else {
+      subHeader.map(val=> val.length).forEach(arrLenght => {
+        let resArr:[][] = [];
+        (comp.value as [{}]).map(row => Object.values(row) as []).forEach(val => {
+          let resultArr:[] | undefined = val.filter((value, index) => this.predIndex <= index && index < (arrLenght + this.predIndex)) as []
+          if(resultArr)
+            resArr.push(resultArr)
+        })
+        this.predIndex = arrLenght
+        body.push(resArr)
+      })
+    }
 
     return [
       {

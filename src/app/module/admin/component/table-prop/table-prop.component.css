@@ -5,12 +5,3 @@
 .title-text{
   text-align: center;
 }
-.footer{
-  position: fixed;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  border-bottom: 4px solid aqua;
-  height: 20px;
-  z-index: 100000;
-}
