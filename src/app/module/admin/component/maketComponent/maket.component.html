@@ -29,10 +29,10 @@
     </svg>
   </div>
 
-    <div *ngIf="componentType != 'select' && componentType != 'upload'" class="w-full h-full"
+    <div *ngIf="componentType != 'select' && componentType != 'upload'" class="w-full h-full pl-7"
          [innerHTML]="sanitizer.bypassSecurityTrustHtml(value ? value : placeHolder + (inputType ? ' ' + inputType : ''))">
     </div>
-    <div *ngIf="componentType === 'select'" class="w-full h-full"
+    <div *ngIf="componentType === 'select'" class="w-full h-full pl-7"
          [innerHTML]="sanitizer.bypassSecurityTrustHtml(placeHolder)">
     </div>
     <mat-icon *ngIf="componentType === 'upload'" class="ml-4 mt-2 text-blue-500 scale-[2.0]">

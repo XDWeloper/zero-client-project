@@ -28,7 +28,7 @@ import {IceMaketComponent} from "../../classes/icecomponentmaket";
 import {MaketComponent} from "../maketComponent/maket.component";
 import {MatDialog} from "@angular/material/dialog";
 import {EditTextComponent} from "../edit-text/edit-text.component";
-import {ComponentMaket, DocumentTreeTempl, StepTreeTempl} from "../../../../interfaces/interfaces";
+import {ComponentMaket, DocumentTreeTempl, IceDocumentMaket, StepTreeTempl} from "../../../../interfaces/interfaces";
 import {DocumentService} from "../../../../services/document.service";
 import {WatchTemplateComponent} from "../watch-template/watch-template.component";
 import {User} from "../../../../model/User";
@@ -38,6 +38,7 @@ import {TimeService} from "../../../../services/time.service";
 import {KeycloakService} from "../../../../services/keycloak.service";
 import {MessageService} from "../../../../services/message.service";
 import {TablePropComponent} from "../table-prop/table-prop.component";
+import {IceDataSource} from "../../../../model/IceDataSource";
 
 @Component({
   selector: 'app-main-page',
@@ -58,6 +59,10 @@ export class MainPageComponent implements OnInit, OnDestroy {
   currentDocAndStep: any
   currentDoc: DocumentTreeTempl
   currentStep: StepTreeTempl
+  currentTemplate: IceDocumentMaket
+  dataSourceMenuOpen = false
+  dataSourceMenuPosition: {x: number, y: number}
+
 
   @ViewChild('field', {read: ViewContainerRef})
   private itemsField: ViewContainerRef | undefined
@@ -76,6 +81,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
   user: User
   private _modify: boolean = false
   isBlock: boolean = false;
+  currentDataSource: IceDataSource;
 
   constructor(private cellService: CellService,
               private router: Router,
@@ -243,7 +249,6 @@ export class MainPageComponent implements OnInit, OnDestroy {
       this.currentComponentID = val.compID
       this.currCompType = val.compType
     })
-
   }
 
   @HostListener('window:resize', ['$event'])
@@ -339,26 +344,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
     componentRef.componentInstance.dialogCorrectY = window.innerHeight / 10 / 2
   }
 
-  // openTablesDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
-  //   let componentRef = this.dialog.open(ChangeTableComponent, {
-  //     enterAnimationDuration,
-  //     exitAnimationDuration,
-  //   })
-  //
-  //   componentRef.componentInstance.tableNum.subscribe(tableNum => {
-  //     this.componentRef.instance.tableType = tableNum
-  //     this.componentRef.instance.placeHolder = "Таблица - " + tableList.find(it => it.num === tableNum).text
-  //     componentRef.close()
-  //
-  //     this.openTablePropDialog()
-  //
-  //   })
-  //
-  // }
-
   setCurrentDocAndStep(docAndStep: any) {
-   // console.log(docAndStep)
-
     this.componentService.selectedComponent$.next(undefined)
     this.pushCurrentPage();
 
@@ -373,6 +359,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
       this.restoreComponents(this.documentService.getComponentCollections(this.currentDoc, this.currentStep))
       this.currentStep.visible = this.documentService.getTemplateByDocId(this.currentDoc.id).docStep.find(s => s.stepNum === this.currentStep.num).visible
     }
+    this.currentTemplate = this.documentService.getTemplateByDocId(this.currentDoc.id)
   }
 
   private restoreComponents(componentCollections: ComponentMaket[]) {
@@ -415,4 +402,23 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
   }
 
+  rightClick($event: MouseEvent) {
+    $event.preventDefault();
+    this.dataSourceMenuPosition = {x: $event.x, y: $event.y}
+    this.dataSourceMenuOpen = true
+  }
+
+  addDataSource() {
+    this.dataSourceMenuOpen = false
+    this.currentTemplate = this.documentService.getTemplateByDocId(this.currentDoc.id)
+    if(!this.currentTemplate.dataSource)
+      this.currentTemplate.dataSource = []
+
+    let newDataSource = new IceDataSource()
+    newDataSource.name = "Источник данных " + this.currentTemplate.dataSource.length
+    this.currentTemplate.dataSource.push(newDataSource)
+
+
+
+  }
 }

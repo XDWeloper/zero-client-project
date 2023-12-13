@@ -13,17 +13,16 @@
     </mat-icon>
   </div>
 
-
   <p *ngIf="docPanelCurrentSize > docPanelOpenWidth / 2" class="inline-block bg-primary-base dark:bg-dark-background">
     Документы</p>
   <mat-icon class=" mt-1 text-white cursor-pointer" (click)="openPanel.emit(); isPanelOpen = !isPanelOpen">menu
   </mat-icon>
 </div>
 
-<div class="h-[90%] flex flex-col justify-items-stretch">
+<div class="h-[95%] flex flex-col justify-items-stretch">
 
   <div *ngIf="addDocPanel"
-       class="duration-300 bg-white rounded-2xl text-black border border-primary-base mt-1">
+       class="duration-300 bg-white rounded-2xl text-black border border-primary-base mt-1 flex-none">
     <div
       class="bg-primary-base text-center text-white text-lg rounded-t-2xl border border-primary-base">
       Создать новый документ
@@ -44,7 +43,7 @@
     </div>
   </div>
 
-  <div class="overflow-auto" *ngIf="isPanelOpen && (docPanelCurrentSize > docPanelOpenWidth / 2)">
+  <div class="overflow-auto flex-1" *ngIf="isPanelOpen && (docPanelCurrentSize > docPanelOpenWidth / 2)">
     <mat-tree [dataSource]="dataSource"
               [treeControl]="treeControl"
               class="example-tree bg-gray-200 dark:bg-dark-background h-full">
@@ -90,7 +89,6 @@
           (mousemove)="isDocHover = true; docHover = docNode" (mouseleave)="isDocHover = false"
           (click)="documentChange(docNode)">
           <div class="flex justify-start items-center">
-
             <mat-icon
               [ngClass]="currentDocument != undefined && docNode.id === currentDocument.id ? 'text-red-700':'text-transparent'">
               bookmark_border
@@ -130,7 +128,7 @@
     </mat-tree>
   </div>
 
-  <div *ngIf="isPanelOpen && (docPanelCurrentSize > docPanelOpenWidth / 2)" class="border-t border-t-white py-1 flex items-center justify-between">
+  <div *ngIf="isPanelOpen && (docPanelCurrentSize > docPanelOpenWidth / 2)" class="flex-none border-t border-t-white py-1 flex items-center justify-between">
 
     <label for="file-download" class="text-white text-center bg-primary-base hover:bg-primary-light w-[48%] inline-block mt-1 ml-0.5
                       focus:ring-4 focus:outline-none focus:ring-primary-light font-medium rounded-lg text-sm px-4 py-2

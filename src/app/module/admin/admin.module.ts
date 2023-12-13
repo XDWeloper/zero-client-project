@@ -31,6 +31,7 @@ import {MatSelectModule} from "@angular/material/select";
 import { OptionListComponent } from './component/option-list/option-list.component';
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {MatExpansionModule} from "@angular/material/expansion";
+import {DataSourceComponent} from "./component/data-source/data-source.component";
 
 
 
@@ -75,6 +76,7 @@ import {MatExpansionModule} from "@angular/material/expansion";
         MatSelectModule,
         MatSlideToggleModule,
         MatExpansionModule,
+        DataSourceComponent,
     ]
 
 })

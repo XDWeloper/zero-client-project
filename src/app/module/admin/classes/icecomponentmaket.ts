@@ -7,6 +7,7 @@ import {
   TextPosition
 } from "../../../interfaces/interfaces";
 import {BehaviorSubject} from "rxjs";
+import {IceDataSource} from "../../../model/IceDataSource";
 
 export class IceMaketComponent {
 
@@ -35,7 +36,16 @@ export class IceMaketComponent {
   private _optionList: string[] | undefined
   private _printRule: ComponentRuleForPDF;
   private _tableProp?: TableProperties
+  private _dataSource?: IceDataSource[]
 
+
+  get dataSource(): IceDataSource[] {
+    return this._dataSource;
+  }
+
+  set dataSource(value: IceDataSource[]) {
+    this._dataSource = value;
+  }
 
   get tableProp(): TableProperties {
     return this._tableProp;
@@ -286,7 +296,8 @@ export class IceMaketComponent {
       masterControlList: this.masterControlList,
       checkedText: this.checkText,
       optionList: this.optionList,
-      tableProp: this.tableProp
+      tableProp: this.tableProp,
+      dataSource: this.dataSource
   }
   }
 }

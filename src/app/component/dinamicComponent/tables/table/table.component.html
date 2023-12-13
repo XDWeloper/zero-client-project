@@ -51,6 +51,7 @@
           <div *ngFor="let row of tableData; let rowIndex = index">
             <div [ngSwitch]="subHeader.column.columnType" class="" [ngClass]="{'border-r border-r-black': header.subHeader.length > (i + 1)  }">
               <ng-template ngSwitchCase="area"><textarea class="w-full h-full border"
+                                                         style="resize: none"
                                                          [value]="subHeader.column.defaultValue"
                                                          [mask]="subHeader.column.columnMask"
                                                          [(ngModel)]="tableData[rowIndex][subHeader.order]"

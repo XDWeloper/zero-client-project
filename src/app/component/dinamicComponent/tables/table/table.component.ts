@@ -163,7 +163,11 @@ export class TableComponent implements IceComponent, AfterViewInit{
 
   addRow() {
     let newRow = new Array(this.columnNum)
-    newRow.fill("&&&&")
+    this.tableProp.header.map(value1 => value1.subHeader).flat().map(value1 => {
+      newRow[value1.order] = value1.column.defaultValue
+    })
+
+    console.log(newRow)
     this.tableData.push(newRow)
     this.setValue()
   }

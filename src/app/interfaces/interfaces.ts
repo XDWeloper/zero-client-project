@@ -1,4 +1,6 @@
 import {DocStat, IceComponentType} from "../constants";
+import {DataSource} from "@angular/cdk/collections";
+import {IceDataSource} from "../model/IceDataSource";
 
 export interface ComponentRuleForPDF {
   isPrint: boolean
@@ -171,6 +173,7 @@ export interface ComponentMaket {
   visible?: boolean
   printRule: ComponentRuleForPDF
   tableProp?: TableProperties
+  dataSource?: IceDataSource[]
 }
 
 export type FontWeight = "normal" | "bold" | "semiBold"
@@ -235,9 +238,9 @@ export interface IceDocumentMaket{
   docName: string
   docStep: IceStepMaket[]
   isActive?: boolean,
-  isLoaded?: boolean
+  isLoaded?: boolean,
+  dataSource?: IceDataSource[]
 }
-
 
 export interface IceComponent {
   inputType: string;

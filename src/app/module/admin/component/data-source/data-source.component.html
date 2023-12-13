@@ -1,0 +1,22 @@
+<div (contextmenu)="rightClick($event)"
+  class="w-24 p-1  ml-1 hover:border hover:border-primary-light hover:bg-white duration-300 rounded-md cursor-pointer ">
+  <div class="w-full border border-primary-dark rounded-md flex justify-center items-center">
+    <mat-icon class="text-primary-base">cloud_download</mat-icon>
+  </div>
+  <div class="text-xs text-center break-words p-0">{{ dataSource.name }}</div>
+</div>
+
+<div *ngIf="dataSourceMenuOpen" class="border border-primary-light bg-white rounded-md absolute p-2"
+     [ngStyle]="{'left.px': dataSourceMenuPosition.x, 'top.px': dataSourceMenuPosition.y}">
+  <ul class="list-group">
+    <li class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-sm w-full" (click)="editDataSource()">
+      <mat-icon class="text-info-base">edit</mat-icon>
+      <span class="ml-2">Редактировать источник данных</span>
+    </li>
+    <li class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-sm w-full" (click)="removeDataSource()">
+      <mat-icon class="text-warning-base">clear</mat-icon>
+      <span class="ml-2">Удалить источник данных</span>
+    </li>
+  </ul>
+
+</div>

@@ -1,4 +1,4 @@
-<div [class]="isDark ? 'dark' : 'light'" class="font-mono antialiased	">
+<div [class]="isDark ? 'dark' : 'light'" class="font-mono antialiased">
 <!--  <div class="absolute top-4 right-4 z-50 ">-->
 <!--    <div class="">-->
 <!--      <h1 class="bg-gray-50 rounded-full h-8 w-8 flex justify-center items-center cursor-pointer">-->
@@ -20,10 +20,12 @@
     <app-message-dialog></app-message-dialog>
   </router-outlet>
 
-  <h6 class="absolute left-1 -bottom-2 text-gray-500"  >Версия : {{ app_version }}</h6>
 
   <div *ngIf="isSpiner" class="absolute top-0  left-0 w-full h-full flex items-center justify-center z-10000 ">
     <mat-spinner class="pl" ></mat-spinner>
   </div>
 </div>
+
+<!--<h6 class="absolute left-1 -bottom-2 text-gray-500"  >Версия : {{ app_version }}</h6>-->
+
 

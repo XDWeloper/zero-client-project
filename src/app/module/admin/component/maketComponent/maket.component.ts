@@ -50,8 +50,8 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   private isRightClicked = false
 
 
-  @ViewChild('component', {read: ElementRef})
-  private component: ElementRef
+  // @ViewChild('component', {read: ElementRef})
+  // private component: ElementRef
   isResizable = true
 
 

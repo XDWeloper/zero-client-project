@@ -12,6 +12,15 @@ module.exports = {
     },
     extend: {
       colors:{
+          error:{
+            base: '#c80082',
+          },
+        info:{
+            base: '#00c8aa'
+        },
+        warning:{
+            base: '#c84600'
+        },
           primary:{
             base: '#0081c8',
             light:'#5bb0fb',
