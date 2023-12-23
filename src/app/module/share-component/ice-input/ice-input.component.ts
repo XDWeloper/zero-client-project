@@ -1,6 +1,6 @@
-import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Component, EventEmitter, forwardRef, Input, Output} from '@angular/core';
 import {NgxMaskDirective} from "ngx-mask";
-import {FormsModule} from "@angular/forms";
+import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR} from "@angular/forms";
 import {NgIf} from "@angular/common";
 
 @Component({
@@ -11,9 +11,14 @@ import {NgIf} from "@angular/common";
     NgxMaskDirective,
     FormsModule,
     NgIf
-  ]
+  ],
+  providers: [{
+    provide: NG_VALUE_ACCESSOR,
+    useExisting: forwardRef(() => IceInputComponent),
+    multi: true
+  }]
 })
-export class IceInputComponent {
+export class IceInputComponent implements ControlValueAccessor{
   @Input()
   label: string
   @Input()
@@ -37,10 +42,25 @@ export class IceInputComponent {
     if (this.inputType === "email")
       this._localValue = value;
     this.value.emit(value)
+    this.onChange(value)
+  }
+
+  onChange(_: any) {
   }
 
   showEye() {
     this.show = !this.show
+  }
+
+  registerOnChange(fn: any): void {
+    this.onChange = fn
+  }
+
+  registerOnTouched(fn: any): void {
+  }
+
+  writeValue(obj: any): void {
+    this._localValue = obj
   }
 
 }

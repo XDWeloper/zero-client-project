@@ -42,6 +42,7 @@ import { ChangePlaceDialogComponent } from './component/change-place-dialog/chan
 import {MatButtonModule} from "@angular/material/button";
 import { DotPipePipe } from './pipe/dot-pipe.pipe';
 import { SelectComponent } from './component/dinamicComponent/select/select.component';
+import { ComponentFilterPipe } from './pipe/component-filter.pipe';
 
 
 @NgModule({
@@ -61,6 +62,7 @@ import { SelectComponent } from './component/dinamicComponent/select/select.comp
     ChangePlaceDialogComponent,
     DotPipePipe,
     SelectComponent,
+
   ],
     imports: [
         BrowserModule,

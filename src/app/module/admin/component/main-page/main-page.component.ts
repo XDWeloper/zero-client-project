@@ -405,11 +405,11 @@ export class MainPageComponent implements OnInit, OnDestroy {
   rightClick($event: MouseEvent) {
     $event.preventDefault();
     this.dataSourceMenuPosition = {x: $event.x, y: $event.y}
-    this.dataSourceMenuOpen = true
+    this.dataSourceMenuOpen = this.currentDataSource === undefined
+    this.modify = true
   }
 
   addDataSource() {
-    this.dataSourceMenuOpen = false
     this.currentTemplate = this.documentService.getTemplateByDocId(this.currentDoc.id)
     if(!this.currentTemplate.dataSource)
       this.currentTemplate.dataSource = []
@@ -417,8 +417,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
     let newDataSource = new IceDataSource()
     newDataSource.name = "Источник данных " + this.currentTemplate.dataSource.length
     this.currentTemplate.dataSource.push(newDataSource)
-
-
-
+    this.modify = true
+    this.dataSourceMenuOpen = false
   }
 }

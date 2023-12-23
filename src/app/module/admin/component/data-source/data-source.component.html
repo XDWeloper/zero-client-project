@@ -1,22 +1,166 @@
-<div (contextmenu)="rightClick($event)"
-  class="w-24 p-1  ml-1 hover:border hover:border-primary-light hover:bg-white duration-300 rounded-md cursor-pointer ">
-  <div class="w-full border border-primary-dark rounded-md flex justify-center items-center">
-    <mat-icon class="text-primary-base">cloud_download</mat-icon>
+<div (contextmenu)="rightClick($event)" (click)="showDatSourceProp = true"
+     class="w-24 p-1  ml-1 hover:border hover:border-primary-light hover:bg-white duration-300 rounded-md cursor-pointer ">
+  <div class="w-full border border-primary-dark rounded-md flex justify-center items-center bg-white">
+    <mat-icon class="text-primary-light">cloud_download</mat-icon>
   </div>
   <div class="text-xs text-center break-words p-0">{{ dataSource.name }}</div>
 </div>
 
-<div *ngIf="dataSourceMenuOpen" class="border border-primary-light bg-white rounded-md absolute p-2"
-     [ngStyle]="{'left.px': dataSourceMenuPosition.x, 'top.px': dataSourceMenuPosition.y}">
+<div *ngIf="dataSourceMenuOpen && dataSourceMenuPosition" (mouseleave)="dataSourceMenuOpen = false"
+     class="border border-primary-light bg-white rounded-md absolute p-2 -mt-1 -ml-1"
+     [ngStyle]="{'left.px': dataSourceMenuPosition.x , 'top.px': dataSourceMenuPosition.y}">
   <ul class="list-group">
-    <li class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-sm w-full" (click)="editDataSource()">
-      <mat-icon class="text-info-base">edit</mat-icon>
+    <li
+      class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-sm w-full"
+      (click)="editDataSource()">
+      <mat-icon class="text-primary-base">edit</mat-icon>
       <span class="ml-2">Редактировать источник данных</span>
     </li>
-    <li class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-sm w-full" (click)="removeDataSource()">
+    <li
+      class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-sm w-full"
+      (click)="removeDataSource()">
       <mat-icon class="text-warning-base">clear</mat-icon>
       <span class="ml-2">Удалить источник данных</span>
     </li>
   </ul>
+</div>
+
+
+<div *ngIf="showDatSourceProp"
+     class="absolute top-0 left-0 h-screen w-screen flex justify-center items-center bg-gray-200 z-50 bg-opacity-50">
+
+  <!--  Настройка источника данных-->
+  <div class="w-[80%] h-[80%] border border-primary-dark rounded-md bg-white p-1 relative flex flex-col">
+
+    <mat-icon class="close-button"
+              (click)="showDatSourceProp = false; currentDataSource.next(undefined);this.responseDataMap=[]">close
+    </mat-icon>
+
+    <p class="text-center text-lg flex-none">Настройка источника данных</p>
+
+    <app-ice-input class="flex-none" [(ngModel)]="dataSourceChanges.name" [label]="'Наименование источника'"
+                   [inputType]="'text'"></app-ice-input>
+
+    <div class="flex-none items-center relative gap-1 flex">
+      <app-ice-input class="flex-1 -mt-2" [(ngModel)]="dataSourceChanges.url" [label]="'URL запроса'"
+                     [inputType]="'text'"></app-ice-input>
+      <button class="flex-wrap bg-primary-base text-white  font-medium rounded-lg text-sm px-4 py-2 "
+              [ngClass]="!dataSourceChanges.url ? 'cursor-auto opacity-50 hover:bg-primary-base' : 'hover:bg-primary-light cursor-pointer'"
+              (click)="testConnection()">Получить данные
+      </button>
+    </div>
+
+    <div class="flex-none flex mt-1">
+      <div class="w-[5%] text-center">№</div>
+      <div class="w-[35%] text-center">Путь</div>
+      <div class="w-[40%] text-center">Значение</div>
+      <div class="w-[20%] text-center">Компонент</div>
+    </div>
+
+    <div class="flex-1 overflow-auto border ">
+      <div
+        class="flex cursor-pointer border border-white border-2 text-base  hover:border-primary-light hover:animate-pulse duration-200 rounded-lg"
+        [ngClass]="{'bg-gray-200': i%2 != 0}"
+        (click)="openComponentRelationDialog(data);"
+        *ngFor="let data of responseDataMap | dataSourceFilter: sourceSearchText; let i = index">
+        <div class="w-[5%] px-1">{{ i }}</div>
+        <div class="w-[35%] px-1">{{ data.key }}</div>
+        <div class="w-[40%] px-1">{{ data.value }}</div>
+        <div class="w-[20%] px-1 flex justify-between items-center">
+          <div>{{ data.componentName }}</div>
+          <mat-icon *ngIf="data.componentName" class="text-error-base cursor-pointer hover:animate-pulse"
+                    (mouseenter)="onClear = true" (mouseleave)="onClear = false"
+                    (click)="data.componentName = undefined;">close</mat-icon>
+        </div>
+      </div>
+    </div>
+
+    <div class="h-1 flex-none"></div>
+
+    <div class="flex-none border-t border-t-primary-dark flex justify-end items-center pt-0.5 gap-1">
+
+      <div class="relative flex-1">
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+          <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+               fill="none" viewBox="0 0 20 20">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+          </svg>
+        </div>
+        <input type="search" [(ngModel)]="sourceSearchText"
+               class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+               placeholder="Поиск..." required>
+      </div>
+
+      <button class="flex-none button-style right-0 bottom-0 relative" (click)="SaveAndClose()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="showComponentRelationDialog"
+     class="absolute top-0 left-0 h-screen w-screen flex justify-center items-center bg-gray-200 z-50 bg-opacity-50">
+  <!--Настройка сопряжения с компонентом-->
+  <div class="w-[50%] h-[50%] border border-primary-dark rounded-md bg-white p-1 relative flex flex-col gap-0.5">
+    <mat-icon class="close-button" (click)="showComponentRelationDialog = false">close</mat-icon>
+
+    <p class="text-center text-lg flex-none">Настройка сопряжения с компонентом</p>
+    <div class="flex-none flex border text-lg">
+      <div class="flex-1 text-center">{{ currentResponseData.key }}</div>
+      <div class="flex-none text-center text-warning-base animate-pulse"> >> </div>
+      <div class="flex-1 text-center">{{ tempComponentName }}</div>
+    </div>
+
+    <div class="flex mt-1">
+      <div class="w-[5%] text-center">Ид</div>
+      <div class="w-[55%]  text-center">Имя компонента</div>
+      <div class="w-[40%]  text-center">Тип компонента</div>
+    </div>
+
+    <div class="flex-1 overflow-auto border rounded-t-lg p-0.5">
+      <div
+        class="flex cursor-pointer border border-white border-2 text-base  hover:border-primary-light hover:animate-pulse duration-200 rounded-lg"
+        [ngClass]="{'bg-gray-200': i%2 != 0}"
+        (click)="changeComponentForRelation(component)"
+        *ngFor="let component of currentTemplateComponentList | componentFilter: searchText; let i = index">
+        <div class="w-[10%] ">{{ component.componentID }}</div>
+        <div class="w-[70%]">{{ component.componentName }}</div>
+        <div class="w-[20%]">{{ component.componentType }}</div>
+      </div>
+    </div>
+
+    <div class="flex-none  border-t border-t-primary-dark flex justify-end items-center pt-0.5 gap-1">
+
+      <div class="relative w-full">
+        <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+          <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+               fill="none" viewBox="0 0 20 20">
+            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+          </svg>
+        </div>
+        <input type="search" [(ngModel)]="searchText"
+               class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+               placeholder="Поиск компонента, ид, имя, тип..." required>
+      </div>
+
+      <button class="button-style right-0 bottom-0 relative" (click)="SaveAndCloseRelation()">Сохранить</button>
+    </div>
+
+  </div>
 
 </div>
+
+<div *ngIf="showChangeTableColumNumDialog"
+     class="absolute top-0 left-0 h-screen w-screen flex justify-center items-center bg-gray-200 z-50 bg-opacity-50">
+  <!--Настройка сопряжения с компонентом-->
+  <div class="w-[20%] h-[10%] border border-primary-dark rounded-md bg-white p-1">
+    <p class="text-center text-lg border-b border-b-primary-dark">Выбрать номер столбца таблицы</p>
+    <label for="colNumSelect" class="ml-1">Номер столбца таблицы:</label>
+    <select id="colNumSelect" class="ml-1" (change)="columnSelected()" [(ngModel)]="selectedColumnNum">
+      <option *ngFor="let num of tableColumnArray" [value]="num" >{{ num }}</option>
+    </select>
+
+  </div>
+
+</div>
+

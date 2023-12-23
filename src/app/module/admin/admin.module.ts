@@ -1,6 +1,5 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {RouterModule} from "@angular/router";
 import { MainPageComponent } from './component/main-page/main-page.component';
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatIconModule} from "@angular/material/icon";
@@ -32,7 +31,7 @@ import { OptionListComponent } from './component/option-list/option-list.compone
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {DataSourceComponent} from "./component/data-source/data-source.component";
-
+import {RouterModule} from "@angular/router";
 
 
 @NgModule({
@@ -50,8 +49,7 @@ import {DataSourceComponent} from "./component/data-source/data-source.component
         MasterControlPropComponent,
         OptionListComponent,
     ],
-    exports: [
-    ],
+    exports: [],
     imports: [
         CommonModule,
         RouterModule.forChild([

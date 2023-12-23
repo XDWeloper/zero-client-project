@@ -80,9 +80,9 @@
         <div *ngIf="currentTemplate" class="mt-2 flex min-h-[10%]">
           <div class="w-10 "></div>
           <div class="w-[90%] mx-auto border border-primary-base p-1 flex flex-wrap" (contextmenu)="rightClick($event)" (click)="dataSourceMenuOpen=false">
-          <app-data-source *ngFor="let dataSource of currentTemplate.dataSource"
-                           [dataSource]="dataSource"
-                           [dataSourceList]="currentTemplate.dataSource"
+          <app-data-source *ngFor="let dataSource of currentTemplate.dataSource; let i = index"
+                           [dataSource]="currentTemplate.dataSource[i]"
+                           [currentTemplate]="currentTemplate"
                            (currentDataSource)="currentDataSource = $event"
                            (mouseenter)="currentDataSource = dataSource"
                            (mouseleave)="currentDataSource = undefined"></app-data-source>
@@ -127,11 +127,12 @@
 
 <div *ngIf="isBlock" class="absolute top-0  left-0 w-screen h-screen z-100000 bg-gray-400 opacity-50"></div>
 
-<div *ngIf="dataSourceMenuOpen && !currentDataSource" class="border border-primary-light bg-white rounded-md absolute p-2"
+<div *ngIf="dataSourceMenuOpen && !currentDataSource" (mouseleave)="dataSourceMenuOpen = false"
+     class="border border-primary-light bg-white rounded-md absolute p-2"
      [ngStyle]="{'left.px': dataSourceMenuPosition.x, 'top.px': dataSourceMenuPosition.y}">
   <ul class="list-group">
     <li class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-sm w-full" (click)="addDataSource()">
-      <mat-icon class="text-green-500">cloud_download</mat-icon>
+      <mat-icon class="text-primary-light">cloud_download</mat-icon>
       <span class="ml-2">Добавить источник данных</span>
     </li>
   </ul>
