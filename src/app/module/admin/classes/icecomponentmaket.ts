@@ -2,7 +2,7 @@ import {IceComponentType} from "../../../constants";
 import {
   ComponentBound,
   ComponentMaket,
-  ComponentRuleForPDF,
+  ComponentRuleForPDF, IceEvent,
   MasterControl, TableProperties,
   TextPosition
 } from "../../../interfaces/interfaces";
@@ -37,7 +37,16 @@ export class IceMaketComponent {
   private _printRule: ComponentRuleForPDF;
   private _tableProp?: TableProperties
   private _dataSource?: IceDataSource[]
+  private _componentEvent?: IceEvent[]
 
+
+  get componentEvent(): IceEvent[] {
+    return this._componentEvent;
+  }
+
+  set componentEvent(value: IceEvent[]) {
+    this._componentEvent = value;
+  }
 
   get dataSource(): IceDataSource[] {
     return this._dataSource;
@@ -183,6 +192,9 @@ export class IceMaketComponent {
 
   set inputType(value: string) {
     this._inputType = value;
+    if(value === 'button' && this.printRule) {
+      this.printRule.isPrint = false
+    }
   }
 
   get bound(): ComponentBound {
@@ -207,7 +219,11 @@ export class IceMaketComponent {
 
   set placeHolder(value: string) {
     this._placeHolder = value;
-  }
+    if(value === 'button') {
+      this.value = value
+    }
+
+    }
 
   get textColor(): string {
     return this._textColor;
@@ -297,7 +313,8 @@ export class IceMaketComponent {
       checkedText: this.checkText,
       optionList: this.optionList,
       tableProp: this.tableProp,
-      dataSource: this.dataSource
+      dataSource: this.dataSource,
+      componentEvent: this.componentEvent
   }
   }
 }

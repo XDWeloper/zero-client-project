@@ -62,6 +62,9 @@ export class InputComponent implements IceComponent {
 
 
   ngOnInit(): void {
+    if(this.inputType === 'button')
+      this.value = this.placeHolder
+
     this.height = this.cellService.getClientCellHeight() * this.componentBound.heightScale
     this.width = this.cellService.getClientCellWidth() * this.componentBound.widthScale
     this.left = this.cellService.getClientCellBound(this.cellNumber).x - this.correctX

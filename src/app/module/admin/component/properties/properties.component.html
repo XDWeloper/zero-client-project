@@ -26,10 +26,12 @@
       <option value="checkbox">check</option>
       <option value="radio">radio</option>
       <option value="color">цвет</option>
+      <option value="button">кнопка</option>
     </select>
 
     <!--    параметры печати-->
     <mat-accordion
+      *ngIf="currentComponent.inputType !== 'button'"
       class="col-span-12 w-[95%] text-center rounded-md dark:bg-slate-700 bg-gray-200 border border-primary-light relative">
       <mat-expansion-panel hideToggle [expanded]="currentComponent.printRule.isPrint === true">
         <mat-expansion-panel-header>
@@ -121,32 +123,20 @@
     </div>
 
     <div class="col-span-12 mt-4 grid grid-cols-12">
-      <div class="col-span-5 -mt-1">Добавить рамку</div>
       <input class="col-span-1 h-4 w-4 text-center" type="checkbox" [(ngModel)]="addFrame">
+      <div class="col-span-5 -mt-1">Добавить рамку</div>
       <input class="col-span-6 w-[90%] -mt-2" type="color" *ngIf="addFrame" [(ngModel)]="currentComponent.frameColor">
     </div>
 
 
-    <p *ngIf="currentComponent.componentType === 'input'
-    || currentComponent.componentType === 'area'
-    || currentComponent.componentType === 'place'
-    || currentComponent.componentType === 'table'
-    || currentComponent.componentType === 'upload'
-    || currentComponent.componentType === 'select'"
-       class="col-span-10 mt-4">Обязательно для заполнения
-    </p>
-    <input *ngIf="currentComponent.componentType === 'input'
-    || currentComponent.componentType === 'area'
-    || currentComponent.componentType === 'place'
-    || currentComponent.componentType === 'table'
-    || currentComponent.componentType === 'upload'
-    || currentComponent.componentType === 'select'"
-           class="col-span-2 w-[90%] text-center rounded-md dark:bg-slate-700 mt-4" type="checkbox"
-           [(ngModel)]="currentComponent.required">
+    <div class="col-span-full mt-4 " *ngIf="currentComponent.componentType !== 'text' && currentComponent.inputType != 'button'">
+      <input id="reqCheck" class="rounded-md" type="checkbox"[(ngModel)]="currentComponent.required">
+      <label for="reqCheck"  class="ml-4">Обязательно для заполнения</label>
+    </div>
 
     <span
       *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'|| currentComponent.componentType === 'select' || currentComponent.componentType === 'place'"
-      class="col-span-12 text-center">Текст компонента</span>
+      class="col-span-12 text-center mt-4">Текст компонента</span>
     <textarea
       *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'|| currentComponent.componentType === 'select' || currentComponent.componentType === 'place'"
       [(ngModel)]="currentComponent.placeHolder"

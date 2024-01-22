@@ -1,19 +1,9 @@
-import {
-  ChangeDetectionStrategy,
-  ChangeDetectorRef,
-  Component, ElementRef,
-  EventEmitter,
-  Input,
-  OnInit,
-  Output, ViewChild
-} from '@angular/core';
+import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {NestedTreeControl} from "@angular/cdk/tree";
 import {MatTreeNestedDataSource} from "@angular/material/tree";
 import {
-  ComponentMaket,
   DocumentTreeTempl,
   IceDocumentMaket,
-  IceStepMaket,
   ResponseTree,
   StepTreeTempl
 } from "../../../../interfaces/interfaces";
@@ -22,6 +12,7 @@ import {BackendService} from "../../../../services/backend.service";
 import {MessageService} from "../../../../services/message.service";
 import {ERROR, INFO, MAKET_DELETE_ERROR, MAKET_NAME_LOAD_ERROR} from "../../../../constants";
 import {ComponentService} from "../../../../services/component.service";
+import {dataSourceEmulation} from "../../../../services/data-source.service";
 
 
 @Component({
@@ -313,9 +304,9 @@ export class DocumentComponent implements OnInit {
   }
 
   handleFileSelect(evt: any) {
-    var files = evt.target.files;
-    var f = files[0];
-    var reader = new FileReader();
+    let files = evt.target.files;
+    let f = files[0];
+    let reader = new FileReader();
     reader.readAsText(f);
     reader.onload = (f => {
       return e => {
@@ -346,18 +337,19 @@ export class DocumentComponent implements OnInit {
               docName: res.docName,
               docStep: res.docStep,
               isLoaded: true,
-            })
-          //this.normalizeComponentId() Если в друг произошло задвоение ид компонентов(чего быть не должно!!!) можно это запустить для нормалиизации идешек.
+              docAttrib: res.docAttrib,
+              //docAttrib: {dataSource: JSON.parse(dataSourceEmulation)}, //TODO(не забудь убрать)
+            }
+            )
+          //this.normalizeComponentId() Если в друг произошло за двоение ид компонентов(чего быть не должно!!!) можно это запустить для нормализации идешек.
         }),
       })
-
   }
 
   saveChanges() {
 
     if (this.currentStep && this.currentDocument) {
-      let stepVisible = this.documentService.getStep(this.currentDocument.id, this.currentStep.num).visible
-      this.currentStep.visible = stepVisible
+      this.currentStep.visible = this.documentService.getStep(this.currentDocument.id, this.currentStep.num).visible
       this.documentService.addTemplate(this.currentDocument, this.currentStep, this.componentService.componentCollection)
     }
 
@@ -381,7 +373,7 @@ export class DocumentComponent implements OnInit {
         })
       } else {
         this.backendService.updateMaket(modifyedMaket).subscribe({
-          next: (res => {
+          next: (() => {
             this.documentService.getDocById(modifyedMaket.docId).isModified = false
             this.refreshTree()
             this.isModified = false
@@ -397,26 +389,26 @@ export class DocumentComponent implements OnInit {
     this.documentService.saveTemplate(this.currentDocument)
   }
 
-  private normalizeComponentId() {
-    let componentIdArray = this.documentService.getTemplateByDocId(this.currentDocument.id).docStep.map(s => s.componentMaket).flat(1).map(c => c.componentID)
-    let dublArray = new Array(400)
-    dublArray.fill(0,0,199)
-
-    componentIdArray.forEach(id => {
-      dublArray[id] ++
-    })
-
-    let maxID = this.documentService.getMaxComponentID(this.currentDocument.id) + 1
-
-    for (let i = 0; i < dublArray.length; i++){
-      if(dublArray[i] > 1) {
-        let component: ComponentMaket[] = this.documentService.getTemplateByDocId(this.currentDocument.id).docStep.map(s => s.componentMaket).flat(1).filter(c => c.componentID === i)
-        for(let c = 1; c < component.length; c++){
-          component[c].componentID = maxID ++
-        }
-      }
-    }
-
-    componentIdArray = this.documentService.getTemplateByDocId(this.currentDocument.id).docStep.map(s => s.componentMaket).flat(1).map(c => c.componentID)
-  }
+  // private normalizeComponentId() {
+  //   let componentIdArray = this.documentService.getTemplateByDocId(this.currentDocument.id).docStep.map(s => s.componentMaket).flat(1).map(c => c.componentID)
+  //   let dublArray = new Array(400)
+  //   dublArray.fill(0,0,199)
+  //
+  //   componentIdArray.forEach(id => {
+  //     dublArray[id] ++
+  //   })
+  //
+  //   let maxID = this.documentService.getMaxComponentID(this.currentDocument.id) + 1
+  //
+  //   for (let i = 0; i < dublArray.length; i++){
+  //     if(dublArray[i] > 1) {
+  //       let component: ComponentMaket[] = this.documentService.getTemplateByDocId(this.currentDocument.id).docStep.map(s => s.componentMaket).flat(1).filter(c => c.componentID === i)
+  //       for(let c = 1; c < component.length; c++){
+  //         component[c].componentID = maxID ++
+  //       }
+  //     }
+  //   }
+  //
+  //   componentIdArray = this.documentService.getTemplateByDocId(this.currentDocument.id).docStep.map(s => s.componentMaket).flat(1).map(c => c.componentID)
+  // }
 }

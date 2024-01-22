@@ -38,7 +38,7 @@ import {TimeService} from "../../../../services/time.service";
 import {KeycloakService} from "../../../../services/keycloak.service";
 import {MessageService} from "../../../../services/message.service";
 import {TablePropComponent} from "../table-prop/table-prop.component";
-import {IceDataSource} from "../../../../model/IceDataSource";
+import {IceDataSource, IIceDataSource} from "../../../../model/IceDataSource";
 
 @Component({
   selector: 'app-main-page',
@@ -81,7 +81,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
   user: User
   private _modify: boolean = false
   isBlock: boolean = false;
-  currentDataSource: IceDataSource;
+  currentDataSource: IIceDataSource;
 
   constructor(private cellService: CellService,
               private router: Router,
@@ -217,6 +217,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
       this.componentRef.instance.masterControlList = compMaket.masterControlList
       this.componentRef.instance.optionList = compMaket.optionList
       this.componentRef.instance.tableProp = compMaket.tableProp
+      this.componentRef.instance.componentEvent = compMaket.componentEvent
 
     } else {
       this._modify = true
@@ -406,18 +407,25 @@ export class MainPageComponent implements OnInit, OnDestroy {
     $event.preventDefault();
     this.dataSourceMenuPosition = {x: $event.x, y: $event.y}
     this.dataSourceMenuOpen = this.currentDataSource === undefined
-    this.modify = true
+    //this.modify = true
   }
 
   addDataSource() {
     this.currentTemplate = this.documentService.getTemplateByDocId(this.currentDoc.id)
-    if(!this.currentTemplate.dataSource)
-      this.currentTemplate.dataSource = []
+    if(!this.currentTemplate.docAttrib.workerList)
+      this.currentTemplate.docAttrib.workerList = []
 
     let newDataSource = new IceDataSource()
-    newDataSource.name = "Источник данных " + this.currentTemplate.dataSource.length
-    this.currentTemplate.dataSource.push(newDataSource)
+    newDataSource.id =this.getDataSourceNextID()
+    newDataSource.name = "Источник данных " + this.currentTemplate.docAttrib.workerList.length
+    this.currentTemplate.docAttrib.workerList.push(newDataSource)
     this.modify = true
     this.dataSourceMenuOpen = false
+
+    //console.log(newDataSource)
+  }
+
+  private getDataSourceNextID(): number {
+    return this.currentTemplate.docAttrib.workerList.length > 0 ? Math.max( ...this.currentTemplate.docAttrib.workerList.map(value => value.id) ) + 1 : 0
   }
 }

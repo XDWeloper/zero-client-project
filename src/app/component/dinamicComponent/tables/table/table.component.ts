@@ -78,7 +78,7 @@ export class TableComponent implements IceComponent, AfterViewInit{
   }
 
   ngAfterViewInit(): void {
-      // После отрисовки необходимо скорректровать высоту заголовков
+      // После отрисовки необходимо скорректировать высоту заголовков
     this.setHeaderHeight()
     if(this.tableProp)
       this.columnNum = this.tableProp.header.map(value => value.subHeader.length).reduce((previousValue, currentValue) => previousValue + currentValue)

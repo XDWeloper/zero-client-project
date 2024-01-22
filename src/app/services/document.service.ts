@@ -122,7 +122,8 @@ export class DocumentService {
       let newTempl: IceDocumentMaket = {
         docId: doc.id,
         docName: doc.name,
-        docStep: [newStep]
+        docStep: [newStep],
+        docAttrib: {}
       }
       this.templateList.push(newTempl)
       this.calculateComponentId(doc.id)

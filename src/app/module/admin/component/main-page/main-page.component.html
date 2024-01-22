@@ -80,8 +80,8 @@
         <div *ngIf="currentTemplate" class="mt-2 flex min-h-[10%]">
           <div class="w-10 "></div>
           <div class="w-[90%] mx-auto border border-primary-base p-1 flex flex-wrap" (contextmenu)="rightClick($event)" (click)="dataSourceMenuOpen=false">
-          <app-data-source *ngFor="let dataSource of currentTemplate.dataSource; let i = index"
-                           [dataSource]="currentTemplate.dataSource[i]"
+          <app-data-source *ngFor="let dataSource of currentTemplate.docAttrib.workerList; let i = index"
+                           [dataSource]="currentTemplate.docAttrib.workerList[i]"
                            [currentTemplate]="currentTemplate"
                            (currentDataSource)="currentDataSource = $event"
                            (mouseenter)="currentDataSource = dataSource"

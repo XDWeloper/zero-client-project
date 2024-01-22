@@ -1,6 +1,6 @@
 import {DocStat, IceComponentType} from "../constants";
 import {DataSource} from "@angular/cdk/collections";
-import {IceDataSource} from "../model/IceDataSource";
+import {IceDataSource, IIceDataSource, IWorker} from "../model/IceDataSource";
 
 export interface ComponentRuleForPDF {
   isPrint: boolean
@@ -90,7 +90,8 @@ export interface IceDocument{
   status?: DocStat,
   statusText?: string
   responseDocReference?: string | undefined,
-  docStep?: IceStepMaket[],
+  docStep: IceStepMaket[]
+  docAttrib: IceDocAttrib
 }
 
 export type Role = "ROLE_user" | "ROLE_admin" | "ROLE_operator"
@@ -174,6 +175,8 @@ export interface ComponentMaket {
   printRule: ComponentRuleForPDF
   tableProp?: TableProperties
   dataSource?: IceDataSource[]
+  componentEvent?: IceEvent[]
+
 }
 
 export type FontWeight = "normal" | "bold" | "semiBold"
@@ -230,16 +233,29 @@ export interface IceStepMaket {
   componentMaket: ComponentMaket[]
   checkedText?: string | undefined
   visible?: boolean
+  stepEvent?: IceEvent[]
 }
 
 
 export interface IceDocumentMaket{
   docId: number
   docName: string
-  docStep: IceStepMaket[]
   isActive?: boolean,
   isLoaded?: boolean,
-  dataSource?: IceDataSource[]
+  docStep: IceStepMaket[]
+  docAttrib?: IceDocAttrib
+}
+
+
+export interface IceDocAttrib {
+  workerList?: IWorker[]
+  documentEvent?: IceEvent[]
+  //оставим для будущих полей
+}
+
+export interface IceEvent {
+  eventName: EventObject
+  workerIdList: number[]
 }
 
 export interface IceComponent {
@@ -271,7 +287,7 @@ export interface IceComponent {
   visible?: boolean
   printRule: ComponentRuleForPDF
   tableProp?: TableProperties
-
+  componentEvent?: IceEvent[]
 }
 
 export class MasterControl{
@@ -317,6 +333,22 @@ export enum DocStatus{
   REJECTED = "Отвергнут"
 }
 
+export enum EventObject {
+  DOCUMENT_OPEN = "Открытие документа",
+  DOCUMENT_CLOSE = "Закрытие документа",
+  DOCUMENT_CHANGE_STEP = "Изменение шага",
+
+  STEP_OPEN ="Открытие страницы",
+  STEP_CLOSE ="Закрытие страницы",
+
+  COMPONENT_INIT = "Создание компонента",
+  COMPONENT_CLICK = "Клик компонента",
+  COMPONENT_CHANGE_VALUE = "Изменение данных компонента",
+  COMPONENT_DESTROY = "Удаление компонента",
+
+}
+
+
 export interface PlaceObject{
   id: number,
   regionCode: number,
@@ -338,9 +370,9 @@ export interface PlaceObject{
   shortName: string
 }
 
-export interface PlaceComponentValue {
-  placeObjectList: PlaceObject[]
-}
+// export interface PlaceComponentValue {
+//   placeObjectList: PlaceObject[]
+// }
 
 export interface Pageable{
   "content": any[],

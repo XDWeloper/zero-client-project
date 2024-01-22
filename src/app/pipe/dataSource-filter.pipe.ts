@@ -9,8 +9,7 @@ import {DataSourceMap} from "../services/data-source.service";
 export class DataSourceFilterPipe implements PipeTransform {
 
   transform(items: DataSourceMap[], searchText:string): DataSourceMap[] {
-    console.log(searchText)
-    if(!items || !searchText) return items
+    if(!items || !searchText || items.length < 1) return items
 
     searchText = searchText.toLocaleLowerCase()
 

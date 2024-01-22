@@ -1,7 +1,10 @@
-import {Component, EventEmitter, forwardRef, Input, Output} from '@angular/core';
+import {Component, EventEmitter, forwardRef, Input, OnInit, Output} from '@angular/core';
 import {NgxMaskDirective} from "ngx-mask";
 import {ControlValueAccessor, FormsModule, NG_VALUE_ACCESSOR} from "@angular/forms";
-import {NgIf} from "@angular/common";
+import {AsyncPipe, NgClass, NgIf} from "@angular/common";
+
+const regexURL = new RegExp("^(?:http(s)?:\\/\\/)?[\\w.-]+(?:\\.[\\w\\.-]+)+[\\w\\-\\._~:/?#[\\]@!\\{0}'\\(\\)\\*\\+,;=.]+$")
+const ERL_ERROR_TEXT = "Не верный URL запроса"
 
 @Component({
   standalone: true,
@@ -10,7 +13,9 @@ import {NgIf} from "@angular/common";
   imports: [
     NgxMaskDirective,
     FormsModule,
-    NgIf
+    NgIf,
+    NgClass,
+    AsyncPipe
   ],
   providers: [{
     provide: NG_VALUE_ACCESSOR,
@@ -18,20 +23,40 @@ import {NgIf} from "@angular/common";
     multi: true
   }]
 })
-export class IceInputComponent implements ControlValueAccessor{
+export class IceInputComponent implements ControlValueAccessor, OnInit{
+
+  localLabel = ""
+  private _localValue: any
+  private _label: string
+  show: boolean = true;
+
+
   @Input()
-  label: string
+  set label(value: string){
+    this._label = value
+    this.localLabel = value
+  }
+
+
   @Input()
   inputType: string
   @Output()
   value = new EventEmitter
-  @Input()
-  errorText: any;
 
-  private _localValue: any
-  show: boolean = true;
   @Input()
   toolTip: any;
+  @Input()
+  disabled: boolean;
+  @Input()
+  readonly : boolean;
+  @Output()
+  isValid = new EventEmitter
+  @Input()
+  errorText: string
+
+  ngOnInit() {
+    setTimeout(() => {this.checkValue(this.localValue)}, 500)
+  }
 
 
   get localValue() {
@@ -41,8 +66,21 @@ export class IceInputComponent implements ControlValueAccessor{
   set localValue(value) {
     if (this.inputType === "email")
       this._localValue = value;
+
     this.value.emit(value)
     this.onChange(value)
+
+    this.checkValue(value)
+  }
+
+  checkValue(value: any){
+    if(this.inputType === 'url'){
+      let isValidUrl = regexURL.test(value)
+      this.localLabel = isValidUrl ? this._label : ERL_ERROR_TEXT
+      this.isValid.next(isValidUrl)
+    } else {
+      this.isValid.next(true)
+    }
   }
 
   onChange(_: any) {

@@ -64,7 +64,8 @@ export enum IceComponentType{
   TABLE = "table",
   SELECT= "select",
   PLACE = "place",
-  UPLOAD= "upload"
+  UPLOAD= "upload",
+  BUTTON = "button"
 }
 export enum CellType {
   admin= "admin",

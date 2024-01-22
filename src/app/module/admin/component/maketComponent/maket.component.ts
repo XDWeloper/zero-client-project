@@ -3,11 +3,9 @@ import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
   Component,
-  ElementRef,
   HostListener,
   OnDestroy,
-  OnInit,
-  ViewChild
+  OnInit
 } from '@angular/core';
 import {IceMaketComponent} from "../../classes/icecomponentmaket";
 import {Subscription} from "rxjs";
@@ -17,19 +15,20 @@ import {DomSanitizer} from "@angular/platform-browser";
 import {cellColl, collInRow, IceComponentType} from "../../../../constants";
 import {CdkDragMove, CdkDragStart} from "@angular/cdk/drag-drop";
 import {DocumentService} from "../../../../services/document.service";
+import {EventObject} from "../../../../interfaces/interfaces";
 
 
 @Component({
   selector: 'app-maket',
   templateUrl: './maket.component.html',
   styleUrls: ["./maket.component.css"],
-  changeDetection:ChangeDetectionStrategy.OnPush
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MaketComponent extends IceMaketComponent implements OnInit, OnDestroy, AfterContentInit {
 
   isSelected = false
   dragPosition = {x: 0, y: 0};
-  width:number
+  width: number
   height: number
   isResized = false
   isDragged = false
@@ -48,7 +47,11 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   private resizeStartX: number
   private resizeStartY: number
   private isRightClicked = false
+  private componentEventType: EventObject.COMPONENT_DESTROY | EventObject.COMPONENT_INIT | EventObject.COMPONENT_CHANGE_VALUE | EventObject.COMPONENT_CLICK
 
+  getEventName(){
+    return Object.keys(EventObject).filter(value => value.includes("COMPONENT")).map((value, index) => Object.values(EventObject)[index])
+  }
 
   // @ViewChild('component', {read: ElementRef})
   // private component: ElementRef
@@ -58,12 +61,13 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   constructor(public cellService: CellService,
               private componentService: ComponentService,
               public sanitizer: DomSanitizer,
-              private documentService: DocumentService,private changeDetection: ChangeDetectorRef ) {
+              private documentService: DocumentService, private changeDetection: ChangeDetectorRef) {
     documentService.lastComponentIndex++
     super(0, documentService.lastComponentIndex)
 
-  }
 
+    //console.log(this.getEventName())
+  }
 
 
   ngAfterContentInit(): void {
@@ -82,8 +86,8 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
     this.setResizableProp()
     this.setSize()
     this.initComponent()
-    if(this.textPosition === undefined)
-    this.textPosition = {vertical: 'top', horizontal: 'left'}
+    if (this.textPosition === undefined)
+      this.textPosition = {vertical: 'top', horizontal: 'left'}
   }
 
   get isHover(): boolean {
@@ -115,29 +119,35 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   }
 
   private setSize() {
-    if(this.bound !== undefined) return
+    if (this.bound !== undefined) return
     this.height = this.cellService.getCellHeight()
 
-    switch (this.componentType){
-        case IceComponentType.TEXT: this.width = this.cellService.getCellWidth() * collInRow * cellColl; break;
-        case IceComponentType.INPUT:this.width = this.cellService.getCellWidth() * 3 * cellColl;break;
-        case IceComponentType.SELECT: this.width = this.cellService.getCellWidth() * 3 * cellColl; break;
-        case IceComponentType.AREA:
-          this.width = this.cellService.getCellWidth() * collInRow * cellColl;
-          this.height = this.cellService.getCellHeight() * 3
-          break;
-        case IceComponentType.TABLE:
-          this.width = this.cellService.getCellWidth() * collInRow * cellColl;
-          this.height = this.cellService.getCellHeight() * 3
-          break;
-        case IceComponentType.PLACE:
-          this.width = this.cellService.getCellWidth() * collInRow * cellColl;
-          this.height = this.cellService.getCellHeight()
-          break;
-        case IceComponentType.UPLOAD:
-          this.width = this.cellService.getCellWidth() * 8 * cellColl;
-          this.height = this.cellService.getCellHeight() * 8
-          break;
+    switch (this.componentType) {
+      case IceComponentType.TEXT:
+        this.width = this.cellService.getCellWidth() * collInRow * cellColl;
+        break;
+      case IceComponentType.INPUT:
+        this.width = this.cellService.getCellWidth() * 3 * cellColl;
+        break;
+      case IceComponentType.SELECT:
+        this.width = this.cellService.getCellWidth() * 3 * cellColl;
+        break;
+      case IceComponentType.AREA:
+        this.width = this.cellService.getCellWidth() * collInRow * cellColl;
+        this.height = this.cellService.getCellHeight() * 3
+        break;
+      case IceComponentType.TABLE:
+        this.width = this.cellService.getCellWidth() * collInRow * cellColl;
+        this.height = this.cellService.getCellHeight() * 3
+        break;
+      case IceComponentType.PLACE:
+        this.width = this.cellService.getCellWidth() * collInRow * cellColl;
+        this.height = this.cellService.getCellHeight()
+        break;
+      case IceComponentType.UPLOAD:
+        this.width = this.cellService.getCellWidth() * 8 * cellColl;
+        this.height = this.cellService.getCellHeight() * 8
+        break;
     }
     this.bound = {
       x: this.dragPosition.x,
@@ -154,12 +164,12 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
     this.resizeStartY = $event.y
   }
 
-  @HostListener('window:mousemove',['$event'])
+  @HostListener('window:mousemove', ['$event'])
   drag($event: MouseEvent) {
-    if(this.isResized){
+    if (this.isResized) {
       this.width += $event.x - this.resizeStartX
       this.resizeStartX = $event.x
-      if(this.componentType !== IceComponentType.INPUT && this.componentType !== IceComponentType.SELECT){
+      if (this.componentType !== IceComponentType.INPUT && this.componentType !== IceComponentType.SELECT) {
         this.height += $event.y - this.resizeStartY
         this.resizeStartY = $event.y
       }
@@ -167,9 +177,9 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
     }
   }
 
-  @HostListener('window:mouseup',['$event'])
-  windowMouseUp(){
-    if(this.isResized) {
+  @HostListener('window:mouseup', ['$event'])
+  windowMouseUp() {
+    if (this.isResized) {
       this.isResized = false
       let hScale = this.height / this.cellService.getCellHeight()
       let wScale = this.width / this.cellService.getCellWidth()
@@ -178,11 +188,11 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
       let nextHCell = predHCell + 1
       let nextWCell = predWCell + 1
 
-      if((hScale - predHCell) < 0.2) hScale = predHCell
-      if((nextHCell - hScale) < 0.2) hScale = nextHCell
+      if ((hScale - predHCell) < 0.2) hScale = predHCell
+      if ((nextHCell - hScale) < 0.2) hScale = nextHCell
 
-      if((wScale - predWCell) < 0.2) wScale = predWCell
-      if((nextWCell - wScale) < 0.2) wScale = nextWCell
+      if ((wScale - predWCell) < 0.2) wScale = predWCell
+      if ((nextWCell - wScale) < 0.2) wScale = nextWCell
 
       this.bound = {
         x: this.dragPosition.x,
@@ -195,7 +205,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   }
 
   public setCorrectBound() {
-    this.width =  this.cellService.getCellWidth() * this.bound.widthScale
+    this.width = this.cellService.getCellWidth() * this.bound.widthScale
     this.height = this.cellService.getCellHeight() * this.bound.heightScale
     this.changeDetection.detectChanges()
   }
@@ -214,7 +224,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
 
         this.numObserv$ = this.numberObserve$.subscribe(v => {
           this.currentCell = this.cellService.getCellBound(v)
-          if((!this.isHover && !this.isDragged && !this.isSelected) || this.isHover)
+          if ((!this.isHover && !this.isDragged && !this.isSelected) || this.isHover)
             this.setDragPosition();
         })
       }
@@ -233,9 +243,9 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
     this.setCorrectBound()
   }
 
-  initPositionOnMouseEvent(){
+  initPositionOnMouseEvent() {
     this.cellSubject$ = this.cellService.cellSubject$.subscribe(val => {
-      if(val === null) return
+      if (val === null) return
       if ((this.isSelected && !this.isResized && !this.isRightClicked)) {
         this.cellNumber = val.number
       }
@@ -243,7 +253,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
     })
   }
 
-  correctToCellBound(){
+  correctToCellBound() {
     if (this.cellNumber !== undefined) {
       let bound = this.cellService.getCellBound(this.cellNumber)
       this.dragPosition = {
@@ -255,7 +265,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   }
 
   private initComponent() {
-    if(this.componentType !== IceComponentType.TEXT)
+    if (this.componentType !== IceComponentType.TEXT)
       this.value = undefined
   }
 

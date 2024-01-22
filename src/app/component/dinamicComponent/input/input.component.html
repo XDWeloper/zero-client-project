@@ -3,7 +3,8 @@
      [ngClass]="{'border':localBorderColor}" *ngIf="visible"
      class="absolute z-10 flex justify-center items-center rounded-lg m-1">
   <input
-    class="w-full h-full bg-white hover:border hover:border-primary-base dark:bg-slate-700 dark:text-white p-2 rounded-lg"
+    class="w-full h-full bg-white hover:border hover:border-primary-base p-2 rounded-lg text-textColor-primary"
+    [ngClass]="{'cursor-pointer': inputType === 'button'}"
     [maxlength]="maxLength" [minlength]="minLength" [max]="maxVal" [min]="minVal" [matTooltip]="checkedText"
     *ngIf="inputType !== 'checkbox' && inputType !== 'number'"
     [id]="componentID"

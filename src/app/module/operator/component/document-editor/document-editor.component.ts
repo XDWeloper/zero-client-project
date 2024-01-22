@@ -394,7 +394,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
           maketId: res.id,
           docName: res.docName,
           docStep: res.docStep,
-          status: "DRAFT"
+          status: "DRAFT",
+          docAttrib: res.docAttrib
         }
         this.openType = "EDIT"
         this.saveControl()
