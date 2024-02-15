@@ -1,7 +1,7 @@
 import {Component, ElementRef, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {DomSanitizer} from "@angular/platform-browser";
 import {
-  ComponentBound,
+  ComponentBound, ComponentInputType,
   ComponentRuleForPDF,
   ControlPropType,
   IceComponent,
@@ -45,7 +45,7 @@ export class TextComponent implements OnInit, IceComponent, OnDestroy {
   componentType: IceComponentType;
   placeHolder: string;
   stepNum: number;
-  inputType: string;
+  inputType: ComponentInputType;
   required: boolean;
   textPosition: TextPosition;
   frameColor: string;

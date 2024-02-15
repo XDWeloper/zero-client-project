@@ -4,7 +4,7 @@
      class="absolute z-10 flex justify-center items-center rounded-lg m-1">
   <input
     class="w-full h-full bg-white hover:border hover:border-primary-base p-2 rounded-lg text-textColor-primary"
-    [ngClass]="{'cursor-pointer': inputType === 'button'}"
+    [ngClass]="{'cursor-pointer m-0.5': inputType === 'button'}"
     [maxlength]="maxLength" [minlength]="minLength" [max]="maxVal" [min]="minVal" [matTooltip]="checkedText"
     *ngIf="inputType !== 'checkbox' && inputType !== 'number'"
     [id]="componentID"
@@ -27,8 +27,8 @@
     *ngIf="inputType === 'checkbox'" [disabled]="!enabled" [matTooltip]="checkedText"
     type="checkbox" (click)="select($event)" [checked]="checked">
   <span *ngIf="required && checkedText" class="absolute flex h-2 w-2 top-0 right-0">
-    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-300 opacity-75"></span>
-    <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error-base opacity-75"></span>
+    <span class="relative inline-flex rounded-full h-2 w-2 bg-error-base"></span>
   </span>
 
 </div>

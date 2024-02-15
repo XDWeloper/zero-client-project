@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy} from '@angular/core';
 import {
-  ComponentBound, ComponentRuleForPDF,
+  ComponentBound, ComponentInputType, ComponentRuleForPDF,
   ControlPropType,
   DialogButtonType,
   IceComponent,
@@ -45,7 +45,7 @@ export class UploadComponent implements IceComponent, OnDestroy {
   correctX: number;
   correctY: number;
   frameColor: string | undefined;
-  inputType: string;
+  inputType: ComponentInputType;
   maxLength: number | undefined;
   maxVal: number | undefined;
   minLength: number | undefined;

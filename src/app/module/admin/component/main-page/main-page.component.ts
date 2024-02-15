@@ -38,7 +38,7 @@ import {TimeService} from "../../../../services/time.service";
 import {KeycloakService} from "../../../../services/keycloak.service";
 import {MessageService} from "../../../../services/message.service";
 import {TablePropComponent} from "../table-prop/table-prop.component";
-import {IceDataSource, IIceDataSource} from "../../../../model/IceDataSource";
+import {IceDataSource, IDataSource} from "../../../../model/IceDataSource";
 
 @Component({
   selector: 'app-main-page',
@@ -81,7 +81,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
   user: User
   private _modify: boolean = false
   isBlock: boolean = false;
-  currentDataSource: IIceDataSource;
+  currentDataSource: IDataSource;
 
   constructor(private cellService: CellService,
               private router: Router,
@@ -361,6 +361,9 @@ export class MainPageComponent implements OnInit, OnDestroy {
       this.currentStep.visible = this.documentService.getTemplateByDocId(this.currentDoc.id).docStep.find(s => s.stepNum === this.currentStep.num).visible
     }
     this.currentTemplate = this.documentService.getTemplateByDocId(this.currentDoc.id)
+    if(!this.currentTemplate.docAttrib){
+      this.currentTemplate.docAttrib = {workerList: [],documentEventList: []}
+    }
   }
 
   private restoreComponents(componentCollections: ComponentMaket[]) {
@@ -415,17 +418,20 @@ export class MainPageComponent implements OnInit, OnDestroy {
     if(!this.currentTemplate.docAttrib.workerList)
       this.currentTemplate.docAttrib.workerList = []
 
-    let newDataSource = new IceDataSource()
-    newDataSource.id =this.getDataSourceNextID()
-    newDataSource.name = "Источник данных " + this.currentTemplate.docAttrib.workerList.length
+    let newDataSource = new IceDataSource(
+      this.getDataSourceNextID(),
+      "Источник данных " + this.currentTemplate.docAttrib.workerList.length
+      )
     this.currentTemplate.docAttrib.workerList.push(newDataSource)
     this.modify = true
     this.dataSourceMenuOpen = false
-
-    //console.log(newDataSource)
   }
 
   private getDataSourceNextID(): number {
     return this.currentTemplate.docAttrib.workerList.length > 0 ? Math.max( ...this.currentTemplate.docAttrib.workerList.map(value => value.id) ) + 1 : 0
+  }
+
+  getWorkerList() {
+    return this.currentTemplate.docAttrib.workerList.sort((a, b) => a.id - b.id)
   }
 }

@@ -1,7 +1,7 @@
 <div *ngIf="isShow" class="absolute h-screen w-screen flex justify-center items-center bg-gray-200 z-50 bg-opacity-50">
-  <div class=" bg-white rounded-2xl  border z-51 dark:bg-slate-700 relative px-6 mat-elevation-z10 w-[80%]"
-       [ngClass]="{'border-primary-base': message.dialogType === 'INFO','border-red-600': message.dialogType === 'ERROR'}">
-    <div *ngIf="message.dialogType === 'ERROR'" class="text-center text-red-600 mt-2 text-xl">Извините что-то пошло не так попробуйте позже... </div>
+  <div class=" bg-white rounded-2xl  border z-10000 dark:bg-slate-700 relative px-6 mat-elevation-z10 w-[80%]"
+       [ngClass]="{'border-primary-base': message.dialogType === 'INFO','border-error-base': message.dialogType === 'ERROR'}">
+    <div *ngIf="message.dialogType === 'ERROR'" class="text-center text-error-base mt-2 text-xl">Извините что-то пошло не так попробуйте позже... </div>
     <div *ngIf="message.dialogType === 'INFO'" class="text-center text-primary-dark mt-2 text-xl">Информация</div>
 
     <mat-accordion>

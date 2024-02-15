@@ -1,19 +1,20 @@
-import {Observable, tap} from 'rxjs';
+import {Observable} from 'rxjs';
 import {Injectable} from '@angular/core';
-import {HttpClient, HttpEvent, HttpHeaders, HttpRequest} from '@angular/common/http';
+import {HttpClient} from '@angular/common/http';
 import {environment} from "../../environments/environment";
 import {HttpMethod, Operation} from "../model/RequestBFF";
 import {
   BankFile,
+  IceComponentValue,
   IceDocument,
   IceDocumentMaket,
+  IIceComponentValue,
   LoginPasswordProperties,
-  OtpType,
-  UploadFile
+  OtpType
 } from "../interfaces/interfaces";
-import {DocNameEdit, DocStat} from "../constants";
-import {List} from "postcss/lib/list";
+import {DocNameEdit, DocStat, IceComponentType} from "../constants";
 import {map} from "rxjs/operators";
+import {compareNumbers} from "@angular/compiler-cli/src/version_helpers";
 
 
 @Injectable({
@@ -70,7 +71,7 @@ export class BackendService {
     const operation = new Operation();
     operation.url = environment.resourceServerURL + "/core/makets?id=" + id + "&components=true"
     operation.httpMethod = HttpMethod.GET;
-    return this.http.post(environment.bffURI + '/operation', operation);
+    return this.http.post(environment.bffURI + '/operation', operation)
   }
 
   updateMaket(maket: IceDocumentMaket): Observable<any> {
@@ -107,6 +108,7 @@ export class BackendService {
   /**Документы*/
 
   createDocument(maket: IceDocument): Observable<any> {
+    maket = this.transferValueToAttrib(maket)
     const operation = new Operation();
     operation.url = environment.resourceServerURL + "/core/documents"
     operation.httpMethod = HttpMethod.POST
@@ -126,11 +128,28 @@ export class BackendService {
   }
 
   updateDocument(maket: IceDocument): Observable<any> {
+    maket = this.transferValueToAttrib(maket)
     const operation = new Operation();
     operation.url = environment.resourceServerURL + "/core/documents/update/" + maket.id
     operation.httpMethod = HttpMethod.PUT
     operation.body = maket
     return this.http.post(environment.bffURI + '/operation', operation);
+  }
+
+  transferValueToAttrib(maket: IceDocument):IceDocument{
+    if(!maket.docAttrib)
+      return maket
+      let componentValueList: IIceComponentValue[] = maket.docStep.map(value => value.componentMaket)
+      .flat()
+        .filter(value => value.componentType != IceComponentType.TEXT && value.inputType != "button")
+      .map(value => new IceComponentValue(
+        value.componentName,
+        value.value,
+        value.componentType,
+        value.notification ? value.notification : value.placeHolder,
+        value.enabled ? value.enabled : true))
+      maket.docAttrib.componentValueList = componentValueList
+    return maket
   }
 
   getDocumentNameList(page?: number,size?: number, sort?: string, order?: string, docName?: string, createDate?: Date, status?: string): Observable<any> {
@@ -143,11 +162,28 @@ export class BackendService {
     return this.http.post(environment.bffURI + '/operation', operation);
   }
 
-  getDocumentFull(id: number): Observable<any> {
+  getDocumentFull(id: number): Observable<IceDocument> {
     const operation = new Operation();
     operation.url = environment.resourceServerURL + "/core/documents?id=" + id + "&components=true"
     operation.httpMethod = HttpMethod.GET;
-    return this.http.post(environment.bffURI + '/operation', operation);
+    return this.http.post<IceDocument>(environment.bffURI + '/operation', operation)
+      .pipe(
+      map(value => {
+        if(!value.docAttrib) return value
+        let valueList = value.docAttrib.componentValueList
+
+        value.docStep.map(step => step.componentMaket)
+          .flat()
+          .filter(comp => comp.componentType != IceComponentType.TEXT && comp.inputType != "button")
+          .filter(comp => valueList.map(value => value.componentName).includes(comp.componentName))
+          .forEach(createComponent => {
+            let currentComponentValue = valueList.find(comp => comp.componentName === createComponent.componentName)
+            if(currentComponentValue)
+              createComponent.value = currentComponentValue.componentValue
+          })
+        return value
+      })
+    );
   }
 
   removeDocument(id: number): Observable<any> {

@@ -36,11 +36,11 @@
         </div>
         <div class="flex-wrap h-full p-1 ">
           <mat-icon class="text-green-500 cursor-pointer block" matTooltip="Добавить заголовок" (click)="addColumn()">add_circle</mat-icon>
-          <mat-icon *ngIf="currentHeader" class="text-red-500 mt-1  cursor-pointer block" matTooltip="Удалить заголовок" (click)="removeColumn()">remove_circle
+          <mat-icon *ngIf="currentHeader" class="text-error-base mt-1  cursor-pointer block" matTooltip="Удалить заголовок" (click)="removeColumn()">remove_circle
           </mat-icon>
           <div class="border-t w-full h-4 mt-4"></div>
           <mat-icon *ngIf="currentHeader && currentSubHeader === undefined " class="text-green-500 cursor-pointer block" matTooltip="Добавить подзаголовок" (click)="addSubHeader()">add_circle</mat-icon>
-          <mat-icon *ngIf="currentHeader && currentSubHeader" class="text-red-500 cursor-pointer block" matTooltip="Удалить подзаголовок" (click)="removeSubHeader()">remove_circle</mat-icon>
+          <mat-icon *ngIf="currentHeader && currentSubHeader" class="text-error-base cursor-pointer block" matTooltip="Удалить подзаголовок" (click)="removeSubHeader()">remove_circle</mat-icon>
         </div>
       </div>
       <div class="flex-initial h-20">

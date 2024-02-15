@@ -2,9 +2,9 @@
      [cdkDragFreeDragPosition]="dragPosition"
      [ngStyle]="{'height.px':height,'width.px':width}"
      [cdkDragDisabled]="isResized"
-     class=" drag-box absolute border border-solid border-primary-light hover:border-2 bg-white overflow-hidden z-10"
+     class=" drag-box absolute border border-solid border-primary-light hover:border-2 bg-white overflow-hidden z-10 cursor-pointer"
      [ngClass]="{
-      'border-red-500 border-2' : isSelected,
+      'border-error-base border-2' : isSelected,
       'z-10': !(isSelected && isDragged),
       'justify-start': textPosition.horizontal === 'left',
       'justify-center': (textPosition.horizontal === 'center'),
@@ -40,7 +40,7 @@
     </mat-icon>
   <mat-icon *ngIf="isResizable"
             (mousedown)="mouseDown($event)"
-            class="text-red-800 scale-50 absolute right-0 bottom-0 translate-x-2 translate-y-2 cursor-nw-resize z-10">
+            class="text-error-base scale-50 absolute right-0 bottom-0 translate-x-2 translate-y-2 cursor-nw-resize z-10">
     network_cell
   </mat-icon>
 

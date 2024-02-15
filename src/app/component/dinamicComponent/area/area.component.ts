@@ -2,7 +2,7 @@ import {Component, OnDestroy} from '@angular/core';
 import {ComponentService} from "../../../services/component.service";
 import {CellService} from "../../../services/cell.service";
 import {
-  ComponentBound,
+  ComponentBound, ComponentInputType,
   ComponentRuleForPDF,
   ControlPropType,
   IceComponent,
@@ -42,7 +42,7 @@ export class AreaComponent implements IceComponent, OnDestroy {
   correctX: number;
   correctY: number;
   stepNum: number;
-  inputType: string;
+  inputType: ComponentInputType;
   required: boolean;
   textPosition: TextPosition;
   private _frameColor: string;

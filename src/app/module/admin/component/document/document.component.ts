@@ -10,9 +10,20 @@ import {
 import {DocumentService} from "../../../../services/document.service";
 import {BackendService} from "../../../../services/backend.service";
 import {MessageService} from "../../../../services/message.service";
-import {ERROR, INFO, MAKET_DELETE_ERROR, MAKET_NAME_LOAD_ERROR} from "../../../../constants";
+import {
+  dialogCloseAnimationDuration,
+  dialogOpenAnimationDuration,
+  ERROR,
+  INFO,
+  MAKET_DELETE_ERROR,
+  MAKET_NAME_LOAD_ERROR
+} from "../../../../constants";
 import {ComponentService} from "../../../../services/component.service";
-import {dataSourceEmulation} from "../../../../services/data-source.service";
+import {ComponentType} from "@angular/cdk/overlay";
+import {MatDialog, MatDialogRef} from "@angular/material/dialog";
+import {BankDocumentListComponent} from "../../../operator/component/bank-document-list/bank-document-list.component";
+import {DocumentSettingsComponent} from "../document-settings/document-settings.component";
+import {StepSettingsComponent} from "../step-settings/step-settings.component";
 
 
 @Component({
@@ -78,10 +89,11 @@ export class DocumentComponent implements OnInit {
     return this._newDocName;
   }
 
-  constructor(private documentService: DocumentService,
+  constructor(protected documentService: DocumentService,
               private backendService: BackendService,
               private messageService: MessageService,
               private componentService: ComponentService,
+              public dialog: MatDialog
               ) {
     this.loadMaketNameList()
   }
@@ -162,7 +174,7 @@ export class DocumentComponent implements OnInit {
         name: this.newDocName,
         children: [{
           num: 1,
-          name: "Шаг 1",
+          name: "Страница 1",
           parentId: newId,
         }],
         isActive: true,
@@ -235,7 +247,7 @@ export class DocumentComponent implements OnInit {
     let newStepNum = this.documentService.getNextStepNumber(doc)
     this.currentEditStep = {
       num: newStepNum,
-      name: "Шаг " + newStepNum,
+      name: "Страница " + newStepNum,
       parentId: doc.id,
       visible: true
     }
@@ -338,7 +350,6 @@ export class DocumentComponent implements OnInit {
               docStep: res.docStep,
               isLoaded: true,
               docAttrib: res.docAttrib,
-              //docAttrib: {dataSource: JSON.parse(dataSourceEmulation)}, //TODO(не забудь убрать)
             }
             )
           //this.normalizeComponentId() Если в друг произошло за двоение ид компонентов(чего быть не должно!!!) можно это запустить для нормализации идешек.
@@ -411,4 +422,34 @@ export class DocumentComponent implements OnInit {
   //
   //   componentIdArray = this.documentService.getTemplateByDocId(this.currentDocument.id).docStep.map(s => s.componentMaket).flat(1).map(c => c.componentID)
   // }
+  stepSettings(stepNode: StepTreeTempl) {
+    console.log(stepNode)
+    let componentRef = this.openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration,StepSettingsComponent)
+
+  }
+
+  documentSettings(docNode: DocumentTreeTempl) {
+    let currentMaket: IceDocumentMaket = this.documentService.getTemplateByDocId(docNode.id)
+    let componentRef = this.openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration,DocumentSettingsComponent)
+    componentRef.componentInstance.currentMaket = currentMaket
+    componentRef.afterClosed().subscribe({
+      next: value => {
+        if(value === 1) {
+          this.documentService.getDocById(currentMaket.docId).isModified = true
+          this.isModified = true
+        }
+      }
+    })
+  }
+
+
+  openDialog<T>(enterAnimationDuration: string, exitAnimationDuration: string, component: ComponentType<T>): MatDialogRef<any> {
+    return this.dialog.open(component, {
+      width: '' + (window.innerWidth * 0.8) + 'px',
+      height: '' + (window.innerHeight * 0.8) + 'px',
+      enterAnimationDuration,
+      exitAnimationDuration,
+    })
+  }
+
 }

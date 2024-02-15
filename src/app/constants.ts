@@ -7,6 +7,9 @@ export const MAKET_NAME_LOAD_ERROR = "Ошибка получения списк
 export const MAKET_LOAD_ERROR = "Ошибка получения макета"
 export const MAKET_DELETE_ERROR = "Ошибка удаления макета"
 
+export const REQUEST_TEST_ERROR = "Ошибка получения данных"
+
+
 export const DOCUMENT_SAVE_ERROR = "Ошибка сохранения документа"
 export const DRAFT_SAVE_ERROR = "Ошибка сохранения черновика документа"
 export const DOCUMENT_NAME_LOAD_ERROR = "Ошибка загрузки документов"

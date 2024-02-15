@@ -1,6 +1,6 @@
 import {IceComponentType} from "../../../constants";
 import {
-  ComponentBound,
+  ComponentBound, ComponentInputType,
   ComponentMaket,
   ComponentRuleForPDF, IceEvent,
   MasterControl, TableProperties,
@@ -20,7 +20,7 @@ export class IceMaketComponent {
   private _placeHolder: string
   private _textColor: string
   private _backgroundColor: string
-  private _inputType: string
+  private _inputType: ComponentInputType
   private _required: boolean
   private _textPosition: TextPosition;
   private _tableType: number
@@ -186,11 +186,11 @@ export class IceMaketComponent {
     this._required = value;
   }
 
-  get inputType(): string {
+  get inputType(): ComponentInputType {
     return this._inputType;
   }
 
-  set inputType(value: string) {
+  set inputType(value: ComponentInputType) {
     this._inputType = value;
     if(value === 'button' && this.printRule) {
       this.printRule.isPrint = false

@@ -51,46 +51,47 @@
                      (mousemove)="isStepHover = true; stepHover = stepNode"
                      (mouseleave)="isStepHover = false"
                      [ngClass]=" stepNode.num != 0 ? 'flex justify-between items-center': 'flex justify-start items-center'"
-                     class=" relative text-black dark:text-white cursor-pointer border border-gray-200 dark:border-dark-background hover:border-primary-light dark:hover:border-primary-light"
+                     class=" relative text-black dark:text-white cursor-pointer border border-gray-200 hover:text-warning-base duration-300"
                      *matTreeNodeDef="let stepNode"
                      matTreeNodeToggle>
 
         <mat-form-field *ngIf="stepNode.num === 0" class="w-full absolute left-0 -top-1">
-          <mat-label>Наименование шага</mat-label>
+          <mat-label>Наименование страницы</mat-label>
           <textarea matInput cdkTextareaAutosize #autosize="cdkTextareaAutosize" cdkAutosizeMinRows="1"
                     cdkAutosizeMaxRows="5" [(ngModel)]="newStepName" (keydown.enter)="enterStep(stepNode)"></textarea>
         </mat-form-field>
 
 
         <div *ngIf="stepNode.num != 0" class="flex justify-start items-center">
-          <mat-icon *ngIf="stepNode.num != 0" [ngClass]="stepNode == currentStep ? 'text-red-700':'text-transparent'"
+          <mat-icon *ngIf="stepNode.num != 0" [ngClass]="stepNode == currentStep ? 'text-error-base':'text-transparent'"
                     class="">
             bookmark_border
           </mat-icon>
           <div>{{stepNode.name}}</div>
         </div>
 
-        <div *ngIf="isStepHover && stepHover == stepNode && stepNode.num != 0 && currentEditId === undefined"
-             class="flex p-2 rounded-md">
+        <div
+             [ngClass]="(isStepHover && stepHover == stepNode && stepNode.num != 0 && currentEditId === undefined) ? 'opacity-100' : 'opacity-0'"
+             class="flex p-2 rounded-md duration-300">
 <!--             class="bg-dark-background flex p-2 rounded-md">-->
-          <mat-icon class="text-blue-500 mr-1 hover:scale-125 duration-300 flex-auto" (click)="editStep(stepNode)"
-                    matTooltip="Редактировать название">edit
-          </mat-icon>
-          <mat-icon class="text-red-500 mr-1 hover:scale-125 duration-300 flex-auto" (click)="delStep(stepNode)"
-                    matTooltip="Удалить шаг">remove
-          </mat-icon>
+          <mat-icon class="text-primary-light mr-1 hover:scale-125 duration-300 flex-auto" (click)="editStep(stepNode)"
+                    matTooltip="Редактировать название">edit</mat-icon>
+          <mat-icon class="text-error-base mr-1 hover:scale-125 duration-300 flex-auto" (click)="delStep(stepNode)"
+                    matTooltip="Удалить страницу">remove</mat-icon>
+          <mat-icon class="text-primary-dark mr-1 hover:scale-125 duration-300 flex-auto" (click)="stepSettings(stepNode)"
+                    matTooltip="Параметры страницы">settings</mat-icon>
         </div>
 
       </mat-tree-node>
 
       <mat-nested-tree-node *matTreeNodeDef="let docNode; when: hasChild">
         <div
-          class="flex justify-between items-center relative mat-tree-node dark:text-white cursor-pointer border border-gray-300 dark:border-dark-background hover:border-primary-light dark:hover:border-primary-light"
+          class="flex justify-between items-center relative mat-tree-node dark:text-white cursor-pointer border border-gray-300 hover:text-warning-base duration-300"
           (mousemove)="isDocHover = true; docHover = docNode" (mouseleave)="isDocHover = false"
           (click)="documentChange(docNode)">
           <div class="flex justify-start items-center">
             <mat-icon
-              [ngClass]="currentDocument != undefined && docNode.id === currentDocument.id ? 'text-red-700':'text-transparent'">
+              [ngClass]="currentDocument != undefined && docNode.id === currentDocument.id ? 'text-error-base':'text-transparent'">
               bookmark_border
             </mat-icon>
             <button mat-icon-button matTreeNodeToggle [attr.aria-label]="'Toggle ' + docNode.name"
@@ -100,24 +101,21 @@
             <div
               [ngClass]="{'text-green-600': (docNode.isModified != undefined && docNode.isModified) }">{{ docNode.name }}</div>
           </div>
-          <div *ngIf="isDocHover && docHover == docNode && currentEditDoc === undefined"
-               class="flex p-2 rounded-md">
-<!--               class="bg-dark-background flex p-2 rounded-md">-->
+          <div
+               [ngClass]="(isDocHover && docHover == docNode && currentEditDoc === undefined) ? 'opacity-100' : 'opacity-0'"
+               class="flex p-2 rounded-md duration-300">
             <mat-icon (click)="addStep(docNode); treeControl.expand(docNode)"
                       class="text-green-500 mr-1 hover:scale-125 duration-300 flex-auto"
-                      matTooltip="Добавить шаг">
-              add
-            </mat-icon>
+                      matTooltip="Добавить страницу">add</mat-icon>
             <mat-icon (click)="editDoc(docNode)"
-                      class="text-blue-500 mr-1 hover:scale-125 duration-300 flex-auto"
-                      matTooltip="Редактировать название">
-              edit
-            </mat-icon>
+                      class="text-primary-light mr-1 hover:scale-125 duration-300 flex-auto"
+                      matTooltip="Редактировать название">edit</mat-icon>
             <mat-icon (click)="delDoc(docNode)"
-                      class="text-red-500 mr-1 hover:scale-125 duration-300 flex-auto"
-                      matTooltip="Удалить документ">
-              remove
-            </mat-icon>
+                      class="text-error-base mr-1 hover:scale-125 duration-300 flex-auto"
+                      matTooltip="Удалить документ">remove</mat-icon>
+            <mat-icon (click)="documentSettings(docNode)" *ngIf="this.documentService.getTemplateByDocId(docNode.id)"
+                      class="text-primary-dark mr-1 hover:scale-125 duration-300 flex-auto"
+                      matTooltip="Параметры документа">settings</mat-icon>
           </div>
         </div>
         <div [class.example-tree-invisible]="!treeControl.isExpanded(docNode)"

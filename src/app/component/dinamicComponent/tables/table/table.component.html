@@ -1,31 +1,33 @@
 <!--[ngClass]="{'border':frameColor}"-->
-<div class="absolute z-10"
+<div class="absolute z-10 flex flex-col border"
      [ngStyle]="{'height.px':height,'width.px':width}"
      [style.top.px]="top" [style.left.px]="left" [style.border-color]="frameColor">
 
-  <div> <!--  таблица-->
+  <div class="flex-1 overflow-auto"> <!--  таблица-->
     <ng-container [ngTemplateOutlet]="TableTemplate"></ng-container>
   </div>
 
-<!--  Кнопки управления-->
-<div class="flex justify-start items-center border bg-primary-dark" [style.border-color]="frameColor" *ngIf="enabled">
-  <mat-icon class="text-green-500 cursor-pointer" matTooltip="Добавить строку" (click)="addRow()">add</mat-icon>
-  <mat-icon class="text-red-500 cursor-pointer" matTooltip="Удалить строку" (click)="removeRow()">remove</mat-icon>
-  <mat-icon class="text-red-500 cursor-pointer" matTooltip="Очистить таблицу" (click)="clearTable()">close</mat-icon>
-</div>
-<p *ngIf="enabled">«+» - добавить строку, «-» - убрать строку </p>
+  <!--  Кнопки управления-->
+
+  <div class="flex-none  flex justify-start items-center border bg-primary-dark" [style.border-color]="frameColor" *ngIf="enabled">
+    <mat-icon class="text-green-500 cursor-pointer" matTooltip="Добавить строку" (click)="addRow()">add</mat-icon>
+    <mat-icon class="text-error-base cursor-pointer" matTooltip="Удалить строку" (click)="removeRow()">remove</mat-icon>
+    <mat-icon class="text-error-base cursor-pointer" matTooltip="Очистить таблицу" (click)="clearTable()">close
+    </mat-icon>
+  </div>
+  <p *ngIf="enabled">«+» - добавить строку, «-» - убрать строку </p>
 
 
-<span *ngIf="required" class="absolute flex h-2 w-2 top-0 right-0 z-20">
-      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-300 opacity-75"></span>
-      <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
-    </span>
+  <span *ngIf="required" class="absolute flex h-2 w-2 top-0 right-0 z-20">
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error-base opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2 w-2 bg-error-base"></span>
+  </span>
 </div>
 
 
 <ng-template #TableTemplate>
-  <div class="flex flex-row headerContainerClass" >
-    <div class="flex-1 border border-black" *ngFor="let header of tableProp.header" >
+  <div class="flex flex-row headerContainerClass">
+    <div class="flex-1 border border-black " *ngFor="let header of tableProp.header">
       <div class="text-center break-all border-b border-b-black headClass"
            [innerHTML]="sanitizer.bypassSecurityTrustHtml(getNormalizeText(header))"
            [ngStyle]="{
@@ -48,22 +50,24 @@
            'font-size': subHeader.fontSize + 'px',
            'min-height': subHeaderMaxHeight + 'px'}"></div>
 
-          <div *ngFor="let row of tableData; let rowIndex = index">
-            <div [ngSwitch]="subHeader.column.columnType" class="" [ngClass]="{'border-r border-r-black': header.subHeader.length > (i + 1)  }">
-              <ng-template ngSwitchCase="area"><textarea class="w-full h-full border"
-                                                         style="resize: none"
+          <div class="overflow-auto">
+            <div *ngFor="let row of tableData; let rowIndex = index">
+              <div [ngSwitch]="subHeader.column.columnType" class=""
+                   [ngClass]="{'border-r border-r-black': header.subHeader.length > (i + 1)  }">
+                <ng-template ngSwitchCase="area"><textarea class="w-full h-full border"
+                                                           style="resize: none"
+                                                           [value]="subHeader.column.defaultValue"
+                                                           [mask]="subHeader.column.columnMask"
+                                                           [(ngModel)]="tableData[rowIndex][subHeader.order]"
+                                                           (change)="setValue()"></textarea></ng-template>
+                <ng-template ngSwitchCase="input"><input class="w-full h-full border"
                                                          [value]="subHeader.column.defaultValue"
                                                          [mask]="subHeader.column.columnMask"
                                                          [(ngModel)]="tableData[rowIndex][subHeader.order]"
-                                                         (change)="setValue()"></textarea></ng-template>
-              <ng-template ngSwitchCase="input"><input class="w-full h-full border"
-                                                       [value]="subHeader.column.defaultValue"
-                                                       [mask]="subHeader.column.columnMask"
-                                                       [(ngModel)]="tableData[rowIndex][subHeader.order]"
-                                                       (change)="setValue()"/></ng-template>
+                                                         (change)="setValue()"/></ng-template>
+              </div>
             </div>
           </div>
-
         </div>
       </div>
     </div>

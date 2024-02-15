@@ -1,6 +1,6 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy} from '@angular/core';
 import {
-  ComponentBound,
+  ComponentBound, ComponentInputType,
   ComponentRuleForPDF,
   ControlPropType,
   IceComponent,
@@ -34,7 +34,7 @@ export class AddressComponent implements IceComponent, OnDestroy {
   componentType: IceComponentType;
   correctX: number;
   correctY: number;
-  inputType: string;
+  inputType: ComponentInputType;
   masterControlList: MasterControl[];
   maxLength: number | undefined;
   maxVal: number | undefined;

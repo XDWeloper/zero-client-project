@@ -1,6 +1,6 @@
 import {DocStat, IceComponentType} from "../constants";
 import {DataSource} from "@angular/cdk/collections";
-import {IceDataSource, IIceDataSource, IWorker} from "../model/IceDataSource";
+import {IceDataSource, IDataSource, IWorker} from "../model/IceDataSource";
 
 export interface ComponentRuleForPDF {
   isPrint: boolean
@@ -146,10 +146,12 @@ export interface TextPosition {
   vertical: string
 }
 
+export type ComponentInputType = "text" | "number" | "datetime-local" | "date" | "time" | "week" | "month" | "checkbox" | "radio" | "color" | "button"
+
 export interface ComponentMaket {
   cellNumber: number | undefined
   componentType: IceComponentType
-  inputType: string
+  inputType: ComponentInputType
   componentName: string | undefined
   componentID:number
   bound: ComponentBound
@@ -248,18 +250,44 @@ export interface IceDocumentMaket{
 
 
 export interface IceDocAttrib {
-  workerList?: IWorker[]
-  documentEvent?: IceEvent[]
-  //оставим для будущих полей
+  workerList?: IWorker[]                  /** Воркеры документа*/
+  documentEventList?: IceEvent[]              /** События на уровне документа */
+  componentValueList?: IIceComponentValue[]   /** Храним отдельно данные компонентов в виде: ключ/значение */
+}
+
+export interface IIceComponentValue{
+  componentName: String
+  componentValue?: any
+  componentType: IceComponentType
+  readOnly: boolean
+  componentDescription?: String
+}
+
+export class IceComponentValue implements IIceComponentValue{
+
+
+  constructor(componentName: String, componentValue: any, componentType: IceComponentType, componentDescription: String, readOnly: boolean) {
+    this.componentName = componentName;
+    this.componentValue = componentValue;
+    this.componentType = componentType;
+    this.componentDescription = componentDescription;
+    this.readOnly = readOnly;
+  }
+
+  componentName: String
+  componentValue?: any
+  componentType: IceComponentType
+  componentDescription: String;
+  readOnly: boolean;
 }
 
 export interface IceEvent {
-  eventName: EventObject
+  eventName: string
   workerIdList: number[]
 }
 
 export interface IceComponent {
-  inputType: string;
+  inputType: ComponentInputType;
   stepNum: number;
   correctX: number;
   correctY: number;
@@ -301,7 +329,7 @@ export interface ComponentControl{
   componentID: number,
   componentName: string,
   componentType: string,
-  inputType: string | undefined
+  inputType: ComponentInputType | undefined
 }
 
 export interface StepControl{
@@ -334,19 +362,20 @@ export enum DocStatus{
 }
 
 export enum EventObject {
-  DOCUMENT_OPEN = "Открытие документа",
-  DOCUMENT_CLOSE = "Закрытие документа",
-  DOCUMENT_CHANGE_STEP = "Изменение шага",
+  ON_DOCUMENT_OPEN = "Открытие документа",
+  ON_DOCUMENT_CLOSE = "Закрытие документа",
+  ON_DOCUMENT_CHANGE_STEP = "Изменение страницы",
 
-  STEP_OPEN ="Открытие страницы",
-  STEP_CLOSE ="Закрытие страницы",
+  ON_STEP_OPEN ="Открытие страницы",
+  ON_STEP_CLOSE ="Закрытие страницы",
 
-  COMPONENT_INIT = "Создание компонента",
-  COMPONENT_CLICK = "Клик компонента",
-  COMPONENT_CHANGE_VALUE = "Изменение данных компонента",
-  COMPONENT_DESTROY = "Удаление компонента",
-
+  ON_COMPONENT_INIT = "Создание компонента",
+  ON_COMPONENT_CLICK = "Клик на компоненте",
+  ON_COMPONENT_CHANGE_VALUE = "Изменение данных компонента",
+  ON_COMPONENT_DESTROY = "Удаление компонента",
 }
+
+export type EventObjectType = "DOCUMENT" |  "STEP" | "COMPONENT"
 
 
 export interface PlaceObject{

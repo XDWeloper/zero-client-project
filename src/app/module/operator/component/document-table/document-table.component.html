@@ -74,7 +74,7 @@
 
     <ng-container matColumnDef="status">
       <th class="w-[20%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Статус</th>
-      <td class="w-[20%]" [ngClass]="{'bg-cyan-100/50':row.status === 'CONTROL', 'bg-yellow-100/50':row.status === 'AGREE','bg-red-100/50': (row.status === 'REJECTED' || row.status === 'INCORRECT')}" mat-cell *matCellDef="let row">
+      <td class="w-[20%]" [ngClass]="{'bg-cyan-100/50':row.status === 'CONTROL', 'bg-yellow-100/50':row.status === 'AGREE','bg-error-base/50': (row.status === 'REJECTED' || row.status === 'INCORRECT')}" mat-cell *matCellDef="let row">
         <div class="flex justify-between items-center w-full">
           <span class="w-[90%]" >{{row.status | docStatus }}</span>
           <mat-icon *ngIf="row.statusText" (click)="onInfoClick(row.statusText)"
@@ -115,12 +115,12 @@
             </mat-icon>
           </div>
           <div class="w-1/4">
-            <mat-icon *ngIf="false" class=" text-red-500 cursor-pointer" matTooltip="Удалить"
+            <mat-icon *ngIf="false" class=" text-error-base cursor-pointer" matTooltip="Удалить"
                       (click)="removeDoc(row.id)">delete
             </mat-icon>
           </div>
           <div class="w-1/4">
-            <mat-icon class=" text-red-500 cursor-pointer" matTooltip="История статусов"
+            <mat-icon class=" text-error-base cursor-pointer" matTooltip="История статусов"
                       (click)="openHistoryDialog(row.id)">history
             </mat-icon>
           </div>

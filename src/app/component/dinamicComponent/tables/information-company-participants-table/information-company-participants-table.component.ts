@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {CellService} from "../../../../services/cell.service";
-import {ComponentBound, ComponentRuleForPDF,
+import {
+  ComponentBound, ComponentInputType, ComponentRuleForPDF,
   IceComponent,
   MasterControl,
   TextPosition
@@ -32,7 +33,7 @@ export class InformationCompanyParticipantsTableComponent implements IceComponen
   componentType: IceComponentType;
   correctX: number;
   correctY: number;
-  inputType: string;
+  inputType: ComponentInputType;
   placeHolder: string;
   required: boolean;
   stepNum: number;

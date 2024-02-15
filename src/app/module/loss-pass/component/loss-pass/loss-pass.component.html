@@ -1,7 +1,7 @@
 <div class="w-screen h-screen bg-gray-200 flex justify-center items-center dark:bg-dark-background ">
   <div *ngIf="pinResult === undefined"
     class="bg-white dark:bg-slate-900 border border-primary-light p-2 w-[30%] rounded-lg shadow-gray-500 shadow-2xl min-w-fit">
-    <p class="text-center text-lg dark:text-white w-full"><span class="text-red-600">&#10008;</span> Сброс пароля</p>
+    <p class="text-center text-lg dark:text-white w-full"><span class="text-error-base">&#10008;</span> Сброс пароля</p>
     <app-ice-input  label="Телефон" (value)="phone = $event" [inputType]="'phone'" [errorText]="phone_error"
                     [toolTip]="loginPasswordProperties ? loginPasswordProperties.loginValidatorHint : ''"></app-ice-input>
     <app-ice-input  label="Пароль" (value)="password = $event" [inputType]="'password'" [errorText]="password_error"

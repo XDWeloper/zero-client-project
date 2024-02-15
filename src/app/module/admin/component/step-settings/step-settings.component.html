@@ -1,0 +1,39 @@
+<!--  Настройка источника данных-->
+<div class="w-[100%] h-[100%] border border-primary-dark rounded-md bg-white p-1 relative flex flex-col">
+
+  <mat-icon class="close-button"(click)="dialogRef.close()">close</mat-icon>
+
+  <p class="text-center text-lg flex-none">Настройка страницы</p>
+
+  <mat-tab-group class="flex-1 overflow-auto">
+
+    <mat-tab> <!-- Вкладка визуальные настройки-->
+      <ng-template mat-tab-label>
+        <mat-icon>assignment</mat-icon>
+        Внешний вид
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab> <!-- Вкладка запуск обработчиков-->
+      <ng-template mat-tab-label>
+        <mat-icon>playlist_add</mat-icon>
+        Обработчики
+      </ng-template>
+    </mat-tab>
+
+    <mat-tab> <!-- Вкладка разное-->
+      <ng-template mat-tab-label>
+        <mat-icon>playlist_add</mat-icon>
+        Разные настройки
+      </ng-template>
+    </mat-tab>
+
+  </mat-tab-group>
+
+
+  <div class="h-1 flex-none"></div>
+
+  <div class="flex-none border-t border-t-primary-dark flex justify-end items-center pt-0.5 gap-1">
+    <button class="flex-none button-style right-0 bottom-0 relative" (click)="SaveAndClose()">Сохранить</button>
+  </div>
+</div>

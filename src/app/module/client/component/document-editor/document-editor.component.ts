@@ -52,6 +52,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {PDFDocObject, PDFImageObject, PrintService} from "../../../../services/print.service";
 import {AnketaScriptRule} from "../../../../data/anketaScriptRule";
 import {TableComponent} from "../../../../component/dinamicComponent/tables/table/table.component";
+import {CdkStepLabel} from "@angular/cdk/stepper";
 
 @Component({
   selector: 'app-document-editor',
@@ -197,7 +198,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     this.validatonTextClear()
 
 
-    if (this._currentStepIndex != value && this.openType === "EDIT") {
+    if (this._currentStepIndex != value && this.openType === "EDIT" && value != 0) {
       this.saveDoc(this.currentDocument.status, 0)
     }
 
@@ -205,7 +206,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
     if (this.itemsField)
       this.itemsField.clear()
-
     this.showComponentOnCurrentStep(this._currentStepIndex + 1)
 
     this.checkStepComponent();
@@ -415,8 +415,13 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
           docAttrib: res.docAttrib
         }
         this.openType = "EDIT"
-        // /**И сохраняем его сразу как черновик*/
-        this.saveDoc(this.currentDocument.status, 0)
+
+        /**И сохраняем его сразу как черновик*/
+        if(this.currentDocument.id === undefined) {
+          console.log("И сохраняем его сразу как черновик", this.currentDocument.id)
+          this.saveDoc(this.currentDocument.status, 0)
+        }
+
       }),
       error: (err => this.messageService.show(MAKET_LOAD_ERROR, err.error.message, ERROR))
     })
@@ -425,7 +430,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   saveDoc(docStatus: DocStat, reg: number) {
     if (!this.currentDocument || docStatus === "INCORRECT") return
     this.currentDocument.status = docStatus
-
     if (this.currentDocument.id === undefined) {
       this.createDocument$ = this.backService.createDocument(this.currentDocument).subscribe({
         next: (res => {
@@ -446,6 +450,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         })
       })
     }
+    this.changeDetection.detectChanges()
   }
 
   private docSaved(message: string, message2: string) {

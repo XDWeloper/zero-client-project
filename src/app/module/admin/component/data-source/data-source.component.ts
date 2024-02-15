@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from "@angular/material/icon";
-import {IceDataSource, IIceDataSource, IVariablesMap} from "../../../../model/IceDataSource";
+import {IceDataSource, IDataSource, IVariablesMap} from "../../../../model/IceDataSource";
 import {IceInputComponent} from "../../../share-component/ice-input/ice-input.component";
 import {FormsModule} from "@angular/forms";
 import {DataSourceMap, DataSourceService} from "../../../../services/data-source.service";
@@ -17,13 +17,16 @@ import {ComponentMaket, IceDocumentMaket} from "../../../../interfaces/interface
 import {DocumentService} from "../../../../services/document.service";
 import {ComponentFilterPipe} from "../../../../pipe/component-filter.pipe";
 import {DataSourceFilterPipe} from "../../../../pipe/dataSource-filter.pipe";
-import {IceComponentType} from "../../../../constants";
+import {ERROR, IceComponentType, REQUEST_TEST_ERROR} from "../../../../constants";
 import {ComponentService} from "../../../../services/component.service";
 import {NgxMaskDirective} from "ngx-mask";
 import {MatTabsModule} from "@angular/material/tabs";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {MatCheckboxModule} from "@angular/material/checkbox";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
+import {MessageService} from "../../../../services/message.service";
+import {environment} from "../../../../../environments/environment";
+import {SpinnerService} from "../../../../services/spinner.service";
 
 @Component({
   selector: 'app-data-source',
@@ -35,26 +38,20 @@ import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 export class DataSourceComponent implements OnInit {
   dataSourceChanges: IceDataSource;
   relationChanges: { sourcePath: string, receiverComponentName: string }[] = []
-  dataSource: IIceDataSource;
+  dataSource: IDataSource;
   responseDataMap: DataSourceMap[] = [];
   protected isSelectComponentType: 'path' | 'body'
+  bffUrl = environment.bffURI + '/operation'
+  nativeString = ""
 
   @Input('dataSource')
-  set DataSource(value: IIceDataSource) {
+  set DataSource(value: IDataSource) {
     this.dataSource = value
-    this.dataSourceChanges = new IceDataSource()
-    this.dataSourceChanges.url = value.url
-    this.dataSourceChanges.id = value.id
-    this.dataSourceChanges.relation = value.relation
-    this.dataSourceChanges.event = value.event
-    this.dataSourceChanges.bodyVariables = value.bodyVariables
-    this.dataSourceChanges.pathVariables = value.pathVariables
-    this.dataSourceChanges.method = value.method
-    this.dataSourceChanges.name = value.name
-
+    this.dataSourceChanges = new IceDataSource(value.id,value.name,value.url,value.method,value.pathVariables,value.bodyVariables,value.relation,value.event, value.isNativeSource)
     if (value.relation) {
       this.relationChanges = [...value.relation]
     }
+    this.isNativeSource = value.isNativeSource
   }
 
   @Input('currentTemplate') currentTemplate: IceDocumentMaket
@@ -76,11 +73,39 @@ export class DataSourceComponent implements OnInit {
   protected urlIsValid: boolean = false;
 
   editVariable: IVariablesMap = {key:"",value:"",isAutoFill: true}
+  private _isNativeSource: boolean = true;
 
 
-  constructor(private dataSourceService: DataSourceService, private documentService: DocumentService,private componentService: ComponentService,private changeDetection: ChangeDetectorRef) {
+  constructor(
+    private dataSourceService: DataSourceService,
+    private documentService: DocumentService,
+    private componentService: ComponentService,
+    private changeDetection: ChangeDetectorRef,
+    private messageService: MessageService,
+    private spinnerService: SpinnerService) {
   }
 
+
+  get isNativeSource(): boolean {
+    return this._isNativeSource;
+  }
+
+  set isNativeSource(value: boolean) {
+
+    this.dataSourceChanges.isNativeSource = value
+    this.nativeString = value ? "Получение данных из нативного источника (запрос будет по адресу:" : "Получение данных из стороннего источника"
+
+    if(value){ /**Если запрос на наш бэк*/
+      this.dataSourceChanges.method = this.dataSource.isNativeSource ? this.dataSource.method : "GET"
+      this.dataSourceChanges.url = this.dataSource.isNativeSource ? this.dataSource.url : environment.resourceServerURL
+
+    } else {/**На сторонний*/
+      this.dataSourceChanges.method = !this.dataSource.isNativeSource ? this.dataSource.method : "GET"
+      this.dataSourceChanges.url = !this.dataSource.isNativeSource ? this.dataSource.url : "https://"
+    }
+
+    this._isNativeSource = value;
+  }
 
   get selectedTabIndex(): number {
     return this._selectedTabIndex;
@@ -150,7 +175,20 @@ export class DataSourceComponent implements OnInit {
 
   testConnection() {
     if (!this.dataSourceChanges.method || !this.urlIsValid) return
-    this.responseDataMap = [...this.dataSourceService.getData("")]
+    this.spinnerService.show()
+    this.dataSourceService.getData(this.dataSourceChanges).subscribe({
+      next  : (res  => {
+        console.log("getData ----- ",res)
+        this.responseDataMap = [...res]
+        this.spinnerService.hide()
+        this.changeDetection.detectChanges()
+      }),
+      error : (error =>  {
+        this.messageService.show(REQUEST_TEST_ERROR, error.message, ERROR)
+        this.spinnerService.hide()
+        this.SaveAndClose()
+      }),
+  })
 
     this.relationChanges.forEach(value => {
       let data = this.responseDataMap.find(value1 => value1.key === value.sourcePath)

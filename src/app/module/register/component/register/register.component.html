@@ -17,7 +17,7 @@
                       [toolTip]="loginPasswordProperties ? loginPasswordProperties.passwordValidatorHint : ''"></app-ice-input>
 
     <div class="mt-4 flex justify-between">
-      <a class="underline font-semibold font-sans" [ngClass]="isClicked ? 'text-red-500' : 'text-primary-base'" href="https://www.cmrbank.ru/" target="_blank" (click)="isClicked = true">Даю согласие на обработку персональных данных</a>
+      <a class="underline font-semibold font-sans" [ngClass]="isClicked ? 'text-error-base' : 'text-primary-base'" href="https://www.cmrbank.ru/" target="_blank" (click)="isClicked = true">Даю согласие на обработку персональных данных</a>
       <mat-slide-toggle  [(ngModel)]="personalDataAgree" (click)="validateFields()" [color]="'primary'"></mat-slide-toggle>
     </div>
 

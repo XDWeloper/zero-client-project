@@ -1,14 +1,10 @@
-import {PDFDocObject, PDFTableObject} from "../services/print.service";
-import {ComponentMaket, ComponentRuleForPDF, IceComponent, IceDocument} from "../interfaces/interfaces";
+import {PDFDocObject} from "../services/print.service";
+import {ComponentMaket, ComponentRuleForPDF} from "../interfaces/interfaces";
 import {IceComponentType} from "../constants";
 import {stripHtml} from "string-strip-html";
-import {IceMaketComponent} from "../module/admin/classes/icecomponentmaket";
-import {from, Observable, take} from "rxjs";
-import {fromArrayLike} from "rxjs/internal/observable/innerFrom";
-import {tap} from "rxjs/operators";
 
-const oneTab = 3 //пробелов у одного таба
-const PAY_TABLE_NAME = "pay_table" // Таблица безналичных расчетов(делаем в ручную)
+// const oneTab = 3 //пробелов у одного таба
+// const PAY_TABLE_NAME = "pay_table" // Таблица безналичных расчетов(делаем в ручную)
 
 export class AnketaScriptRule {
   currentCrfPdf: ComponentRuleForPDF
@@ -22,34 +18,34 @@ export class AnketaScriptRule {
     //let resRul: PDFDocObject[] = []
 
     this.documentComponent.filter(c => (c.printRule === undefined || (c.printRule && c.printRule.isPrint === true)))
-    .forEach(comp => {
-      this.currentCrfPdf = comp.printRule ? comp.printRule : {isPrint: comp.componentType != IceComponentType.TEXT}
-      if (comp && this.currentCrfPdf.isPrint) {
-        if (comp.componentType === IceComponentType.AREA ||
-          comp.componentType === IceComponentType.SELECT ||
-          comp.componentType === IceComponentType.PLACE ||
-          (comp.componentType === IceComponentType.INPUT
-            && comp.inputType != "checkbox"
-            && comp.inputType != "radio")) {
-          resRul.push(...this.setPdfRuleForAreaInputComponent(comp))
+      .forEach(comp => {
+        this.currentCrfPdf = comp.printRule ? comp.printRule : {isPrint: comp.componentType != IceComponentType.TEXT}
+        if (comp && this.currentCrfPdf.isPrint) {
+          if (comp.componentType === IceComponentType.AREA ||
+            comp.componentType === IceComponentType.SELECT ||
+            comp.componentType === IceComponentType.PLACE ||
+            (comp.componentType === IceComponentType.INPUT
+              && comp.inputType != "checkbox"
+              && comp.inputType != "radio")) {
+            resRul.push(...this.setPdfRuleForAreaInputComponent(comp))
+          }
+          if (comp.componentType === IceComponentType.INPUT && comp.inputType === "checkbox")
+            resRul.push(...this.setPdfRuleForCheckBoxComponent(comp))
+          if (comp.componentType === IceComponentType.TEXT)
+            resRul.push(...this.setPdfRuleForTextComponent(comp))
+          if (comp.componentType === IceComponentType.TABLE) {
+            resRul.push(...this.setPdfRuleForTableComponent(comp))
+          }
+          if (comp.componentType === IceComponentType.UPLOAD)
+            resRul.push(...this.setPdfRuleForUploadComponent(comp))
         }
-        if (comp.componentType === IceComponentType.INPUT && comp.inputType === "checkbox")
-          resRul.push(...this.setPdfRuleForCheckBoxComponent(comp))
-        if (comp.componentType === IceComponentType.TEXT)
-          resRul.push(...this.setPdfRuleForTextComponent(comp))
-        if (comp.componentType === IceComponentType.TABLE) {
-          resRul.push(...this.setPdfRuleForTableComponent(comp))
-        }
-        if (comp.componentType === IceComponentType.UPLOAD)
-          resRul.push(...this.setPdfRuleForUploadComponent(comp))
-      }
-    })
+      })
 
     return resRul as PDFDocObject[]
   }
 
   private setPdfRuleForTextComponent(comp: ComponentMaket): PDFDocObject[] {
-    let string = stripHtml(comp.value ? comp.value : "",{skipHtmlDecoding:true}).result
+    let string = stripHtml(comp.value ? comp.value : "", {skipHtmlDecoding: true}).result
     string = string.replaceAll("&nbsp;", "\n")
     return this.setPdfRule(string, "")
   }
@@ -75,7 +71,7 @@ export class AnketaScriptRule {
     }
     let result: PDFDocObject[] = []
 
-    if(label.length > 0)
+    if (label.length > 0)
       result.push({
         value: label,
         redLine: this.currentCrfPdf.redLine,
@@ -88,7 +84,7 @@ export class AnketaScriptRule {
         align: this.currentCrfPdf.align,
         tabCount: this.currentCrfPdf.tabCount
       })
-    if(value.length > 0)
+    if (value.length > 0)
       result.push({
         value: value,
         redLine: this.currentCrfPdf.redLine,
@@ -115,7 +111,7 @@ export class AnketaScriptRule {
       valueString = (comp.value && comp.value.placeString) ? comp.value.placeString : valueString
     else
       valueString = comp.value ? comp.value : valueString
-    return this.setPdfRule((comp.placeHolder ? comp.placeHolder + ": " : "") , valueString)
+    return this.setPdfRule((comp.placeHolder ? comp.placeHolder + ": " : ""), valueString)
   }
 
   getComponentFromDoc(id: number): ComponentMaket {
@@ -134,7 +130,7 @@ export class AnketaScriptRule {
 
     if (comp.tableType && comp.tableType === 1) {
       header = ["Плательщики", "Получатели"]
-      subHeader = [["Наименование", "Местонахождение (страна, город)"],["Наименование", "Местонахождение (страна, город)"]]
+      subHeader = [["Наименование", "Местонахождение (страна, город)"], ["Наименование", "Местонахождение (страна, город)"]]
     }
 
     if (comp.tableType && comp.tableType === 2) {
@@ -148,27 +144,27 @@ export class AnketaScriptRule {
       subHeader = [["1"], ["2"], ["3"], ["4"], ["5"]]
     }
 
-    if(comp.tableType === undefined){
+    if (comp.tableType === undefined) {
       header = comp.tableProp.header.map(value => value.title)
       subHeader = comp.tableProp.header.map(value => value.subHeader.map(value1 => value1.title))
 
-      subHeader.map(val=> val.length).forEach(arrLenght => {
-        let resArr:[][] = [];
+      subHeader.map(val => val.length).forEach(arrLenght => {
+        let resArr: [][] = [];
         comp.value.forEach((val: any[]) => {
-          let resultArr:[] | undefined = val.filter((value, index) => this.predIndex <= index && index < (arrLenght + this.predIndex)) as []
-          if(resultArr)
+          let resultArr: [] | undefined = val.filter((value, index) => this.predIndex <= index && index < (arrLenght + this.predIndex)) as []
+          if (resultArr)
             resArr.push(resultArr)
         })
         this.predIndex = arrLenght
         body.push(resArr)
       })
 
-    }else {
-      subHeader.map(val=> val.length).forEach(arrLenght => {
-        let resArr:[][] = [];
+    } else {
+      subHeader.map(val => val.length).forEach(arrLenght => {
+        let resArr: [][] = [];
         (comp.value as [{}]).map(row => Object.values(row) as []).forEach(val => {
-          let resultArr:[] | undefined = val.filter((value, index) => this.predIndex <= index && index < (arrLenght + this.predIndex)) as []
-          if(resultArr)
+          let resultArr: [] | undefined = val.filter((value, index) => this.predIndex <= index && index < (arrLenght + this.predIndex)) as []
+          if (resultArr)
             resArr.push(resultArr)
         })
         this.predIndex = arrLenght
@@ -198,7 +194,7 @@ export class AnketaScriptRule {
   }
 
   private setPdfRuleForUploadComponent(comp: ComponentMaket): PDFDocObject[] {
-    if(!comp.value) return []
+    if (!comp.value) return []
     let arr = comp.value as Array<{ name: string, size: number }>
     let header: string[] = ["Имя файла", "Размер"]
     let subHeader = [1, 2]

@@ -7,6 +7,9 @@ import {dialogCloseAnimationDuration, dialogOpenAnimationDuration, IceComponentT
 import {IceMaketComponent} from "../../classes/icecomponentmaket";
 import {ComponentType} from "@angular/cdk/overlay";
 import {OptionListComponent} from "../option-list/option-list.component";
+import {EventObject, EventObjectType} from "../../../../interfaces/interfaces";
+import {EventService} from "../../../../services/event.service";
+import {EventControlPropComponent} from "../../event-control-prop/event-control-prop.component";
 
 @Component({
   selector: 'app-properties',
@@ -38,10 +41,11 @@ export class PropertiesComponent implements OnInit, OnDestroy {
     else this.currentComponent.frameColor = undefined
   }
 
-  constructor(private componentService: ComponentService,public dialog: MatDialog) {
+  constructor(private componentService: ComponentService,public dialog: MatDialog,public eventService: EventService) {
   }
 
   ngOnDestroy(): void {
+    if(this.selectedComponent$)
         this.selectedComponent$.unsubscribe()
     }
 
@@ -61,6 +65,10 @@ export class PropertiesComponent implements OnInit, OnDestroy {
     })
 
 
+  }
+
+  openEventControlDialog(){
+    this.openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration, EventControlPropComponent)
   }
 
   openMasterControlDialog(){

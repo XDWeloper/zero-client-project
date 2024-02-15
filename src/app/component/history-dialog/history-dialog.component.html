@@ -26,7 +26,7 @@
           <td class="w-[30%]"
               [ngClass]="{'bg-cyan-100/50':row.status === 'CONTROL',
             'bg-yellow-100/50':row.status === 'AGREE',
-            'bg-red-100/50': (row.status === 'REJECTED' || row.status === 'INCORRECT')}"
+            'bg-error-base/50': (row.status === 'REJECTED' || row.status === 'INCORRECT')}"
               mat-cell *matCellDef="let row"> {{ row.status | docStatus }}</td>
         </ng-container>
 

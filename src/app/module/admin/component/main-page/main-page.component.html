@@ -50,7 +50,7 @@
             <mat-icon class="component-panel-button-style text-gray-500" matTooltip="Область ввода"
                       [matTooltipPosition]="'right'" (click)="createComponent('area')">crop_din
             </mat-icon>
-            <mat-icon class="component-panel-button-style text-red-500" matTooltip="Таблица"
+            <mat-icon class="component-panel-button-style text-error-base" matTooltip="Таблица"
                       [matTooltipPosition]="'right'" (click)="createComponent('table')">view_comfy
             </mat-icon>
             <mat-icon class="component-panel-button-style text-cyan-500" matTooltip="Выбор"
@@ -77,10 +77,11 @@
             </div>
           </div>
         </div>
-        <div *ngIf="currentTemplate" class="mt-2 flex min-h-[10%]">
+        <div *ngIf="currentTemplate " class="mt-2 flex min-h-[10%]">
           <div class="w-10 "></div>
           <div class="w-[90%] mx-auto border border-primary-base p-1 flex flex-wrap" (contextmenu)="rightClick($event)" (click)="dataSourceMenuOpen=false">
-          <app-data-source *ngFor="let dataSource of currentTemplate.docAttrib.workerList; let i = index"
+          <app-data-source
+                            *ngFor="let dataSource of getWorkerList(); let i = index"
                            [dataSource]="currentTemplate.docAttrib.workerList[i]"
                            [currentTemplate]="currentTemplate"
                            (currentDataSource)="currentDataSource = $event"

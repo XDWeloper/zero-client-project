@@ -50,7 +50,7 @@ export class IceInputComponent implements ControlValueAccessor, OnInit{
   @Input()
   readonly : boolean;
   @Output()
-  isValid = new EventEmitter
+  isValid = new EventEmitter<boolean>(false)
   @Input()
   errorText: string
 
@@ -81,6 +81,7 @@ export class IceInputComponent implements ControlValueAccessor, OnInit{
     } else {
       this.isValid.next(true)
     }
+
   }
 
   onChange(_: any) {

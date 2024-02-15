@@ -2,7 +2,7 @@ import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component} fr
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from "@angular/material/icon";
 import {
-  ComponentBound,
+  ComponentBound, ComponentInputType,
   ComponentRuleForPDF,
   ControlPropType,
   Header,
@@ -41,7 +41,7 @@ export class TableComponent implements IceComponent, AfterViewInit{
   componentType: IceComponentType;
   correctX: number;
   correctY: number;
-  inputType: string;
+  inputType: ComponentInputType;
   placeHolder: string;
   required: boolean;
   stepNum: number;

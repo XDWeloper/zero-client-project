@@ -3,12 +3,12 @@
   <div
     class="w-full mt-2 border-t border-b border-color flex items-center h-10 p-1 bg-primary-dark dark:bg-dark-background rounded-lg border border-gray-200" >
     <button *ngIf="currentDocument && currentDocument.status ==='CONTROL'" (click)="changeStatusWithReason('INCORRECT')" matTooltip="Вернуть клиенту для корректировки" class="toolBar-button-style">
-      <mat-icon class="text-red-300 font-bold">arrow_back</mat-icon>
+      <mat-icon class="text-error-base font-bold">arrow_back</mat-icon>
       <span class="ml-1">Не корректно</span>
     </button>
 
     <button *ngIf="currentDocument && currentDocument.status ==='CONTROL'" (click)="changeStatusWithReason('REJECTED')" matTooltip="Отвергнуто" class="toolBar-button-style">
-      <mat-icon class="text-red-300 font-bold">block</mat-icon>
+      <mat-icon class="text-error-base font-bold">block</mat-icon>
       <span class="ml-1">Отвергнуть</span>
     </button>
     <button *ngIf="isDocumentRequiredFieldNotEmpty && openType === 'EDIT'" matTooltip="Отправить клиенту на подтверждение"
@@ -64,17 +64,17 @@
 
     <div *ngIf="openType === 'EDIT'" class="w-[20%] ml-6 overflow-auto border-l border-color px-4 pt-2">
       <p *ngIf="commentText" class="text-gray-600 dark:text-gray-300 overflow-auto border-b border-color" >{{ commentText }}</p>
-      <p *ngIf="checkedText" class="text-red-600 dark:text-gray-300 overflow-auto border-b border-color" >{{ checkedText }}</p>
-      <p *ngIf="!isDocumentRequiredFieldNotEmpty" class="text-red-600 dark:text-gray-300 overflow-auto border-b border-color" >
+      <p *ngIf="checkedText" class="text-error-base dark:text-gray-300 overflow-auto border-b border-color" >{{ checkedText }}</p>
+      <p *ngIf="!isDocumentRequiredFieldNotEmpty" class="text-error-base dark:text-gray-300 overflow-auto border-b border-color" >
         Документ не может быть отправлен на рассмотрение в банк. Не заполнены обязательные поля документа.
       </p>
 
-      <div class="text-red-500 text-xs dark:text-red-300 overflow-auto" *ngFor="let item of validationText">
+      <div class="text-red-500 text-xs dark:text-rerror-base overflow-auto" *ngFor="let item of validationText">
         <span class="text-black">&bull;</span>{{ item }}</div>
       <div *ngIf="currentDocument"  class="absolute bottom-0 w-fill border-t border-color pt-4 flex flex-wrap">
         <span class="relative flex h-2 w-2 ml-1 mt-1">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-300 opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error-base opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-error-base"></span>
         </span>
         <span class="ml-1">- Обязательное поле!!!</span>
       </div>

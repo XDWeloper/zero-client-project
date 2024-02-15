@@ -47,14 +47,6 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   private resizeStartX: number
   private resizeStartY: number
   private isRightClicked = false
-  private componentEventType: EventObject.COMPONENT_DESTROY | EventObject.COMPONENT_INIT | EventObject.COMPONENT_CHANGE_VALUE | EventObject.COMPONENT_CLICK
-
-  getEventName(){
-    return Object.keys(EventObject).filter(value => value.includes("COMPONENT")).map((value, index) => Object.values(EventObject)[index])
-  }
-
-  // @ViewChild('component', {read: ElementRef})
-  // private component: ElementRef
   isResizable = true
 
 
@@ -64,9 +56,6 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
               private documentService: DocumentService, private changeDetection: ChangeDetectorRef) {
     documentService.lastComponentIndex++
     super(0, documentService.lastComponentIndex)
-
-
-    //console.log(this.getEventName())
   }
 
 

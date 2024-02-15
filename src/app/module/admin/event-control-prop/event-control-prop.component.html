@@ -1,0 +1,67 @@
+<div class="w-full h-full p-1 rounded-md flex flex-col">
+  <header class="flex-none text-center p-1">
+    <mat-icon class="close-button" (click)="close()">close</mat-icon>
+    Управление событиями
+  </header>
+
+  <content class="flex-1 border p-2 flex flex-col space-y-2">
+
+    <div class="flex-none relative mt-2">
+      <select class="peer h-full w-full rounded-[7px] border border-gray-200 border-t-transparent bg-transparent px-3 py-2.5
+                     font-sans text-sm font-normal text-gray-700 outline outline-0 transition-all placeholder-shown:border
+                     placeholder-shown:border-gray-200 placeholder-shown:border-t-gray-200 focus:border-2 focus:border-primary-base
+                     focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-gray-50 dark:text-white dark:border-gray-50"
+              [(ngModel)]="currentEventName">
+        <option *ngFor="let event of eventList" [value]="event.eventName">{{ event.eventTitle }}</option>
+      </select>
+      <label
+        class="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none
+      text-[11px] font-normal leading-tight text-gray-400 transition-all before:pointer-events-none before:mt-[6.5px]
+      before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l
+      before:border-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border
+      after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-gray-200
+      after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-gray-500
+      peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px]
+      peer-focus:leading-tight peer-focus:text-primary-base peer-focus:before:border-t-2 peer-focus:before:border-l-2
+      peer-focus:before:border-primary-base peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-primary-base
+      peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent
+      peer-disabled:peer-placeholder-shown:text-gray-500 dark:peer-focus:text-white ">
+        Событие обьекта
+      </label>
+    </div>
+
+    <div class="flex-1 flex justify-between items-center">
+      <div class="h-full w-[45%] flex flex-col">
+        <p class="flex-none text-center">Существующие обработчики</p>
+        <div class="flex-1 w-full border p-1 overflow-auto">
+          <div class="cursor-pointer hover:bg-primary-light hover:text-white px-1 py-1"
+               (click)="selectedCurrentWorkerItem = currentWorker" [ngClass]="{'bg-primary-light text-white' : currentWorker === _selectedCurrentWorkerItem}"
+               *ngFor="let currentWorker of currentEventWorkerList; let i = index">
+            <span class="">{{ currentWorker.workerName }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-col relative">
+        <mat-icon *ngIf="_selectedCurrentWorkerItem != undefined" (click)="fromCurrentToAll()" class="scale-125 cursor-pointer hover:text-warning-base duration-300 py-1">keyboard_arrow_right</mat-icon>
+        <mat-icon *ngIf="_selectedAllWorkerItem != undefined" (click)="fromAllToCurrent()" class="scale-125 cursor-pointer hover:text-warning-base duration-300 py-1">keyboard_arrow_left</mat-icon>
+      </div>
+      <div class="h-full w-[45%] flex flex-col">
+        <p class="flex-none text-center">Возможные обработчики</p>
+        <div class="flex-1 h-full w-full border p-1 overflow-auto">
+          <div class=" cursor-pointer hover:bg-primary-light hover:text-white px-1 py-1"
+               (click)="selectedAllWorkerItem = allWorker" [ngClass]="{'bg-primary-light text-white' : allWorker === _selectedAllWorkerItem}"
+               *ngFor="let allWorker of allWorkerList; let i = index">
+            <span class="">{{ allWorker.workerName }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </content>
+
+  <footer class="flex-none border-t border-t-primary-base p-1 flex justify-end items-center">
+    <button class="footer-button-style " (click)="saveAndClose()">Сохранить</button>
+  </footer>
+
+</div>

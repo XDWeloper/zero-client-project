@@ -26,7 +26,7 @@
         </mat-icon>
         <p class="ml-4">&nbsp;{{ file.name }} </p>
       </div>
-      <mat-icon *ngIf="file.id != undefined" class="text-gray-300 hover:text-red-500 duration-300 cursor-pointer mr-4"
+      <mat-icon *ngIf="file.id != undefined" class="text-gray-300 hover:text-error-base duration-300 cursor-pointer mr-4"
                 (click)="deleteFile(i)">delete_forever
       </mat-icon>
 
@@ -41,11 +41,11 @@
 
   <div class="absolute bottom-0 left-2 w-[98%] border-t border-t-primary-base h-[8%] text-gray-900">
     <p class="m-0">Общий размер файлов: {{ sumSize }} мб.</p>
-    <p class="m-0 text-red-500">{{ maxFilesizeString }}</p>
+    <p class="m-0 text-error-base">{{ maxFilesizeString }}</p>
   </div>
 
   <span *ngIf="required" class="absolute flex h-2 w-2 top-0 right-0 z-20">
-      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-300 opacity-75"></span>
-      <span class="relative inline-flex rounded-full h-2 w-2 bg-red-500"></span>
+      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error-base opacity-75"></span>
+      <span class="relative inline-flex rounded-full h-2 w-2 bg-error-base"></span>
     </span>
 </div>
