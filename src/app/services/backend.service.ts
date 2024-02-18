@@ -147,7 +147,7 @@ export class BackendService {
         value.value,
         value.componentType,
         value.notification ? value.notification : value.placeHolder,
-        value.enabled ? value.enabled : true))
+        value.enabled ? value.enabled : false))
       maket.docAttrib.componentValueList = componentValueList
     return maket
   }

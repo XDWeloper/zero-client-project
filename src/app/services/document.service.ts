@@ -26,6 +26,14 @@ export class DocumentService {
     })
   }
 
+
+  getComponentByName(docId: number, name: string):ComponentMaket | undefined {
+    return this.templateList
+      .find(doc => doc.docId === docId)
+      .docStep.map(step => step.componentMaket)
+      .flat().find(comp => comp.componentName === name)
+  }
+
   getMaxComponentID(id: number): number{
     return  Math.max(...this.getTemplateByDocId(id).docStep.map(s => s.componentMaket).flat(1).map(c => c.componentID))
   }

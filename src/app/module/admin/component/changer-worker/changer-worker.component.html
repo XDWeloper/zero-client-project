@@ -1,0 +1,49 @@
+<div (contextmenu)="rightClick($event)" (click)="showWorkerProp = true"
+     class="w-24 p-1  ml-1 hover:border hover:border-primary-light hover:bg-white duration-300 rounded-md cursor-pointer ">
+  <div class="w-full border border-primary-dark rounded-md flex justify-center items-center bg-white">
+    <mat-icon class="text-info-base">settings_ethernet</mat-icon>
+  </div>
+  <div class="text-xs text-center break-words p-0">{{ fieldChanger.name }}</div>
+</div>
+
+<div *ngIf="workerMenuOpen && workerMenuPosition" (mouseleave)="workerMenuOpen = false"
+     class="border border-primary-light bg-white rounded-md absolute p-2 -mt-1 -ml-1"
+     [ngStyle]="{'left.px': workerMenuPosition.x , 'top.px': workerMenuPosition.y}">
+  <ul class="list-group">
+    <li
+      class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-sm w-full"
+      (click)="editWorker()">
+      <mat-icon class="text-primary-base">edit</mat-icon>
+      <span class="ml-2">Редактировать источник данных</span>
+    </li>
+    <li
+      class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-sm w-full"
+      (click)="removeWorker()">
+      <mat-icon class="text-warning-base">clear</mat-icon>
+      <span class="ml-2">Удалить источник данных</span>
+    </li>
+  </ul>
+</div>
+
+
+<!--<div *ngIf="showWorkerProp"-->
+<!--     class="absolute top-0 left-0 h-screen w-screen flex justify-center items-center bg-gray-200 z-50 bg-opacity-50">-->
+
+<!--  &lt;!&ndash;  Настройка источника данных&ndash;&gt;-->
+<!--  <div class="w-[80%] h-[80%] border border-primary-dark rounded-md bg-white p-1 relative flex flex-col">-->
+
+<!--    <mat-icon class="close-button"-->
+<!--              (click)="showWorkerProp = false; currentDataSource.next(undefined);this.responseDataMap=[]">close-->
+<!--    </mat-icon>-->
+
+<!--    <p class="text-center text-lg flex-none">Настройка источника данных</p>-->
+
+<!--    <div class="flex-none flex">-->
+<!--      <app-ice-input class="flex-1" [(ngModel)]="dataSourceChanges.name" [label]="'Наименование источника'"-->
+<!--                     [inputType]="'text'"></app-ice-input>-->
+<!--      <app-ice-input class="ml-1 flex-wrap" [ngModel]="dataSourceChanges.id" [label]="'Идентификатор'"-->
+<!--                     [readonly]="true"></app-ice-input>-->
+<!--    </div>-->
+<!--  </div>-->
+<!--</div>-->
+

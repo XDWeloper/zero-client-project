@@ -1,6 +1,6 @@
 <div class="absolute z-10 rounded-lg border-solid"
      [ngStyle]="{'height.px':height,'width.px':width}"
-     [style.top.px]="top" [style.left.px]="left" [style.border-color]="frameColor"
+     [style.top.px]="top" [style.left.px]="left" [style.border-color]="localBorderColor"
      [ngClass]="{'border':frameColor}">
 
   <div class="w-full h-[40%] border-b border-b-gray-500">
@@ -43,9 +43,4 @@
     <p class="m-0">Общий размер файлов: {{ sumSize }} мб.</p>
     <p class="m-0 text-error-base">{{ maxFilesizeString }}</p>
   </div>
-
-  <span *ngIf="required" class="absolute flex h-2 w-2 top-0 right-0 z-20">
-      <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error-base opacity-75"></span>
-      <span class="relative inline-flex rounded-full h-2 w-2 bg-error-base"></span>
-    </span>
 </div>

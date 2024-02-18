@@ -38,7 +38,9 @@ import {TimeService} from "../../../../services/time.service";
 import {KeycloakService} from "../../../../services/keycloak.service";
 import {MessageService} from "../../../../services/message.service";
 import {TablePropComponent} from "../table-prop/table-prop.component";
-import {IceDataSource, IDataSource} from "../../../../model/IceDataSource";
+import {IceDataSourceWorker } from "../../../../workers/IceDataSourceWorker";
+import {FieldChangerWorker} from "../../../../workers/FiedChangerWorker";
+import {IDataSource, IWorker, WorkerType} from "../../../../workers/workerModel";
 
 @Component({
   selector: 'app-main-page',
@@ -60,8 +62,8 @@ export class MainPageComponent implements OnInit, OnDestroy {
   currentDoc: DocumentTreeTempl
   currentStep: StepTreeTempl
   currentTemplate: IceDocumentMaket
-  dataSourceMenuOpen = false
-  dataSourceMenuPosition: {x: number, y: number}
+  workerMenuOpen = false
+  workerMenuPosition: {x: number, y: number}
 
 
   @ViewChild('field', {read: ViewContainerRef})
@@ -81,7 +83,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
   user: User
   private _modify: boolean = false
   isBlock: boolean = false;
-  currentDataSource: IDataSource;
+  currentWorker : IWorker;
 
   constructor(private cellService: CellService,
               private router: Router,
@@ -408,30 +410,42 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
   rightClick($event: MouseEvent) {
     $event.preventDefault();
-    this.dataSourceMenuPosition = {x: $event.x, y: $event.y}
-    this.dataSourceMenuOpen = this.currentDataSource === undefined
+    this.workerMenuPosition = {x: $event.x, y: $event.y}
+    this.workerMenuOpen = this.currentWorker === undefined
     //this.modify = true
   }
 
-  addDataSource() {
+  addDataSource(workerType: WorkerType) {
     this.currentTemplate = this.documentService.getTemplateByDocId(this.currentDoc.id)
     if(!this.currentTemplate.docAttrib.workerList)
       this.currentTemplate.docAttrib.workerList = []
 
-    let newDataSource = new IceDataSource(
-      this.getDataSourceNextID(),
-      "Источник данных " + this.currentTemplate.docAttrib.workerList.length
-      )
-    this.currentTemplate.docAttrib.workerList.push(newDataSource)
+    let newWorker:IWorker
+    if(workerType === "NETDATASOURCE")
+      newWorker = new IceDataSourceWorker(
+        this.getDataSourceNextID(),
+        "Источник данных " + this.currentTemplate.docAttrib.workerList.length,
+        "NETDATASOURCE")
+    if(workerType === "FIELDCHANGER")
+      newWorker = new FieldChangerWorker(
+        this.getDataSourceNextID(),
+        "Обработчик " + this.currentTemplate.docAttrib.workerList.length,
+        "FIELDCHANGER")
+
+    if(!newWorker) return
+
+    this.currentTemplate.docAttrib.workerList.push(newWorker)
     this.modify = true
-    this.dataSourceMenuOpen = false
+    this.workerMenuOpen = false
   }
 
   private getDataSourceNextID(): number {
     return this.currentTemplate.docAttrib.workerList.length > 0 ? Math.max( ...this.currentTemplate.docAttrib.workerList.map(value => value.id) ) + 1 : 0
   }
 
-  getWorkerList() {
-    return this.currentTemplate.docAttrib.workerList.sort((a, b) => a.id - b.id)
+  getWorkerList(workerType: WorkerType):IWorker[] {
+    return this.currentTemplate.docAttrib.workerList.filter(item => item.type === workerType).sort((a, b) => a.id - b.id)
   }
+
+  //protected readonly IceDataSourceWorker = IceDataSourceWorker;
 }

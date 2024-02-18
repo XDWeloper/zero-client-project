@@ -7,7 +7,7 @@
            [value]="currentComponent.componentID" [readOnly]="true">
     <p class="col-span-4">Имя</p>
     <input class="col-span-8 w-[90%] text-center rounded-md dark:bg-slate-700" type="text"
-           [(ngModel)]="currentComponent.componentName">
+           [(ngModel)]="currentComponent.componentName" (focusout)="checkComponentName()">
     <p class="col-span-4">Тип</p>
     <input class="col-span-8 w-[90%] text-center rounded-md dark:bg-slate-700" type="text"
            [value]="currentComponent.componentType" [readOnly]="true">
@@ -33,7 +33,7 @@
     <mat-accordion
       *ngIf="currentComponent.inputType !== 'button'"
       class="col-span-12 w-[95%] text-center rounded-md dark:bg-slate-700 bg-gray-200 border border-primary-light relative">
-      <mat-expansion-panel hideToggle [expanded]="currentComponent.printRule.isPrint === true">
+      <mat-expansion-panel hideToggle [expanded]="false">
         <mat-expansion-panel-header>
           <mat-panel-title>
             <p>Параметры печати компонента</p>

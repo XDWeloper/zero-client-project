@@ -9,10 +9,9 @@ import {MatTooltipModule} from "@angular/material/tooltip";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {MatDialogRef} from "@angular/material/dialog";
 import {IceDocumentMaket, IceEvent} from "../../../../interfaces/interfaces";
-import {IceMaketComponent} from "../../classes/icecomponentmaket";
-import {IWorker} from "../../../../model/IceDataSource";
 import {EventNameTitle, EventService} from "../../../../services/event.service";
 import {DocumentService} from "../../../../services/document.service";
+import {IWorker} from "../../../../workers/workerModel";
 
 interface LocalWorker {workerName: string, workerId: number}
 
@@ -79,7 +78,7 @@ export class DocumentSettingsComponent implements OnInit{
   saveAndClose() {
     if(!this.currentMaket.docAttrib.documentEventList)
       this.currentMaket.docAttrib.documentEventList = []
-    this.currentMaket.docAttrib.documentEventList.splice(1, this.currentMaket.docAttrib.documentEventList.length)
+    this.currentMaket.docAttrib.documentEventList.splice(0, this.currentMaket.docAttrib.documentEventList.length)
     this.currentMaket.docAttrib.documentEventList.push(...this.localEvent)
     this.dialogRef.close(1)
   }
@@ -130,5 +129,11 @@ export class DocumentSettingsComponent implements OnInit{
       wrapper[0].setAttribute("style","height:100%")
     }
   }
+
+  clearAllEvent() {
+    this.localEvent.splice(0,this.localEvent.length)
+    this.setEventWorkerList(this.currentEventName)
+  }
+
 
 }

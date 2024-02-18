@@ -10,6 +10,7 @@ import {
 import {AlertColor, IceComponentType} from "../../../constants";
 import {ComponentService} from "../../../services/component.service";
 import {Subscription} from "rxjs";
+import {list} from "postcss";
 
 @Component({
   selector: 'app-input',
@@ -33,7 +34,7 @@ export class InputComponent implements IceComponent {
   minVal: number;
   maxVal: number;
 
-  private _frameColor: string;
+  frameColor: string;
   required: boolean;
   cellNumber: number;
   componentBound: ComponentBound;
@@ -81,8 +82,7 @@ export class InputComponent implements IceComponent {
 
 
       if(componentId === this.componentID && value === "NaN") {
-        if(item.checkedText && item.checkedText.length > 0)
-          this.localBorderColor = AlertColor
+        this.localBorderColor = (item.checkedText && item.checkedText.length > 0) ? AlertColor : this.frameColor
         this.checkedText = item.checkedText
       }
 
@@ -113,15 +113,6 @@ export class InputComponent implements IceComponent {
   }
 
 
-  get frameColor(): string {
-    return this._frameColor;
-  }
-
-  set frameColor(value: string) {
-    this._frameColor = value;
-    this.localBorderColor = this.frameColor
-  }
-
   get value(): any {
     return this._value;
   }
@@ -134,7 +125,7 @@ export class InputComponent implements IceComponent {
       this.checked = value
     }
       this._value = value;
-    this.checkValid()
+    //this.checkValid()
     if(this.componentID) {
       this.componentService.setComponentValue({componentId: this.componentID, value: value})
     }
@@ -163,5 +154,8 @@ export class InputComponent implements IceComponent {
           this.localBorderColor = this.frameColor
       }
     }
+  }
+
+  update(): void {
   }
 }

@@ -3,13 +3,15 @@ import {User} from "../../../../model/User";
 import {DOCUMENT_LOAD_ERROR, ERROR, TAB_DOCUMENT_LIST, TAB_DOCUMENT_SHOW} from "../../../../constants";
 import {MessageService} from "../../../../services/message.service";
 import {BackendService} from "../../../../services/backend.service";
-import {IceDocument, OpenDocType} from "../../../../interfaces/interfaces";
+import {EventObject, IceDocument, OpenDocType} from "../../../../interfaces/interfaces";
 import {DocumentEditorComponent} from "../document-editor/document-editor.component";
 import {TabService} from "../../../../services/tab.service";
 import {Subscription} from "rxjs";
 import {Router} from "@angular/router";
 import {TimeService} from "../../../../services/time.service";
 import {KeycloakService} from "../../../../services/keycloak.service";
+import {EventService} from "../../../../services/event.service";
+import {WorkerService} from "../../../../services/worker.service";
 
 @Component({
   selector: 'app-main-page',
@@ -35,7 +37,9 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
               tabService: TabService,
               private router: Router,
               private timeService: TimeService,
-              private keycloakService: KeycloakService) {
+              private keycloakService: KeycloakService,
+              private eventService: EventService,
+              private workerService: WorkerService) {
     /**Разрешить обновление токенов*/
     timeService.isRefreshToken = true
 
@@ -74,6 +78,13 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
         this.tempOpenedComponent = res
         //this.openedDocument = res
         this.currentTabNum = TAB_DOCUMENT_SHOW
+        /**Создаем воркеры*/
+        if(this.tempOpenedComponent.docAttrib && this.tempOpenedComponent.docAttrib.workerList)
+          this.workerService.createWorker(this.tempOpenedComponent)
+
+        /**Создаем событие открытие докуента*/
+        this.eventService.launchEvent(EventObject.ON_DOCUMENT_OPEN, this.tempOpenedComponent,this.tempOpenedComponent.docAttrib.documentEventList)
+
       }),
       error: (err => {
         this.messageService.show(DOCUMENT_LOAD_ERROR,err.error.message,ERROR)

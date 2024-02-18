@@ -36,6 +36,7 @@
         <div class="flex-1 w-full border p-1 overflow-auto">
           <div class="cursor-pointer hover:bg-primary-light hover:text-white px-1 py-1"
                (click)="selectedCurrentWorkerItem = currentWorker" [ngClass]="{'bg-primary-light text-white' : currentWorker === _selectedCurrentWorkerItem}"
+               (dblclick)="selectedCurrentWorkerItem = currentWorker;fromCurrentToAll()"
                *ngFor="let currentWorker of currentEventWorkerList; let i = index">
             <span class="">{{ currentWorker.workerName }}</span>
           </div>
@@ -50,6 +51,7 @@
         <div class="flex-1 h-full w-full border p-1 overflow-auto">
           <div class=" cursor-pointer hover:bg-primary-light hover:text-white px-1 py-1"
                (click)="selectedAllWorkerItem = allWorker" [ngClass]="{'bg-primary-light text-white' : allWorker === _selectedAllWorkerItem}"
+               (dblclick)="selectedAllWorkerItem = allWorker;fromAllToCurrent()"
                *ngFor="let allWorker of allWorkerList; let i = index">
             <span class="">{{ allWorker.workerName }}</span>
           </div>
@@ -61,6 +63,8 @@
   </content>
 
   <footer class="flex-none border-t border-t-primary-base p-1 flex justify-end items-center">
+    <button class="footer-button-style bg-warning-base" (click)="clearAllEvent()" *ngIf="localEvent.length > 0">Удалить все</button>
+    <div class="w-1"></div>
     <button class="footer-button-style " (click)="saveAndClose()">Сохранить</button>
   </footer>
 

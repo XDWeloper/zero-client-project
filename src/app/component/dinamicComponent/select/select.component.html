@@ -1,19 +1,13 @@
 <div     [ngStyle]="{'height.px':height,'width.px':width}"
-         [style.top.px]="top" [style.left.px]="left" [style.border-color]="localBorderColor"
-         [ngClass]="{'border':localBorderColor}" *ngIf="visible"
-         class="absolute z-10 flex justify-center items-center rounded-lg m-1 border-solid" >
+         [style.top.px]="top + 4" [style.left.px]="left + 4" [style.border-color]="localBorderColor"
+         *ngIf="visible"
+         class="absolute z-10 flex justify-center items-center rounded-lg border hover:border-primary-base" >
 
-  <select class="w-full h-[98%] bg-white border-solid hover:border hover:border-primary-base dark:bg-slate-700 dark:text-white pl-2 rounded-lg"
+  <select class="w-full h-[98%] bg-white pl-2 rounded-lg cursor-pointer"
           [(ngModel)]="value" [disabled]="!enabled" [matTooltip]="checkedText" (click)="changeComponent()" >
 <!--    <option [value]="-888888888888" hidden>{{placeHolder}}</option>-->
     <option [value]="undefined" hidden>{{placeHolder}}</option>
     <option *ngFor="let item of optionList" [value]="item">{{ item }}</option>
   </select>
-
-  <span *ngIf="required && checkedText" class="absolute flex h-2 w-2 top-0 right-0">
-    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-error-base opacity-75"></span>
-    <span class="relative inline-flex rounded-full h-2 w-2 bg-error-base"></span>
-  </span>
-
 </div>
 

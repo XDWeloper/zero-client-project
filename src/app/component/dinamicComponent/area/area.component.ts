@@ -6,7 +6,9 @@ import {
   ComponentRuleForPDF,
   ControlPropType,
   IceComponent,
+  IceEvent,
   MasterControl,
+  TableProperties,
   TextPosition
 } from "../../../interfaces/interfaces";
 import {AlertColor, IceComponentType} from "../../../constants";
@@ -20,6 +22,12 @@ export class AreaComponent implements IceComponent, OnDestroy {
 
   constructor(private cellService: CellService, private componentService: ComponentService) {
   }
+
+  tableProp?: TableProperties;
+    componentEvent?: IceEvent[];
+    update(): void {
+        throw new Error('Method not implemented.');
+    }
 
   tableType: number;
 
@@ -45,7 +53,7 @@ export class AreaComponent implements IceComponent, OnDestroy {
   inputType: ComponentInputType;
   required: boolean;
   textPosition: TextPosition;
-  private _frameColor: string;
+  frameColor: string;
   notification: string | undefined;
   checkedText: string | undefined = undefined
 
@@ -78,8 +86,6 @@ export class AreaComponent implements IceComponent, OnDestroy {
       let value = item.value
 
       if(componentId === this.componentID && value === "NaN") {
-        if(item.checkedText && item.checkedText.length > 0)
-          this.localBorderColor = AlertColor
         this.checkedText = item.checkedText
       }
 
@@ -116,16 +122,6 @@ export class AreaComponent implements IceComponent, OnDestroy {
 
   }
 
-
-  get frameColor(): string {
-    return this._frameColor;
-  }
-
-  set frameColor(value: string) {
-    this._frameColor = value;
-    this.localBorderColor = this._frameColor
-  }
-
   get value(): any {
     return this._value;
   }
@@ -137,12 +133,10 @@ export class AreaComponent implements IceComponent, OnDestroy {
   }
 
   checkValid() {
-    if(this.value){
-      if (this.maxLength < this.value.length || this.minLength > this.value.length)
+      if ((!this.value && this.required) || (this.value && (this.maxLength < this.value.length || this.minLength > this.value.length)))
         this.localBorderColor = AlertColor
       else
         this.localBorderColor = this.frameColor
-    }
   }
 
   changeComponent() {

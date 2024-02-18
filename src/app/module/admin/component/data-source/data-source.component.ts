@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from "@angular/material/icon";
-import {IceDataSource, IDataSource, IVariablesMap} from "../../../../model/IceDataSource";
+import {IceDataSourceWorker } from "../../../../workers/IceDataSourceWorker";
 import {IceInputComponent} from "../../../share-component/ice-input/ice-input.component";
 import {FormsModule} from "@angular/forms";
 import {DataSourceMap, DataSourceService} from "../../../../services/data-source.service";
@@ -27,6 +27,7 @@ import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {MessageService} from "../../../../services/message.service";
 import {environment} from "../../../../../environments/environment";
 import {SpinnerService} from "../../../../services/spinner.service";
+import {IDataSource, IVariablesMap, IWorker} from "../../../../workers/workerModel";
 
 @Component({
   selector: 'app-data-source',
@@ -36,7 +37,7 @@ import {SpinnerService} from "../../../../services/spinner.service";
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DataSourceComponent implements OnInit {
-  dataSourceChanges: IceDataSource;
+  dataSourceChanges: IceDataSourceWorker;
   relationChanges: { sourcePath: string, receiverComponentName: string }[] = []
   dataSource: IDataSource;
   responseDataMap: DataSourceMap[] = [];
@@ -44,18 +45,19 @@ export class DataSourceComponent implements OnInit {
   bffUrl = environment.bffURI + '/operation'
   nativeString = ""
 
-  @Input('dataSource')
-  set DataSource(value: IDataSource) {
-    this.dataSource = value
-    this.dataSourceChanges = new IceDataSource(value.id,value.name,value.url,value.method,value.pathVariables,value.bodyVariables,value.relation,value.event, value.isNativeSource)
-    if (value.relation) {
-      this.relationChanges = [...value.relation]
+  @Input("worker")
+  set DataSource(value: IWorker) {
+    let newValue = value as IDataSource
+    this.dataSource = newValue
+    this.dataSourceChanges = new IceDataSourceWorker(newValue.id,newValue.name,"NETDATASOURCE",newValue.url,newValue.method,newValue.pathVariables,newValue.bodyVariables,newValue.relation,newValue.event, newValue.isNativeSource)
+    if (newValue.relation) {
+      this.relationChanges = [...newValue.relation]
     }
-    this.isNativeSource = value.isNativeSource
+    this.isNativeSource = newValue.isNativeSource
   }
 
   @Input('currentTemplate') currentTemplate: IceDocumentMaket
-  @Output('currentDataSource') currentDataSource = new EventEmitter<IceDataSource>()
+  @Output('currentWorker') currentWorker = new EventEmitter<IWorker>()
   dataSourceMenuOpen: boolean = false;
   dataSourceMenuPosition: any;
   private _showDatSourceProp = false;
@@ -74,7 +76,7 @@ export class DataSourceComponent implements OnInit {
 
   editVariable: IVariablesMap = {key:"",value:"",isAutoFill: true}
   private _isNativeSource: boolean = true;
-
+  currentDoc: IceDocumentMaket
 
   constructor(
     private dataSourceService: DataSourceService,
@@ -132,6 +134,8 @@ export class DataSourceComponent implements OnInit {
 
   ngOnInit() {
     this.initComponentList()
+    if(this.currentTemplate)
+      this.currentDoc = this.documentService.getTemplateByDocId(this.currentTemplate.docId)
   }
 
   revertMenu() {
@@ -154,20 +158,22 @@ export class DataSourceComponent implements OnInit {
     if (index != undefined)
       this.currentTemplate.docAttrib.workerList.splice(index, 1)
     this.revertMenu()
-    this.currentDataSource.next(undefined)
+    this.currentWorker.next(undefined)
     this.componentService.setModified(true)
 
   }
 
   SaveAndClose() {
-    let templ = this.documentService.getTemplateByDocId(this.currentTemplate.docId)
-    let tamplDataSourceIndex = templ.docAttrib.workerList.findIndex(value => value === this.dataSource)
-    templ.docAttrib.workerList.splice(tamplDataSourceIndex, 1)
+    //let templ = this.documentService.getTemplateByDocId(this.currentTemplate.docId)
+    let tamplDataSourceIndex = this.currentDoc.docAttrib.workerList.findIndex(value => value === this.dataSource)
+    this.currentDoc.docAttrib.workerList.splice(tamplDataSourceIndex, 1)
 
+    if(this.dataSourceChanges.relation)
+      this.dataSourceChanges.relation.splice(0,this.dataSourceChanges.relation.length)
     this.dataSourceChanges.relation = [...this.relationChanges]
-    this.dataSource = {...this.dataSourceChanges}
-    this.currentDataSource.next(undefined)
-    templ.docAttrib.workerList.push(this.dataSource)
+    this.dataSource = {...this.dataSourceChanges as IDataSource}
+    this.currentWorker.next(undefined)
+    this.currentDoc.docAttrib.workerList.push(this.dataSource)
     this._showDatSourceProp = false
 
     this.componentService.setModified(true)
@@ -178,8 +184,8 @@ export class DataSourceComponent implements OnInit {
     this.spinnerService.show()
     this.dataSourceService.getData(this.dataSourceChanges).subscribe({
       next  : (res  => {
-        console.log("getData ----- ",res)
         this.responseDataMap = [...res]
+        this.rewriteOldRelation()
         this.spinnerService.hide()
         this.changeDetection.detectChanges()
       }),
@@ -190,10 +196,16 @@ export class DataSourceComponent implements OnInit {
       }),
   })
 
+  }
+
+  rewriteOldRelation(){
     this.relationChanges.forEach(value => {
-      let data = this.responseDataMap.find(value1 => value1.key === value.sourcePath)
-      if(data)
-        data.componentName = value.receiverComponentName
+      this.responseDataMap.filter(value1 => value1.key === value.sourcePath).forEach(value1 => {
+        value1.componentName = value.receiverComponentName
+      })
+      // let data = this.responseDataMap.find(value1 => value1.key === value.sourcePath)
+      // if(data)
+      //   data.componentName = value.receiverComponentName
     })
   }
 
@@ -210,6 +222,7 @@ export class DataSourceComponent implements OnInit {
 
   changeComponentForRelation(component: ComponentMaket) {
     this.tempComponentName = component.componentName
+
     if(this.isSelectComponentType) {
       return
     }
@@ -221,7 +234,22 @@ export class DataSourceComponent implements OnInit {
     }else {
       this.setComponentNameForRelation();
     }
+    /**заэнэблить компонент*/
+    this.documentService.getTemplateByDocId(this.currentTemplate.docId).docStep
+      .map(i => i.componentMaket)
+      .flat()
+      .find(i => i.componentID === 1).enabled = false
+
+
+    let currentComponent = this.componentService.componentCollection
+                              .map(item => item.instance)
+                              .find(item =>item.componentID == component.componentID)
+
+    if(currentComponent)
+      currentComponent.enabled = false
+
   }
+
 
   private setComponentNameForRelation() {
     let relationData = this.relationChanges.find(value => value.sourcePath === this.currentResponseData.key)
@@ -304,9 +332,14 @@ export class DataSourceComponent implements OnInit {
 
   initComponentList(){
     if(this.isSelectComponentType)
-      this.currentTemplateComponentList = this.currentTemplateComponentList.filter(value => value.componentType === IceComponentType.INPUT)
+      this.currentTemplateComponentList = this.currentTemplateComponentList
+        .filter(value => value.componentType === IceComponentType.INPUT)
     else
       this.currentTemplateComponentList = this.currentTemplate.docStep.map(value => value.componentMaket.flat()).flat()
 
+  }
+
+  removeRelation(index: number) {
+      this.relationChanges.splice(index,1)
   }
 }

@@ -383,6 +383,8 @@ export class DocumentComponent implements OnInit {
           error: (err => this.messageService.show("Ошибка  сохранения макета",err.error.message,ERROR))
         })
       } else {
+
+        console.log("modifyedMaket  ",modifyedMaket)
         this.backendService.updateMaket(modifyedMaket).subscribe({
           next: (() => {
             this.documentService.getDocById(modifyedMaket.docId).isModified = false

@@ -5,11 +5,14 @@ import {
   DialogButtonType,
   IceComponent,
   IceDocument,
+  IceEvent,
   MasterControl,
+  TableProperties,
   TextPosition,
   UploadFile
 } from "../../../interfaces/interfaces";
 import {
+  AlertColor,
   BANK_FILE_LOAD_ERROR,
   ERROR,
   FILE_SIZE_ERROR,
@@ -57,6 +60,7 @@ export class UploadComponent implements IceComponent, OnDestroy {
   stepNum: number;
   textPosition: TextPosition;
   private _value: any;
+  localBorderColor: string
 
   height: any;
   width: any;
@@ -95,6 +99,12 @@ export class UploadComponent implements IceComponent, OnDestroy {
               private stepService: StepService) {
   }
 
+  tableProp?: TableProperties;
+    componentEvent?: IceEvent[];
+    update(): void {
+        throw new Error('Method not implemented.');
+    }
+
   tableType: number;
     checkedText?: string;
     optionList?: string[];
@@ -119,6 +129,7 @@ export class UploadComponent implements IceComponent, OnDestroy {
   }
 
   set value(value: any) {
+    this.localBorderColor = value === undefined && this.required ? AlertColor : this.frameColor
     this._value = value;
 
     if (value) {

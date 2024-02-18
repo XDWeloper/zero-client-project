@@ -4,7 +4,9 @@ import {CellService} from "../../../../services/cell.service";
 import {
   ComponentBound, ComponentInputType, ComponentRuleForPDF,
   IceComponent,
+  IceEvent,
   MasterControl,
+  TableProperties,
   TextPosition
 } from "../../../../interfaces/interfaces";
 import {ComponentService} from "../../../../services/component.service";
@@ -58,6 +60,12 @@ export class InformationMainCounterpartiesTableComponent implements IceComponent
 
   constructor(private cellService: CellService, private componentService: ComponentService) {
   }
+
+  tableProp?: TableProperties;
+    componentEvent?: IceEvent[];
+    update(): void {
+        throw new Error('Method not implemented.');
+    }
 
   tableType: number;
 

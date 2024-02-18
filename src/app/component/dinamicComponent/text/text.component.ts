@@ -5,7 +5,9 @@ import {
   ComponentRuleForPDF,
   ControlPropType,
   IceComponent,
+  IceEvent,
   MasterControl,
+  TableProperties,
   TextPosition
 } from "../../../interfaces/interfaces";
 import {CellService} from "../../../services/cell.service";
@@ -22,6 +24,12 @@ export class TextComponent implements OnInit, IceComponent, OnDestroy {
 
   constructor(public sanitizer: DomSanitizer, private cellService: CellService, private componentService: ComponentService) {
   }
+
+  tableProp?: TableProperties;
+    componentEvent?: IceEvent[];
+    update(): void {
+        throw new Error('Method not implemented.');
+    }
 
   tableType: number;
 

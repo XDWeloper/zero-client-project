@@ -37,13 +37,16 @@ export const CHANGE_STATUS_TO_INCORRECT = "Документ отправлен �
 export const CHANGE_STATUS_TO_REJECT = "Документ отвергнут"
 export const GET_DOCUMENT_STATUS_HISTORY_ERROR = "Ошибка получения истории изменения статусов"
 
+export const SET_COMPONENT_NAME_DUPLICATE = "Данное имя компонента уже используется"
+
+
 export const ERROR = "ERROR"
 export const INFO = "INFO"
 
 export const TAB_DOCUMENT_LIST = 0
 export const TAB_DOCUMENT_SHOW = 1
 
-export const AlertColor = "#FF2400"
+export const AlertColor = "#c80082"
 export const fiveMin = 300_000
 export const freeMin = 180_000
 

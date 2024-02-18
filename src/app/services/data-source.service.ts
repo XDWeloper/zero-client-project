@@ -1,10 +1,13 @@
 import {Injectable} from '@angular/core';
-import {IceDataSource} from "../model/IceDataSource";
+import {IceDataSourceWorker} from "../workers/IceDataSourceWorker";
 import {Observable, of, throwError} from "rxjs";
 import {HttpClient} from '@angular/common/http';
 import {catchError, map, tap} from "rxjs/operators";
 import {HttpMethod, Operation} from "../model/RequestBFF";
 import {environment} from "../../environments/environment";
+import {IceDocument} from "../interfaces/interfaces";
+import {MessageService} from "./message.service";
+import {MAKET_LOAD_ERROR, REQUEST_TEST_ERROR} from "../constants";
 
 export class DataSourceMap {
   key: string
@@ -20,17 +23,17 @@ export class DataSourceService {
   currentKeyPath: string = ""
   dataSourceMap: DataSourceMap[] = []
 
-  constructor(private http: HttpClient) {
+  constructor(private http: HttpClient, private messageService: MessageService) {
   }
 
-  getData(dataSource: IceDataSource): Observable<any> {
+  getData(dataSource: IceDataSourceWorker, currentDocument?: IceDocument): Observable<DataSourceMap[]> {
 
     this.dataSourceMap.splice(0, this.dataSourceMap.length)    //обнулить
 
     if(dataSource.isNativeSource){ /**Запрос на наш бэк черз БФФ*/
       const operation = new Operation();
-      operation.url = dataSource.url + dataSource.getPathVariablesString()
-      console.log("operation.url",operation.url)
+      operation.url = dataSource.url + dataSource.getPathVariablesString(currentDocument)
+      console.log(operation.url)
       switch (dataSource.method) {
         case  "GET":
           operation.httpMethod = HttpMethod.GET;
@@ -51,7 +54,9 @@ export class DataSourceService {
           let rezJson = JSON.parse(valRes)
           this.reverseValue(rezJson)
         }),
-
+        catchError((err, caught) =>
+            this.messageService.show(REQUEST_TEST_ERROR, err.message, "ERROR")
+        ),
         map(value => this.dataSourceMap)
       );
     } else{ /**Запрос на произвольный url*/
@@ -72,11 +77,11 @@ export class DataSourceService {
     if(!object) return
     let tempKey = this.currentKeyPath
     let key = Object.keys(object)
-    key.forEach(k => {
-        let val = object[k]
+    key.forEach(objectKey => {
+        let val = object[objectKey]
 
-        if (isNaN(Number(k)))
-          this.currentKeyPath += "." + k.trim()
+        if (isNaN(Number(objectKey)))
+          this.currentKeyPath += "." + objectKey.trim()
         else {
           if (this.currentKeyPath.startsWith("."))
             this.currentKeyPath = this.currentKeyPath.substring(1, this.currentKeyPath.length)

@@ -5,19 +5,31 @@ import {
   Component,
   ComponentRef,
   ElementRef,
-  HostListener, Inject,
+  HostListener,
   Input,
   OnDestroy,
   OnInit,
   ViewChild,
   ViewContainerRef
 } from '@angular/core';
-import {ComponentMaket, IceComponent, IceDocument, IceStepMaket, OpenDocType} from "../../../../interfaces/interfaces";
+import {
+  ComponentMaket,
+  EventObject,
+  IceComponent,
+  IceDocument,
+  IceStepMaket,
+  OpenDocType
+} from "../../../../interfaces/interfaces";
 import {
   cellColl,
   cellRow,
-  CellType, CHANGE_STATUS_ERROR, CHANGE_STATUS_TO_DRAFT, CHANGE_STATUS_TO_SENDING,
-  collInRow, dialogCloseAnimationDuration, dialogOpenAnimationDuration,
+  CellType,
+  CHANGE_STATUS_ERROR,
+  CHANGE_STATUS_TO_DRAFT,
+  CHANGE_STATUS_TO_SENDING,
+  collInRow,
+  dialogCloseAnimationDuration,
+  dialogOpenAnimationDuration,
   DocStat,
   DOCUMENT_DRAFT_SAVED,
   DOCUMENT_SAVE_ERROR,
@@ -49,10 +61,11 @@ import {SelectComponent} from "../../../../component/dinamicComponent/select/sel
 import {StepService} from "../../../../services/step.service";
 import {StatusReasonComponent} from "../../../../component/status-reason/status-reason.component";
 import {MatDialog} from "@angular/material/dialog";
-import {PDFDocObject, PDFImageObject, PrintService} from "../../../../services/print.service";
+import {PDFDocObject, PrintService} from "../../../../services/print.service";
 import {AnketaScriptRule} from "../../../../data/anketaScriptRule";
 import {TableComponent} from "../../../../component/dinamicComponent/tables/table/table.component";
-import {CdkStepLabel} from "@angular/cdk/stepper";
+import {EventService} from "../../../../services/event.service";
+import {WorkerService} from "../../../../services/worker.service";
 
 @Component({
   selector: 'app-document-editor',
@@ -148,7 +161,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
               private changeDetection: ChangeDetectorRef,
               public dialog: MatDialog,
               private stepService: StepService,
-              private printService: PrintService) {
+              private printService: PrintService,
+              private eventService: EventService,
+              private workerService: WorkerService) {
   }
 
   ngOnDestroy(): void {
@@ -264,6 +279,10 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   ngOnInit(): void {
     this.componentSelected$ = this.componentService.selectedDocumentComponent$.subscribe(component => {
+
+      /**Создаем событие клик копонента*/
+      this.eventService.launchEvent(EventObject.ON_COMPONENT_CLICK ,this.currentDocument, component.componentEvent, null)
+
       this.currentComponent = component
       this.commentText = component.notification
       this.setValidationText(component)
@@ -279,6 +298,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       if (currentComponent.componentType === "upload") {//Если идет изменение загруженных файлов нужно сразу сохранять
         this.saveDoc(this.currentDocument.status, 0)
       }
+
+      /**Создаем событие значение копонента*/
+      this.eventService.launchEvent(EventObject.ON_COMPONENT_CHANGE_VALUE ,this.currentDocument, currentComponent.componentEvent, item.value )
 
       if (this.openType === "EDIT") {
         currentComponent.checkedText = this.checkValidValue(currentComponent)
@@ -372,6 +394,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       compInstance.checkedText = comp.checkedText
       compInstance.optionList = comp.optionList
       compInstance.tableProp = comp.tableProp
+      compInstance.componentEvent = comp.componentEvent
 
       if (this.openType === "EDIT")
         compInstance.enabled = true
@@ -418,10 +441,14 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
         /**И сохраняем его сразу как черновик*/
         if(this.currentDocument.id === undefined) {
-          console.log("И сохраняем его сразу как черновик", this.currentDocument.id)
           this.saveDoc(this.currentDocument.status, 0)
         }
+        /**Создаем воркеры*/
+        if(this.currentDocument.docAttrib && this.currentDocument.docAttrib.workerList)
+          this.workerService.createWorker(this.currentDocument)
 
+        /**Создаем событие создание докуента*/
+        this.eventService.launchEvent(EventObject.ON_DOCUMENT_CREATE, this.currentDocument,this.currentDocument.docAttrib.documentEventList)
       }),
       error: (err => this.messageService.show(MAKET_LOAD_ERROR, err.error.message, ERROR))
     })
@@ -472,6 +499,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       && currentComponent.componentType != IceComponentType.INPUT
       && currentComponent.componentType != IceComponentType.PLACE
       && currentComponent.componentType != IceComponentType.UPLOAD
+      && currentComponent.componentType != IceComponentType.SELECT
     )
       return errorStr
 
@@ -517,11 +545,11 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     if (this.tabLabelNode) {
 
       if (!value) {
-        this.tabLabelNode.style.cssText = 'color: red;'
+        //this.tabLabelNode.style.cssText = 'color: red;'
         this.steps[this.currentStepIndex].checkedText = "ERROR"
       } else {
         this.steps[this.currentStepIndex].checkedText = "SUCCESS"
-        this.tabLabelNode.style.cssText = 'color: #0E9F6E;'
+        //this.tabLabelNode.style.cssText = 'color: #0E9F6E;'
       }
     }
     this._isStepRequiredFieldNotEmpty = value;

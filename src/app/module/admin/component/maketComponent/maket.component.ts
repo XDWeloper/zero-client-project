@@ -17,6 +17,7 @@ import {CdkDragMove, CdkDragStart} from "@angular/cdk/drag-drop";
 import {DocumentService} from "../../../../services/document.service";
 import {EventObject} from "../../../../interfaces/interfaces";
 
+export const marginPixels = 0
 
 @Component({
   selector: 'app-maket',
@@ -141,8 +142,8 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
     this.bound = {
       x: this.dragPosition.x,
       y: this.dragPosition.y,
-      heightScale: this.height / this.cellService.getCellHeight(),
-      widthScale: this.width / this.cellService.getCellWidth()
+      heightScale: (this.height / this.cellService.getCellHeight()),
+      widthScale: (this.width / this.cellService.getCellWidth())
     }
 
   }
@@ -184,18 +185,18 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
       if ((nextWCell - wScale) < 0.2) wScale = nextWCell
 
       this.bound = {
-        x: this.dragPosition.x,
-        y: this.dragPosition.y,
-        heightScale: hScale,
-        widthScale: wScale
+        x: this.dragPosition.x + marginPixels,
+        y: this.dragPosition.y + marginPixels,
+        heightScale: hScale - marginPixels,
+        widthScale: wScale - marginPixels
       }
       this.setCorrectBound()
     }
   }
 
   public setCorrectBound() {
-    this.width = this.cellService.getCellWidth() * this.bound.widthScale
-    this.height = this.cellService.getCellHeight() * this.bound.heightScale
+    this.width = (this.cellService.getCellWidth() * this.bound.widthScale)
+    this.height = (this.cellService.getCellHeight() * this.bound.heightScale)
     this.changeDetection.detectChanges()
   }
 

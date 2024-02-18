@@ -1,7 +1,10 @@
 import {Injectable} from '@angular/core';
-import {EventObject, EventObjectType} from "../interfaces/interfaces";
+import {EventObject, EventObjectType, IceDocument, IceEvent} from "../interfaces/interfaces";
 import {IceMaketComponent} from "../module/admin/classes/icecomponentmaket";
 import {IceComponentType} from "../constants";
+import {Observable, of, Subject} from "rxjs";
+import {EventType} from "@angular/router";
+import {WorkerService} from "./worker.service";
 
 export interface EventNameTitle {eventName: string, eventTitle: string}
 
@@ -10,9 +13,18 @@ export interface EventNameTitle {eventName: string, eventTitle: string}
   providedIn: 'root'
 })
 export class EventService {
-  currentComponent: IceMaketComponent
+  private currentComponent: IceMaketComponent
 
-  constructor() { }
+  constructor(private workerService:WorkerService) { }
+
+  launchEvent(eventType: EventObject,currentDocument: IceDocument,workerEventList:IceEvent[],value?: any){
+    if(workerEventList === undefined
+      || !workerEventList.map(v => this.getEventObjectFromName(v.eventName)).includes(eventType)) return
+    let workerlistId = workerEventList
+      .filter(value => this.getEventObjectFromName(value.eventName) === eventType)
+      .map(value => value.workerIdList).flat()
+    this.workerService.startWorkers(workerlistId, value,currentDocument)
+  }
 
 
   isComponentMastHaveEvents(component: IceMaketComponent): boolean{
@@ -43,6 +55,8 @@ export class EventService {
 
   getEventObjectFromName(eventName: string): EventObject | undefined{
     switch (eventName) {
+      case "ON_DOCUMENT_CREATE": return EventObject.ON_DOCUMENT_CREATE;
+      case "ON_DOCUMENT_DESTROY": return EventObject.ON_DOCUMENT_DESTROY;
       case "ON_DOCUMENT_OPEN": return EventObject.ON_DOCUMENT_OPEN;
       case "ON_DOCUMENT_CLOSE": return EventObject.ON_DOCUMENT_CLOSE;
       case "ON_DOCUMENT_CHANGE_STEP": return EventObject.ON_DOCUMENT_CHANGE_STEP;

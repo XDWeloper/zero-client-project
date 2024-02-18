@@ -32,6 +32,7 @@ import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {DataSourceComponent} from "./component/data-source/data-source.component";
 import {RouterModule} from "@angular/router";
+import {ChangerWorkerComponent} from "./component/changer-worker/changer-worker.component";
 
 
 @NgModule({
@@ -75,6 +76,7 @@ import {RouterModule} from "@angular/router";
         MatSlideToggleModule,
         MatExpansionModule,
         DataSourceComponent,
+        ChangerWorkerComponent,
     ]
 
 })

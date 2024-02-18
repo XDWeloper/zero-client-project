@@ -56,9 +56,9 @@
         <mat-tab-group  [(selectedIndex)]="currentStepIndex" >
           <mat-tab class="font-mono" *ngFor="let tab of steps" [disabled]="disabledStep">
             <ng-template mat-tab-label>
-              <mat-icon *ngIf="tab.checkedText === undefined" class="example-tab-icon">file_copy</mat-icon>
-              <mat-icon *ngIf="tab.checkedText === 'ERROR'" class="example-tab-icon">thumb_down</mat-icon>
-              <mat-icon *ngIf="tab.checkedText === 'SUCCESS'" class="example-tab-icon">thumb_up</mat-icon>
+              <mat-icon *ngIf="tab.checkedText === undefined" class="">file_copy</mat-icon>
+              <mat-icon *ngIf="tab.checkedText === 'ERROR'" class="text-warning-base">error_outline</mat-icon>
+              <mat-icon *ngIf="tab.checkedText === 'SUCCESS'" class="text-info-base">check_circle_outline</mat-icon>
               <span class="ml-1">{{ tab.stepName }}</span>
             </ng-template>
           </mat-tab>
@@ -67,7 +67,7 @@
       <div class="h-10 w-full"></div>
 
       <ng-template #watch_field></ng-template>
-      <div class="w-full grid grid-cols-12 overflow-auto pr-2">
+      <div class="w-full grid grid-cols-12 overflow-auto pr-2 gap-y-0.5">
         <div *ngFor="let item of cellRowList; let outCell = index " class="flex">
           <app-cell class="flex-auto" *ngFor="let i of cellInnerList; let innerCell = index"
                     [cellType]="cellType"
@@ -86,13 +86,6 @@
 
       <div class="text-error-base text-xs dark:text-error-base overflow-auto" *ngFor="let item of validationText">
         <span class="text-black">&bull;</span>{{ item }}</div>
-      <div *ngIf="currentDocument"  class="absolute bottom-0 w-fill border-t border-color pt-4 flex flex-wrap">
-        <span class="relative flex h-2 w-2 ml-1 mt-1">
-            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-warning-base opacity-75"></span>
-            <span class="relative inline-flex rounded-full h-2 w-2 bg-warning-base"></span>
-        </span>
-        <span class="ml-1">- Обязательное поле!!!</span>
-      </div>
     </div>
 
   </div>

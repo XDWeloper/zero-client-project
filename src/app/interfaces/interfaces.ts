@@ -1,6 +1,6 @@
 import {DocStat, IceComponentType} from "../constants";
-import {DataSource} from "@angular/cdk/collections";
-import {IceDataSource, IDataSource, IWorker} from "../model/IceDataSource";
+import {IceDataSourceWorker} from "../workers/IceDataSourceWorker";
+import {IWorker} from "../workers/workerModel";
 
 export interface ComponentRuleForPDF {
   isPrint: boolean
@@ -176,9 +176,8 @@ export interface ComponentMaket {
   visible?: boolean
   printRule: ComponentRuleForPDF
   tableProp?: TableProperties
-  dataSource?: IceDataSource[]
+  dataSource?: IceDataSourceWorker[]
   componentEvent?: IceEvent[]
-
 }
 
 export type FontWeight = "normal" | "bold" | "semiBold"
@@ -250,7 +249,7 @@ export interface IceDocumentMaket{
 
 
 export interface IceDocAttrib {
-  workerList?: IWorker[]                  /** Воркеры документа*/
+  workerList?: IWorker[]                      /** Воркеры документа*/
   documentEventList?: IceEvent[]              /** События на уровне документа */
   componentValueList?: IIceComponentValue[]   /** Храним отдельно данные компонентов в виде: ключ/значение */
 }
@@ -362,9 +361,12 @@ export enum DocStatus{
 }
 
 export enum EventObject {
+
+  ON_DOCUMENT_CREATE = "Создание документа",
   ON_DOCUMENT_OPEN = "Открытие документа",
   ON_DOCUMENT_CLOSE = "Закрытие документа",
   ON_DOCUMENT_CHANGE_STEP = "Изменение страницы",
+  ON_DOCUMENT_DESTROY = "Удаление документа",
 
   ON_STEP_OPEN ="Открытие страницы",
   ON_STEP_CLOSE ="Закрытие страницы",

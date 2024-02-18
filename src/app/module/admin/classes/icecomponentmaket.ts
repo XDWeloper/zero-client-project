@@ -7,7 +7,7 @@ import {
   TextPosition
 } from "../../../interfaces/interfaces";
 import {BehaviorSubject} from "rxjs";
-import {IceDataSource} from "../../../model/IceDataSource";
+import {IceDataSourceWorker} from "../../../workers/IceDataSourceWorker";
 
 export class IceMaketComponent {
 
@@ -34,11 +34,30 @@ export class IceMaketComponent {
   private _notification: string | undefined
   private _checkText: string | undefined;
   private _optionList: string[] | undefined
+  private _enabled: boolean | undefined
+  private _visible: boolean | undefined
+
   private _printRule: ComponentRuleForPDF;
   private _tableProp?: TableProperties
-  private _dataSource?: IceDataSource[]
+  private _dataSource?: IceDataSourceWorker[]
   private _componentEvent?: IceEvent[]
 
+
+  get enabled(): boolean | undefined {
+    return this._enabled;
+  }
+
+  set enabled(value: boolean | undefined) {
+    this._enabled = value;
+  }
+
+  get visible(): boolean | undefined {
+    return this._visible;
+  }
+
+  set visible(value: boolean | undefined) {
+    this._visible = value;
+  }
 
   get componentEvent(): IceEvent[] {
     return this._componentEvent;
@@ -48,11 +67,11 @@ export class IceMaketComponent {
     this._componentEvent = value;
   }
 
-  get dataSource(): IceDataSource[] {
+  get dataSource(): IceDataSourceWorker[] {
     return this._dataSource;
   }
 
-  set dataSource(value: IceDataSource[]) {
+  set dataSource(value: IceDataSourceWorker[]) {
     this._dataSource = value;
   }
 
@@ -314,7 +333,9 @@ export class IceMaketComponent {
       optionList: this.optionList,
       tableProp: this.tableProp,
       dataSource: this.dataSource,
-      componentEvent: this.componentEvent
+      componentEvent: this.componentEvent,
+      enabled: this.enabled,
+      visible: this.visible
   }
   }
 }

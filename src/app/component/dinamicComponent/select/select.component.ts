@@ -1,15 +1,19 @@
 import {Component} from '@angular/core';
 import {CellService} from "../../../services/cell.service";
 import {
-  ComponentBound, ComponentInputType, ComponentRuleForPDF,
+  ComponentBound,
+  ComponentInputType,
+  ComponentRuleForPDF,
   ControlPropType,
   IceComponent,
+  IceEvent,
   MasterControl,
+  TableProperties,
   TextPosition
 } from "../../../interfaces/interfaces";
 import {AlertColor, IceComponentType} from "../../../constants";
 import {ComponentService} from "../../../services/component.service";
-import {Subscription} from "rxjs";
+import {of, Subscription} from "rxjs";
 
 @Component({
   selector: 'app-select',
@@ -17,22 +21,21 @@ import {Subscription} from "rxjs";
 })
 export class SelectComponent implements IceComponent {
 
-  constructor(private cellService: CellService, private componentSelectedService: ComponentService, private componentService: ComponentService) {
+  constructor(private cellService: CellService, private componentService: ComponentService) {
   }
 
+  tableProp?: TableProperties;
+  componentEvent?: IceEvent[];
   tableType: number;
-
   printRule: ComponentRuleForPDF;
-
   masterControlList: MasterControl[];
-
   minLength: number;
   maxLength: number;
   regExp: string;
   minVal: number;
   maxVal: number;
 
-  private _frameColor: string;
+  frameColor: string;
   required: boolean;
   cellNumber: number;
   componentBound: ComponentBound;
@@ -66,7 +69,6 @@ export class SelectComponent implements IceComponent {
     this.width = this.cellService.getClientCellWidth() * this.componentBound.widthScale
     this.left = this.cellService.getClientCellBound(this.cellNumber).x - this.correctX
     this.top = this.cellService.getClientCellBound(this.cellNumber).y - this.correctY
-
     this.propControl()
   }
 
@@ -77,8 +79,6 @@ export class SelectComponent implements IceComponent {
 
 
       if(componentId === this.componentID && value === "NaN") {
-        if(item.checkedText && item.checkedText.length > 0)
-          this.localBorderColor = AlertColor
         this.checkedText = item.checkedText
       }
 
@@ -108,21 +108,13 @@ export class SelectComponent implements IceComponent {
     })
   }
 
-
-  get frameColor(): string {
-    return this._frameColor;
-  }
-
-  set frameColor(value: string) {
-    this._frameColor = value;
-    this.localBorderColor = value
-  }
-
   get value(): any {
     return this._value;
   }
 
   set value(value: any) {
+    this.localBorderColor = value === undefined && this.required ? AlertColor : this.frameColor
+
     if (value === undefined) {
       //this._value = -888888888888
       this._value = value

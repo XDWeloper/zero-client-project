@@ -3,13 +3,20 @@ import {ComponentService} from "../../../../services/component.service";
 import {Subscription} from "rxjs";
 import {MatDialog} from "@angular/material/dialog";
 import {MasterControlPropComponent} from "../master-control-prop/master-control-prop.component";
-import {dialogCloseAnimationDuration, dialogOpenAnimationDuration, IceComponentType} from "../../../../constants";
+import {
+  dialogCloseAnimationDuration,
+  dialogOpenAnimationDuration,
+  DOCUMENT_LOAD_ERROR,
+  IceComponentType, SET_COMPONENT_NAME_DUPLICATE
+} from "../../../../constants";
 import {IceMaketComponent} from "../../classes/icecomponentmaket";
 import {ComponentType} from "@angular/cdk/overlay";
 import {OptionListComponent} from "../option-list/option-list.component";
 import {EventObject, EventObjectType} from "../../../../interfaces/interfaces";
 import {EventService} from "../../../../services/event.service";
-import {EventControlPropComponent} from "../../event-control-prop/event-control-prop.component";
+import {EventControlPropComponent} from "../event-control-prop/event-control-prop.component";
+import {DocumentService} from "../../../../services/document.service";
+import {MessageService} from "../../../../services/message.service";
 
 @Component({
   selector: 'app-properties',
@@ -41,7 +48,11 @@ export class PropertiesComponent implements OnInit, OnDestroy {
     else this.currentComponent.frameColor = undefined
   }
 
-  constructor(private componentService: ComponentService,public dialog: MatDialog,public eventService: EventService) {
+  constructor(private componentService: ComponentService,
+              public dialog: MatDialog,
+              public eventService: EventService,
+              private documentService: DocumentService,
+              private messageService: MessageService) {
   }
 
   ngOnDestroy(): void {
@@ -111,4 +122,10 @@ export class PropertiesComponent implements OnInit, OnDestroy {
     }
   }
 
+  checkComponentName() {
+    if(!this.documentService.getComponentByName(this.currentDocId, this.currentComponent.componentName))
+      return
+    this.messageService.show(SET_COMPONENT_NAME_DUPLICATE,"","ERROR").subscribe(value =>
+      this.currentComponent.componentName = undefined)
+  }
 }

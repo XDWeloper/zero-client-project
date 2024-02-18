@@ -2,7 +2,8 @@ import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component} fr
 import {CommonModule} from '@angular/common';
 import {MatIconModule} from "@angular/material/icon";
 import {
-  ComponentBound, ComponentInputType,
+  ComponentBound,
+  ComponentInputType,
   ComponentRuleForPDF,
   ControlPropType,
   Header,
@@ -185,6 +186,9 @@ export class TableComponent implements IceComponent, AfterViewInit{
   clearTable() {
     this.setValue()
     this.tableData.splice(0,this.tableData.length)
+  }
+
+  update(): void {
   }
 
 }

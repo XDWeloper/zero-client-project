@@ -4,7 +4,9 @@ import {
   ComponentRuleForPDF,
   ControlPropType,
   IceComponent,
+  IceEvent,
   MasterControl, PlaceObject,
+  TableProperties,
   TextPosition
 } from "../../../interfaces/interfaces";
 import {CellService} from "../../../services/cell.service";
@@ -47,14 +49,13 @@ export class AddressComponent implements IceComponent, OnDestroy {
   stepNum: number;
   textPosition: TextPosition;
   checkedText: string | undefined
-  private _value: any;
-  private _frameColor: string;
+  private _value: { placeList: PlaceObject[], placeString: string };
+  frameColor: string;
 
   height: any;
   width: any;
   top: any;
   left: any;
-  localBorderColor: string
 
   enabled = true
   private _visible = true
@@ -64,6 +65,12 @@ export class AddressComponent implements IceComponent, OnDestroy {
 
   constructor(private cellService: CellService, private componentService: ComponentService, private changeDetection: ChangeDetectorRef, public dialog: MatDialog) {
   }
+
+  tableProp?: TableProperties;
+    componentEvent?: IceEvent[];
+    update(): void {
+        throw new Error('Method not implemented.');
+    }
 
   tableType: number;
 
@@ -86,8 +93,7 @@ export class AddressComponent implements IceComponent, OnDestroy {
       let value = item.value
 
       if(componentId === this.componentID && value === "NaN") {
-        if(item.checkedText && item.checkedText.length > 0)
-          this.localBorderColor = AlertColor
+        console.log(this.componentName + "   checkedText ", this.checkedText)
         this.checkedText = item.checkedText
         this.changeDetection.detectChanges()
       }
@@ -123,15 +129,6 @@ export class AddressComponent implements IceComponent, OnDestroy {
       this.changeValue$.unsubscribe()
   }
 
-  get frameColor(): string {
-    return this._frameColor;
-  }
-
-  set frameColor(value: string) {
-    this._frameColor = value;
-    this.localBorderColor = this._frameColor
-  }
-
   openPlaceDialog() {
     this.openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration)
   }
@@ -150,7 +147,7 @@ export class AddressComponent implements IceComponent, OnDestroy {
       componentRef.componentInstance.reCreatedLevels(this.value.placeList.filter((i: PlaceObject) => i))
   }
 
-  get value(): any {
+  get value(): { placeList: PlaceObject[], placeString: string } {
     return this._value;
   }
 
@@ -196,4 +193,6 @@ export class AddressComponent implements IceComponent, OnDestroy {
     this._visible = value;
     this.changeDetection.detectChanges()
   }
+
+  protected readonly AlertColor = AlertColor;
 }

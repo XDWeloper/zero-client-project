@@ -2,9 +2,10 @@
      [cdkDragFreeDragPosition]="dragPosition"
      [ngStyle]="{'height.px':height,'width.px':width}"
      [cdkDragDisabled]="isResized"
-     class=" drag-box absolute border border-solid border-primary-light hover:border-2 bg-white overflow-hidden z-10 cursor-pointer"
+     class=" drag-box absolute border hover:border-2  overflow-hidden z-10 cursor-pointer "
      [ngClass]="{
-      'border-error-base border-2' : isSelected,
+      'border-error-base  bg-info-base text-white' : isSelected,
+      'border-primary-light bg-white text-textColor-primary' : !isSelected,
       'z-10': !(isSelected && isDragged),
       'justify-start': textPosition.horizontal === 'left',
       'justify-center': (textPosition.horizontal === 'center'),

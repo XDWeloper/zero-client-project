@@ -1,14 +1,14 @@
-import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {Component} from '@angular/core';
+import {CommonModule} from '@angular/common';
 import {MatIconModule} from "@angular/material/icon";
 import {MatDialogRef} from "@angular/material/dialog";
 import {MatButtonModule} from "@angular/material/button";
-import {IceMaketComponent} from "../classes/icecomponentmaket";
-import {EventObject, IceEvent} from "../../../interfaces/interfaces";
-import {EventNameTitle, EventService} from "../../../services/event.service";
+import {IceMaketComponent} from "../../classes/icecomponentmaket";
+import {IceEvent} from "../../../../interfaces/interfaces";
+import {EventNameTitle, EventService} from "../../../../services/event.service";
 import {FormsModule, ReactiveFormsModule} from "@angular/forms";
-import {DocumentService} from "../../../services/document.service";
-import {IWorker} from "../../../model/IceDataSource";
+import {DocumentService} from "../../../../services/document.service";
+import {IWorker} from "../../../../workers/workerModel";
 
 interface LocalWorker {workerName: string, workerId: number}
 
@@ -56,10 +56,8 @@ export class EventControlPropComponent {
 
   init() {
     this.eventList = this.eventService.getEventNameAndTitleList('COMPONENT')
-    console.log(this.eventList)
     this.localEvent.push(...(this.currentComponent.componentEvent ?? []))
     this.workers = this.documentService.getTemplateByDocId(this.currentDocId).docAttrib.workerList
-    console.log(this.workers)
 
     if(this.localEvent.length > 0)
       this.currentEventName = this.localEvent[0].eventName
@@ -72,7 +70,7 @@ export class EventControlPropComponent {
   saveAndClose() {
     if(!this.currentComponent.componentEvent)
       this.currentComponent.componentEvent = []
-    this.currentComponent.componentEvent.splice(1, this.currentComponent.componentEvent.length)
+    this.currentComponent.componentEvent.splice(0, this.currentComponent.componentEvent.length)
     this.currentComponent.componentEvent.push(...this.localEvent)
     this.dialogRef.close()
   }
@@ -115,5 +113,10 @@ export class EventControlPropComponent {
       workerIdList = workerIdList.splice(findedIndex, 1)
     this.setEventWorkerList(this.currentEventName)
 
+  }
+
+  clearAllEvent() {
+    this.localEvent.splice(0,this.localEvent.length)
+    this.setEventWorkerList(this.currentEventName)
   }
 }
