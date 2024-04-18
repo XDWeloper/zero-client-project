@@ -1,0 +1,498 @@
+<div class="absolute top-0 left-0 h-full w-full flex justify-center items-center bg-gray-200 z-50 bg-opacity-50">
+
+  <div class="w-full h-full rounded-md bg-white p-1 relative flex flex-col">
+
+    <mat-icon class="close-button"
+              (click)="dialogRef.close(0)">close
+    </mat-icon>
+
+    <p class="text-center text-lg flex-none">Настройка обработчика</p>
+
+    <div class="flex-none flex">
+      <app-ice-input class="flex-1" [(ngModel)]="localWorker.name" [label]="'Наименование обработчика'"
+                     [inputType]="'text'"></app-ice-input>
+      <app-ice-input class="ml-1 flex-wrap" [ngModel]="localWorker.id" [label]="'Идентификатор'"
+                     [readonly]="true"></app-ice-input>
+    </div>
+
+    <div class="flex-none relative">
+      <select class="peer ice-select-style"
+              [(ngModel)]="localWorker.dataSourceId">
+        <option *ngFor="let ds of currentTemplate.docAttrib.dataSourceList" [ngValue]="ds.id"> {{ ds.name }}</option>
+      </select>
+      <label
+        class="before:content[' '] after:content[' '] ice-label-style ">
+        Источник данных
+      </label>
+    </div>
+
+    <div class="h-4"></div>
+
+    <div class="flex-1 flex">
+
+      <div class="p-2 flex flex-col">
+        <mat-icon [matTooltip]="'Создать новый набор действий'"
+                  class="text-info-base cursor-pointer hover:font-bold duration-300" (click)="add()">add_circle_outline
+        </mat-icon>
+        <mat-icon *ngIf="localWorker.actionGroupList && localWorker.actionGroupList.length > 0"
+                  [matTooltip]="'Удалить текущий набор действий'"
+                  class="text-error-base cursor-pointer hover:font-bold duration-300" (click)="remove()">clear
+        </mat-icon>
+      </div>
+
+      <div class="w-[95%] border">
+
+        <mat-tab-group class="w-full h-full"
+                       (animationDone)="selectTab()"
+                       [selectedIndex]="getSelectedIndex()"
+                       (selectedIndexChange)="currentActionGroup = this.localWorker.actionGroupList[$event]">
+
+          <mat-tab *ngFor="let actionGroup of this.localWorker.actionGroupList">
+            <ng-template mat-tab-label>
+              {{ actionGroup.name }}
+            </ng-template>
+            <div class="h-full p-1 flex" #accordionContainer>
+
+              <div class="flex-none p-2 flex flex-col">
+                <mat-icon class="text-info-base cursor-pointer hover:font-bold duration-300" (click)="addAction()"
+                          [matTooltip]="'Создать правило'">add_circle_outline
+                </mat-icon>
+              </div>
+              <div class="flex-1 border-t border-l overflow-auto" [ngStyle]="{'height.px':height}">
+
+                <!--                Условия для запуска -->
+                <mat-accordion>
+                  <mat-expansion-panel hideToggle class="border">
+                    <mat-expansion-panel-header>
+                      <mat-panel-title>
+                        <div class="text-center mt-4">Условия для запуска</div>
+                      </mat-panel-title>
+                      <mat-icon class="text-primary-dark mt-2">help_outline</mat-icon>
+                    </mat-expansion-panel-header>
+                    <p>Установите условия для запуска набора действий</p>
+                    <div class="flex">
+
+                      <div class="flex-1 flex">
+                        <button class="bg-white border border-primary-base rounded-md px-2 h-full"
+                                (click)="selectComponentForCondition(1)">...
+                        </button>
+                        <div class="w-1"></div>
+                        <input type="text" class="flex-1 border border-primary-base"
+                               [(ngModel)]="actionGroup.conditions[0].argument1"/>
+                      </div>
+
+                      <div class="w-1"></div>
+
+                      <select class="w-8 bg-white font-bold text-xl text-center cursor-pointer rounded-md"
+                              [(ngModel)]="actionGroup.conditions[0].relation">
+                        <option ngValue="="> =</option>
+                        <option ngValue="!="> !=</option>
+                        <option ngValue=">"> ></option>
+                        <option ngValue="<"> <</option>
+                      </select>
+
+                      <div class="w-1"></div>
+
+                      <div class="flex-1 flex">
+                        <input type="text" class="flex-1 border border-primary-base"
+                               [(ngModel)]="actionGroup.conditions[0].argument2"/>
+                        <div class="w-1"></div>
+                        <button class="bg-white border border-primary-base rounded-md px-2 h-full"
+                                (click)="selectComponentForCondition(2)">...
+                        </button>
+                      </div>
+
+                      <div class="w-1"></div>
+
+                      <mat-icon class="text-error-base cursor-pointer hover:font-bold duration-300 ml-4"
+                                [matTooltip]="'Очистить условия'" (click)="clearCondition()">clear
+                      </mat-icon>
+                    </div>
+                  </mat-expansion-panel>
+                </mat-accordion>
+
+                <div class="h-6 bg-gray-200"></div>
+
+                <mat-accordion multi *ngIf="this.currentActionGroup.action" class="">
+                  <div *ngFor="let action of this.currentActionGroup.action">
+                    <mat-expansion-panel class="border border-primary-base" hideToggle
+                                         (expandedChange)="this.currentAction = action;setCurrentObject()">
+                      <mat-expansion-panel-header>
+                        <mat-panel-title>
+                          <div class="text-center mt-4">Наименование объекта: "{{ action.objectName ?? "" }}"
+                            (Ид: {{ action.objectId }} Тип: {{ action.objectType }})
+                          </div>
+                        </mat-panel-title>
+                        <div class="flex justify-between items-center">
+                          <mat-icon *ngIf="action.objectType === 'DOCUMENT'" class="text-primary-dark mt-2">list_alt
+                          </mat-icon>
+                          <mat-icon *ngIf="action.objectType === 'PAGE'" class="text-info-base mt-2">library_books
+                          </mat-icon>
+                          <mat-icon *ngIf="action.objectType === 'COMPONENT'" class="text-warning-base mt-2">extension
+                          </mat-icon>
+                          <mat-icon class="text-error-base cursor-pointer hover:font-bold duration-300 ml-4"
+                                    [matTooltip]="'Удалить текущее правило'"
+                                    (click)="removeAction(action)">clear
+                          </mat-icon>
+                        </div>
+                      </mat-expansion-panel-header>
+                      <div class="">
+                        <div class="flex p-1" *ngFor="let field of action.componentFieldActionList">
+                          <div class="w-1/3">{{ getVisualPropForActionList(action, field.fieldName).fieldString }}
+                            ({{ field.fieldName }})
+                          </div>
+                          <div class="w-2/3 flex justify-between items-center">
+                            <input *ngIf="getVisualPropForActionList(action,field.fieldName).fieldType === 'string'"
+                                   [readOnly]="field.isAutoFill" type="text" class="flex-1 border"
+                                   [(ngModel)]="field.fieldSet"/>
+                            <input *ngIf="getVisualPropForActionList(action,field.fieldName).fieldType === 'any'"
+                                   [readOnly]="field.isAutoFill" type="text" class="flex-1 border"
+                                   [(ngModel)]="field.fieldSet"/>
+                            <input *ngIf="getVisualPropForActionList(action,field.fieldName).fieldType === 'boolean'"
+                                   [readOnly]="field.isAutoFill" type="checkbox" class="" [(ngModel)]="field.fieldSet"/>
+                            <input *ngIf="getVisualPropForActionList(action,field.fieldName).fieldType === 'color'"
+                                   [readOnly]="field.isAutoFill" type="color" class="" [(ngModel)]="field.fieldSet"/>
+                            <div class="flex items-center">
+                              <div class="w-2"></div>
+                              <button class="bg-white border border-primary-base rounded-md px-2 h-full"
+                                      *ngIf="field.isAutoFill && this.localWorker.dataSourceId != undefined"
+                                      (click)="setAutoFillFromSourceDialog(field)">...
+                              </button>
+                              <div class="w-2"></div>
+                              <mat-icon *ngIf="field.isAutoFill && field.fieldSet"
+                                        (click)="setAutoFillFromSourceDialogAndShow(field)"
+                                        class="text-primary-dark cursor-pointer">remove_red_eye
+                              </mat-icon>
+                              <div class="w-2"></div>
+                              <mat-slide-toggle *ngIf="this.localWorker.dataSourceId != undefined
+                                                        && (getVisualPropForActionList(action,field.fieldName).fieldType === 'string'
+                                                        || getVisualPropForActionList(action,field.fieldName).fieldType === 'any')"
+                                                [matTooltip]="'Автозаполнение из источника данных'"
+                                                (toggleChange)="field.isDisabledAfterFill = !field.isAutoFill"
+                                                class="p-1"
+                                                color="accent" [(ngModel)]="field.isAutoFill"></mat-slide-toggle>
+                              <mat-slide-toggle *ngIf="action.objectType === 'COMPONENT'"
+                                                [matTooltip]="'Закрыть поле для редактирования после заполнения'"
+                                                class="p-1"
+                                                color="accent"
+                                                [(ngModel)]="field.isDisabledAfterFill"></mat-slide-toggle>
+
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </mat-expansion-panel>
+                    <div class="h-1 bg-gray-200"></div>
+                  </div>
+                </mat-accordion>
+              </div>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+    </div>
+    <div class="h-1"></div>
+
+    <div class="flex-none  border-t border-t-primary-dark flex justify-end items-center pt-0.5 gap-1">
+      <button class="button-style right-0 bottom-0 relative" (click)="SaveAndClose()">Сохранить</button>
+    </div>
+
+  </div>
+  <ng-container [ngTemplateOutlet]="ObjectType"></ng-container>
+  <ng-container [ngTemplateOutlet]="setAutoFillFromSource"></ng-container>
+  <ng-container [ngTemplateOutlet]="errorDialog"></ng-container>
+  <ng-container [ngTemplateOutlet]="dynamicVar"></ng-container>
+  <ng-container [ngTemplateOutlet]="SelectComponentForCondition"></ng-container>
+
+</div>
+
+<ng-template #ObjectType>
+  <div *ngIf="changeActionObjectDialogOpen"
+       class="absolute h-full w-full bg-gray-200 z-50 bg-opacity-50 flex justify-center items-center">
+    <div class="h-[80%] w-[80%] border border-primary-base bg-white flex flex-col z-10000 p-1 relative">
+
+      <mat-icon class="close-button" (click)="changeActionObjectDialogOpen = false">close</mat-icon>
+      <p class="text-center text-lg flex-none border-b">Объект обработки</p>
+
+
+      <div class="flex-none relative">
+        <select class="peer ice-select-style" [(ngModel)]="selectedObjectType">
+          <option [ngValue]="undefined" disabled>Выберите тип объекта обработки</option>
+          <option [ngValue]="'DOCUMENT'">Документ</option>
+          <option [ngValue]="'PAGE'">Страница</option>
+          <option [ngValue]="'COMPONENT'">Компонент</option>
+        </select>
+        <label class="before:content[' '] after:content[' '] ice-label-style ">Тип объекта обработки</label>
+      </div>
+
+      <div class="flex-1 overflow-auto">
+        <ng-container [ngTemplateOutlet]="DocumentProp"></ng-container>
+        <ng-container [ngTemplateOutlet]="PageSelect"></ng-container>
+        <ng-container [ngTemplateOutlet]="ComponentSelect"></ng-container>
+      </div>
+
+      <div class="flex-none  border-t border-t-primary-dark flex justify-end items-center pt-0.5 gap-1">
+        <div class="relative w-full">
+          <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                 fill="none" viewBox="0 0 20 20">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+            </svg>
+          </div>
+          <input type="search" [(ngModel)]="searchText" [disabled]="selectedObjectType === undefined"
+                 class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                 placeholder="Поиск объекта, ид, имя, тип..." required>
+        </div>
+        <button class="button-style right-0 bottom-0 relative"
+                (click)="ChangeActionObjectDialogSaveAndClose();searchText=''"
+                [disabled]="selectedObjectType === undefined
+                || (selectedObjectType === 'PAGE' && selectedPage === undefined)
+                || (selectedObjectType === 'COMPONENT' && selectedComponent === undefined)">
+          Создать
+        </button>
+
+      </div>
+
+
+    </div>
+  </div>
+
+</ng-template>
+
+<ng-template #DocumentProp>
+  <div *ngIf="selectedObjectType === 'DOCUMENT'" class="p-2">
+    <p>Имя объекта: {{ currentTemplate.docName }}</p>
+    <p>Тип объекта: "Документ"</p>
+    <p>Ид объекта: {{ currentTemplate.docId }}</p>
+  </div>
+</ng-template>
+
+<ng-template #PageSelect>
+  <div *ngIf="selectedObjectType === 'PAGE'" class="p-2">
+    <div class="p-1 hover:bg-primary-light hover:text-white duration-300 cursor-pointer"
+         (click)="selectedPage =  page"
+         (dblclick)="selectedPage =  page;ChangeActionObjectDialogSaveAndClose()"
+         *ngFor="let page of currentTemplate.docStep; let i = index">
+      <div class="flex justify-between items-center">
+        <span>{{ page.stepNum }} {{ page.stepName }}</span>
+        <mat-icon *ngIf="selectedPage && page.stepNum === selectedPage.stepNum" class="text-info-base">check</mat-icon>
+      </div>
+      <div class="h-0.5"></div>
+    </div>
+  </div>
+
+</ng-template>
+
+<ng-template #ComponentSelect>
+  <div *ngIf="selectedObjectType === 'COMPONENT'" class="p-2 ">
+    <div class="p-1 hover:bg-primary-light hover:text-white cursor-pointer"
+         (click)="selectedComponent =  component"
+         (dblclick)="selectedComponent =  component;ChangeActionObjectDialogSaveAndClose()"
+         *ngFor="let component of getAllComponent() | componentFilter: searchText; let i = index">
+      <div class="flex justify-between items-center">
+        <div class="flex-1 flex">
+          <div class="w-[5%]">{{ component.componentID }}</div>
+          <div class="w-[35%]"> {{ component.componentName }}</div>
+          <div class="w-[20%]">{{ component.componentType }}</div>
+        </div>
+        <mat-icon *ngIf="selectedComponent && component.componentID === selectedComponent.componentID"
+                  class="text-info-base">check
+        </mat-icon>
+      </div>
+      <div class="h-0.5"></div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #setAutoFillFromSource>
+  <div *ngIf="setAutoFillFromSourceDialogOpen"
+       class="absolute h-full w-full bg-gray-200 z-50 bg-opacity-50 flex justify-center items-center">
+    <div class="h-[90%] w-[90%] border border-primary-base bg-white flex flex-col z-10000 p-1 relative">
+      <mat-icon class="close-button" (click)="setAutoFillFromSourceDialogOpen = false">close</mat-icon>
+      <p class="text-center text-lg flex-none border-b">Получение данных источника</p>
+      <button *ngIf="dataSourceDataMap.length < 1" class="toolBar-button-style" (click)="getDataMap()">Получить данные
+      </button>
+
+      <div class="h-1"></div>
+
+      <div class="flex-1 border p-1 overflow-auto">
+        <div class="flex hover:bg-primary-light hover:text-white cursor-pointer"
+             (click)="selectDataSourceDataMapRow(row) "
+             *ngFor="let row of dataSourceDataMap | dataSourceFilter: searchText">
+          <div class="w-1/2 text-balance overflow-auto"
+               [ngClass]=" row.key.startsWith('[]') ? (row.key.endsWith('{}') ? 'ml-6 text-warning-base': 'ml-10')
+               : (row.key.endsWith('{}') ? (row.key.startsWith('.') ? 'ml-0 text-warning-base' : 'ml-6 text-warning-base') : 'ml-0')"
+          > {{ row.key }}
+          </div>
+          <div class="w-1/2 text-balance overflow-auto"> {{ getValue(row.value) }}</div>
+        </div>
+      </div>
+
+      <div class="flex-none  border-t border-t-primary-dark flex justify-end items-center pt-0.5 gap-1">
+        <div class="relative w-full">
+          <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                 fill="none" viewBox="0 0 20 20">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+            </svg>
+          </div>
+          <input type="search" [(ngModel)]="searchText"
+                 class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                 placeholder="Поиск объекта, ид, имя, тип..." required>
+        </div>
+        <button class="button-style right-0 bottom-0 relative"
+                (click)="setRezultObjectValue(); setAutoFillFromSourceDialogOpen = false;searchText=''">
+          Принять
+        </button>
+
+      </div>
+    </div>
+    <ng-container [ngTemplateOutlet]="setRezultObject"></ng-container>
+  </div>
+
+</ng-template>
+
+<!--  Получить объект обработки-->
+<ng-template #setRezultObject>
+  <div *ngIf="setRezultObjectDialogOpen"
+       class="absolute h-full w-full bg-gray-200 z-50 bg-opacity-50 flex justify-center items-center">
+    <div class="h-[60%] w-[85%] border border-primary-base bg-white flex flex-col z-10000 p-1 relative">
+      <mat-icon class="close-button" (click)="clearRezultObjectValue(); setRezultObjectDialogOpen = false">close
+      </mat-icon>
+      <p class="text-center">Установите значения динамических полей</p>
+      <div class="h-full flex-1 flex">
+        <div class="w-1/3 border  overflow-auto h-full p-2">
+          <div class="flex hover:bg-primary-light hover:text-white cursor-pointer"
+               (dblclick)="setFieldSetPropFromObject(row)"
+               *ngFor="let row of selectedRowObjectDataSourceDataMap">
+            <div class="w-full"
+                 [ngClass]=" row.key.startsWith('[]') ? (row.key.endsWith('{}') ? 'ml-6 text-warning-base': 'ml-10')
+               : (row.key.endsWith('{}') ? (row.key.startsWith('.') ? 'ml-0' : 'ml-6 text-warning-base') : 'ml-0')"
+            > {{ row.key }}
+            </div>
+          </div>
+
+        </div>
+        <div class="w-1 "></div>
+        <div class="w-2/3 border border-primary-base">
+          <!--          Если выбран компонент таблица-->
+          <div *ngIf="currentObject && currentAction.objectType === 'COMPONENT' && getCurrentComponent().componentType === IceComponentType.TABLE"
+            class="w-full h-full flex overflow-auto">
+            <div *ngFor="let header of getCurrentComponent().tableProp.header" class="flex-1 border">
+              <div class="border-b text-center"> {{ header.title }}</div>
+              <div class="flex h-full">
+                <div class="flex-1" *ngFor="let subHeader of header.subHeader">
+                  <div class="border-b  text-center cursor-pointer hover:border-b-2 hover:border-error-base duration-300"
+                       [ngClass]="{'border-b-2 border-error-base': selectedSubHeader === subHeader.order}"
+                       (click)="selectedSubHeader = subHeader.order">{{ subHeader.title }}</div>
+                  <textarea class="mt-0.5 border" [readOnly]="true" [(ngModel)]="this.tableComponentAutoFillValue[subHeader.order]"></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <textarea
+            *ngIf="currentObject && currentAction.objectType === 'COMPONENT' && getCurrentComponent().componentType != IceComponentType.TABLE"
+            class="w-full h-full" [(ngModel)]="fieldSetCurrentText" [readOnly]="true"></textarea>
+        </div>
+      </div>
+      <div class=" border border-t p-1 flex justify-end">
+        <button class="footer-button-style" (click)="setRezultObjectField(); setRezultObjectDialogOpen = false">
+          Сохранить
+        </button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!--  Показывать ошибки-->
+<ng-template #errorDialog>
+  <div *ngIf="localErrorText"
+       class="absolute h-full w-full bg-gray-200 z-50 bg-opacity-50 flex justify-center items-center">
+    <div class="h-[30%] w-[50%] border border-primary-base bg-white flex flex-col z-10000">
+      <div class="flex-1 flex justify-center items-center">
+        <div class="text-center text-error-base">{{ localErrorText }}</div>
+      </div>
+      <div class=" border border-t p-1 flex justify-end">
+        <button class="footer-button-style" (click)="localErrorText = ''">Понятно</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<!--  Запросить значение динамических полей-->
+<ng-template #dynamicVar>
+  <div *ngIf="isDynamicVarDialog"
+       class="absolute h-full w-full bg-gray-200 z-50 bg-opacity-50 flex justify-center items-center">
+    <div class="h-[50%] w-[50%] border border-primary-base bg-white flex flex-col z-10000 p-1">
+      <p class="text-center">Установите значения динамических переменных</p>
+      <div class="flex-1 border overflow-auto">
+        <div class="flex p-1" *ngFor="let item of localDataSource.dynamicPathVariables;">
+          <div class="w-[50%]"> {{ item.key }}</div>
+          <input class="w-[50%] border cursor-pointer bg-white" [(ngModel)]="item.value"
+                 [placeholder]="'Установите значение'"/>
+        </div>
+      </div>
+      <div class=" border border-t p-1 flex justify-end">
+        <button class="footer-button-style" (click)="setDynamicVar(); isDynamicVarDialog = false">Применить</button>
+      </div>
+    </div>
+  </div>
+</ng-template>
+
+<ng-template #SelectComponentForCondition>
+  <div *ngIf="isSelectComponentForCondition"
+       class="absolute h-full w-full bg-gray-200 z-50 bg-opacity-50 flex justify-center items-center">
+    <div class="h-[80%] w-[80%] border border-primary-base bg-white flex flex-col z-10000 p-1 relative">
+
+      <mat-icon class="close-button" (click)="isSelectComponentForCondition = false">close</mat-icon>
+      <p class="text-center text-lg flex-none border-b">Компонент условия обработки</p>
+
+      <div class="flex-1 overflow-auto">
+        <div class="p-1 hover:bg-primary-light hover:text-white"
+             *ngFor="let component of componentPropForCond | conditionComponent : searchText">
+          <div class="flex justify-between items-center">
+            <div class="flex-1 flex">
+              <div class="w-[5%]">{{ component.comp.componentID }}</div>
+              <div class="w-[35%]"> {{ component.comp.componentName }}</div>
+              <div class="w-[20%]">{{ component.comp.componentType }}</div>
+              <select class="w-[35%] border border-primary-base bg-white cursor-pointer text-textColor-primary"
+                      [(ngModel)]="component.compProp">
+                <option selected ngValue="value">value</option>
+                <option ngValue="checkedText">checkedText</option>
+                <option ngValue="visible">visible</option>
+                <option ngValue="enabled">enabled</option>
+              </select>
+            </div>
+            <mat-checkbox class="text-info-base" [checked]="component === selectedComponentForCondition"
+                          (change)="$event.checked ? selectedComponentForCondition = component : selectedComponentForCondition = undefined"/>
+          </div>
+          <div class="h-0.5"></div>
+        </div>
+      </div>
+
+      <div class="flex-none  border-t border-t-primary-dark flex justify-end items-center pt-0.5 gap-1">
+        <div class="relative w-full">
+          <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+            <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true" xmlns="http://www.w3.org/2000/svg"
+                 fill="none" viewBox="0 0 20 20">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+            </svg>
+          </div>
+          <input type="search" [(ngModel)]="searchText"
+                 class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                 placeholder="Поиск объекта, ид, имя, тип..." required>
+        </div>
+        <button class="button-style right-0 bottom-0 relative"
+                [disabled]="selectedComponentForCondition === undefined"
+                (click)="setComponentForCondition();searchText=''">
+          Выбрать
+        </button>
+      </div>
+    </div>
+  </div>
+
+</ng-template>

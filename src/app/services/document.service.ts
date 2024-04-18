@@ -20,18 +20,25 @@ export class DocumentService {
   statusList:{status: string , name: string}[] = []
 
   constructor() {
-    this.statusList.push({status: "", name: ""})
+    //this.statusList.push({status: "", name: ""})
     Object.keys(DocStatus).forEach((status, index) => {
       this.statusList.push({status: status, name: Object.values(DocStatus)[index]})
     })
   }
 
+  removeComponent(componentID: number){
+    let index = this.templateList.map(item => item.docStep.map(item => item.componentMaket).flat()).flat().findIndex(item => item.componentID === componentID)
+    if(index != -1){
+      this.templateList.map(item => item.docStep.map(item => item.componentMaket).flat()).flat().splice(index, 1)
+    }
 
-  getComponentByName(docId: number, name: string):ComponentMaket | undefined {
+  }
+
+  getComponentByName(docId: number, component: IceMaketComponent):ComponentMaket | undefined {
     return this.templateList
       .find(doc => doc.docId === docId)
       .docStep.map(step => step.componentMaket)
-      .flat().find(comp => comp.componentName === name)
+      .flat().find(comp => comp.componentName === component.componentName && comp.componentID != component.componentID)
   }
 
   getMaxComponentID(id: number): number{
@@ -84,7 +91,7 @@ export class DocumentService {
     this.templateList.push(maket)
     let childList = new Array<StepTreeTempl>()
     maket.docStep.forEach(c => {
-      childList.push({num: c.stepNum, name: c.stepName, parentId: maket.docId})
+      childList.push({num: c.stepNum, name: c.stepName, parentId: maket.docId,isToolBar: c.isToolBar != undefined ? c.isToolBar : true, visible: c.visible != undefined ? c.visible : true})
     })
 
     let docMaket = this.docTree.find(p => p.id === maket.docId)
@@ -110,7 +117,6 @@ export class DocumentService {
 
   addTemplate(doc: DocumentTreeTempl, step: StepTreeTempl, refComponentList?: ComponentRef<IceMaketComponent>[]) {
     if(step.num === 0) return
-
     let isDocPresent = this.templateList.find(p => p.docId === doc.id)
     let compList = new Array<ComponentMaket>()
     if (refComponentList != undefined)
@@ -122,9 +128,10 @@ export class DocumentService {
       stepNum: step.num,
       stepName: step.name,
       componentMaket: compList,
-      visible: step.visible
+      visible: step.visible,
+      isToolBar: step.isToolBar,
+      stepEvent: step.stepEvent
     }
-
 
     if (isDocPresent === undefined) { //Сохраняем новый шаблон
       let newTempl: IceDocumentMaket = {
@@ -145,6 +152,7 @@ export class DocumentService {
         isStepPresent.stepName = step.name
         isStepPresent.componentMaket = compList
         isStepPresent.visible = step.visible
+        isStepPresent.isToolBar = step.isToolBar
       }
     }
   }

@@ -6,13 +6,12 @@ import {MasterControlPropComponent} from "../master-control-prop/master-control-
 import {
   dialogCloseAnimationDuration,
   dialogOpenAnimationDuration,
-  DOCUMENT_LOAD_ERROR,
-  IceComponentType, SET_COMPONENT_NAME_DUPLICATE
+  IceComponentType,
+  SET_COMPONENT_NAME_DUPLICATE
 } from "../../../../constants";
 import {IceMaketComponent} from "../../classes/icecomponentmaket";
 import {ComponentType} from "@angular/cdk/overlay";
 import {OptionListComponent} from "../option-list/option-list.component";
-import {EventObject, EventObjectType} from "../../../../interfaces/interfaces";
 import {EventService} from "../../../../services/event.service";
 import {EventControlPropComponent} from "../event-control-prop/event-control-prop.component";
 import {DocumentService} from "../../../../services/document.service";
@@ -123,9 +122,11 @@ export class PropertiesComponent implements OnInit, OnDestroy {
   }
 
   checkComponentName() {
-    if(!this.documentService.getComponentByName(this.currentDocId, this.currentComponent.componentName))
+    if(!this.documentService.getComponentByName(this.currentDocId, this.currentComponent))
       return
     this.messageService.show(SET_COMPONENT_NAME_DUPLICATE,"","ERROR").subscribe(value =>
       this.currentComponent.componentName = undefined)
   }
+
+  protected readonly IceComponentType = IceComponentType;
 }

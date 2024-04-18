@@ -23,7 +23,7 @@ export class AppComponent implements OnInit {
 
   constructor(private keycloakService: KeycloakService,
               private router: Router,
-              private spinnerService: SpinnerService,
+              protected spinnerService: SpinnerService,
               private changeDetection: ChangeDetectorRef,
               private timeService: TimeService) {
     //window.onbeforeunload

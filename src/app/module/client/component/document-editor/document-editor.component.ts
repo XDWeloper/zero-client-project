@@ -39,7 +39,7 @@ import {
   IceComponentType,
   INFO,
   MAKET_LOAD_ERROR,
-  TAB_DOCUMENT_LIST
+  TAB_DOCUMENT_LIST, TAB_DOCUMENT_SHOW
 } from "../../../../constants";
 import {TextComponent} from "../../../../component/dinamicComponent/text/text.component";
 import {InputComponent} from "../../../../component/dinamicComponent/input/input.component";
@@ -66,6 +66,7 @@ import {AnketaScriptRule} from "../../../../data/anketaScriptRule";
 import {TableComponent} from "../../../../component/dinamicComponent/tables/table/table.component";
 import {EventService} from "../../../../services/event.service";
 import {WorkerService} from "../../../../services/worker.service";
+import {DataSourceService} from "../../../../services/data-source.service";
 
 @Component({
   selector: 'app-document-editor',
@@ -83,15 +84,30 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   private _openType: OpenDocType = "EDIT"
   private _isOpenedTab: boolean = false
 
+  @Input() maketId: number | undefined
+
   @Input() set isOpenedTab(value: boolean) {
+    if(value === false)
+      this.currentDocument = undefined
+
     this._isOpenedTab = value
+
+    if(value === true && this.maketId && !this.currentDocument){
+      this._isOpenedTab = false
+      this.loadDocMaket(this.maketId)
+    }
   }
+
+  static instance: DocumentEditorComponent
 
   get isOpenedTab(): boolean {
     return this._isOpenedTab
   }
 
   @Input() set currentDocument(value: IceDocument | undefined) {
+
+    //console.log("set currentDocument: ", value)
+
     this._currentDocument = value;
     this.commentText = ""
     this.currentComponent = undefined
@@ -103,13 +119,15 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       }
 
       this.steps = value.docStep.filter(i => i.visible)
-      //this.currentStepIndex = 0
+      this.currentStepIndex = 0
     } else {
       if (this.itemsField)
         this.itemsField.clear()
       this.steps = []
+      this.currentStepIndex = 0
     }
     //this.changeDetection.detectChanges()
+    this.resizeWindow()
   }
 
 
@@ -163,7 +181,10 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
               private stepService: StepService,
               private printService: PrintService,
               private eventService: EventService,
-              private workerService: WorkerService) {
+              private workerService: WorkerService,
+              private dataSourceService: DataSourceService
+              ) {
+    DocumentEditorComponent.instance = this
   }
 
   ngOnDestroy(): void {
@@ -196,6 +217,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   setMainBounds() {
+    if(!this.mainContainer) return
     this.dialogCorrectX = this.mainContainer.nativeElement.getBoundingClientRect().x - 20
     this.dialogCorrectY = this.mainContainer.nativeElement.getBoundingClientRect().y
   }
@@ -206,29 +228,40 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   set currentStepIndex(value: number) {
-    if (!this.currentDocument) return
+    if (!this.currentDocument || value === undefined) return
 
     this.commentText = ""
     this.checkedText = ""
     this.validatonTextClear()
 
-
-    if (this._currentStepIndex != value && this.openType === "EDIT" && value != 0) {
+    if (this._currentStepIndex != value && this.openType === "EDIT" /*&& value != 0*/) {
       this.saveDoc(this.currentDocument.status, 0)
     }
 
-    this._currentStepIndex = value;
 
     if (this.itemsField)
       this.itemsField.clear()
-    this.showComponentOnCurrentStep(this._currentStepIndex + 1)
+    this.showComponentOnCurrentStep(value + 1)
 
     this.checkStepComponent();
     this.checkRequiredOnCurrentStep()
+
+    // /**Создаем событие открытие страницы*/
+    // if(!this.eventService.isWorkerResize && value != this._currentStepIndex) {
+    //   console.log("value",value)
+    //   console.log("_currentStepIndex",this._currentStepIndex)
+    //   console.log("this.steps",this.steps)
+    //   this.eventService.launchEvent(EventObject.ON_STEP_OPEN, this.currentDocument, this.steps[value].stepEvent)
+    // }
+    // else
+    //    this.eventService.isWorkerResize = false
+
+    this._currentStepIndex = value;
+
   }
 
   private checkStepComponent() {
-    if (this.openType != "EDIT") return
+    if (this.openType != "EDIT" || !this.steps[this.currentStepIndex]) return
     if (this.currentDocument) {
       this.steps[this.currentStepIndex].componentMaket.filter(c => c.componentType != IceComponentType.TEXT).forEach(comp => {
         comp.checkedText = this.checkValidValue(comp)
@@ -280,8 +313,12 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   ngOnInit(): void {
     this.componentSelected$ = this.componentService.selectedDocumentComponent$.subscribe(component => {
 
-      /**Создаем событие клик копонента*/
-      this.eventService.launchEvent(EventObject.ON_COMPONENT_CLICK ,this.currentDocument, component.componentEvent, null)
+      /**Создаем событие клик компонента*/
+      if(!this.eventService.isWorkerResize)
+        this.eventService.launchEvent(EventObject.ON_COMPONENT_CLICK ,this.currentDocument, component.componentEvent, null)
+      else
+        this.eventService.isWorkerResize = false
+
 
       this.currentComponent = component
       this.commentText = component.notification
@@ -299,9 +336,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         this.saveDoc(this.currentDocument.status, 0)
       }
 
-      /**Создаем событие значение копонента*/
-      this.eventService.launchEvent(EventObject.ON_COMPONENT_CHANGE_VALUE ,this.currentDocument, currentComponent.componentEvent, item.value )
-
       if (this.openType === "EDIT") {
         currentComponent.checkedText = this.checkValidValue(currentComponent)
         this.checkAllStepsToRule()
@@ -313,13 +347,17 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         checkedText: currentComponent.checkedText
       })
       this.changeDetection.detectChanges()
+
+      /**Создаем событие значение копонента*/
+      if(!this.eventService.isWorkerResize)
+        this.eventService.launchEvent(EventObject.ON_COMPONENT_CHANGE_VALUE, this.currentDocument, currentComponent.componentEvent, item.value)
+      else
+        this.eventService.isWorkerResize = false
     })
 
     this.cellColl = cellColl
     this.cellRowList = new Array(collInRow * cellRow).fill(null).map((_, i) => i + 1);
     this.cellInnerList = new Array(cellColl).fill(null).map((_, i) => i + 1);
-    //console.log("3")
-    //this.currentStepIndex = this.currentStepIndex
 
     this.stepService.disabledAllStep$.subscribe({
       next: value => {
@@ -330,18 +368,21 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   checkRequiredOnCurrentStep() {
-    if (this.openType != "EDIT") return
+    if (this.openType != "EDIT" || !this.steps[this.currentStepIndex]) return
     if (this.steps.length > 0)
       this.isStepRequiredFieldNotEmpty = this.steps[this.currentStepIndex].componentMaket.filter(i => i.checkedText && i.checkedText.length > 0).length < 1
   }
 
   showComponentOnCurrentStep(stepNum: number) {
     this.firstComponentRef = undefined;
+    if(!this.steps[stepNum - 1]) return
+
     let stepComponentList = this.steps[stepNum - 1].componentMaket
-    //let stepComponentList = this.currentDocument.docStep.find(p => p.stepNum === stepNum).componentMaket
     stepComponentList.forEach(comp => {
-      if (comp.componentType === IceComponentType.SELECT)
+      if (comp.componentType === IceComponentType.SELECT) {
         this.componentRef = this.itemsField.createComponent(SelectComponent);
+        comp.optionList = comp.optionList ? comp.optionList : []
+      }
       if (comp.componentType === IceComponentType.PLACE)
         this.componentRef = this.itemsField.createComponent(AddressComponent);
       if (comp.componentType === IceComponentType.TEXT)
@@ -355,7 +396,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       if (comp.componentType === IceComponentType.AREA)
         this.componentRef = this.itemsField.createComponent(AreaComponent);
       if (comp.componentType === IceComponentType.TABLE) {
-        console.log("comp.tableType ",comp.tableType)
         switch (comp.tableType) {
           case 1:
             this.componentRef = this.itemsField.createComponent(InformationMainCounterpartiesTableComponent);
@@ -370,9 +410,12 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
       let compInstance = this.componentRef.instance
 
+      compInstance.enabled = comp.enabled === undefined ? true : comp.enabled
+      compInstance.visible = comp.visible === undefined ? true : comp.visible
       compInstance.componentType = comp.componentType
       compInstance.inputType = comp.inputType
       compInstance.componentID = comp.componentID
+      compInstance.optionList = comp.optionList
       compInstance.componentBound = comp.bound
       compInstance.cellNumber = comp.cellNumber
       compInstance.componentName = comp.componentName
@@ -392,13 +435,12 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       compInstance.value = comp.value
       compInstance.masterControlList = comp.masterControlList
       compInstance.checkedText = comp.checkedText
-      compInstance.optionList = comp.optionList
       compInstance.tableProp = comp.tableProp
       compInstance.componentEvent = comp.componentEvent
+      compInstance.customAttribName = comp.customAttribName
+      compInstance.customAttribColumnName = comp.customAttribColumnName
 
-      if (this.openType === "EDIT")
-        compInstance.enabled = true
-      else
+      if (this.openType !== "EDIT")
         compInstance.enabled = false
 
       if (comp.componentType === IceComponentType.INPUT || comp.componentType === IceComponentType.AREA)
@@ -435,20 +477,30 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
           docName: res.docName,
           docStep: res.docStep,
           status: "DRAFT",
-          docAttrib: res.docAttrib
+          docAttrib: res.docAttrib,
         }
         this.openType = "EDIT"
 
-        /**И сохраняем его сразу как черновик*/
-        if(this.currentDocument.id === undefined) {
-          this.saveDoc(this.currentDocument.status, 0)
-        }
+        /**Создаем источники данных*/
+        this.dataSourceService.createDataSourceList(this.currentDocument)
+
         /**Создаем воркеры*/
         if(this.currentDocument.docAttrib && this.currentDocument.docAttrib.workerList)
           this.workerService.createWorker(this.currentDocument)
 
-        /**Создаем событие создание докуента*/
-        this.eventService.launchEvent(EventObject.ON_DOCUMENT_CREATE, this.currentDocument,this.currentDocument.docAttrib.documentEventList)
+
+        /**Создаем событие создание документа*/
+        if(!this.eventService.isWorkerResize)
+          this.eventService.launchEvent(EventObject.ON_DOCUMENT_CREATE, this.currentDocument,this.currentDocument.docAttrib.documentEventList)
+        else
+          this.eventService.isWorkerResize = false
+
+        /**И сохраняем его сразу как черновик*/
+        // if(this.currentDocument.id === undefined) {
+        //   this.saveDoc(this.currentDocument.status, 0)
+        // }
+
+        this._isOpenedTab = true
       }),
       error: (err => this.messageService.show(MAKET_LOAD_ERROR, err.error.message, ERROR))
     })
@@ -457,6 +509,10 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   saveDoc(docStatus: DocStat, reg: number) {
     if (!this.currentDocument || docStatus === "INCORRECT") return
     this.currentDocument.status = docStatus
+
+    /**нужно залить доп атрибуты*/
+    this.setCurrentAttrib()
+
     if (this.currentDocument.id === undefined) {
       this.createDocument$ = this.backService.createDocument(this.currentDocument).subscribe({
         next: (res => {
@@ -467,7 +523,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         error: (err => this.messageService.show(DRAFT_SAVE_ERROR, err.error.message, ERROR))
       })
     } else {
-      this.updateDocument$ = this.backService.updateDocument(this.currentDocument).subscribe({
+      this.updateDocument$ = this.backService.updateOnlyDate(this.currentDocument).subscribe({
         next: (res => {
           if (reg === 1)
             this.docSaved(docStatus === "DRAFT" ? DOCUMENT_DRAFT_SAVED : DOCUMENT_SEND, "")
@@ -478,6 +534,19 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       })
     }
     this.changeDetection.detectChanges()
+  }
+
+  private setCurrentAttrib() {
+    let rezObj: Object = {}
+      this.currentDocument.docStep
+      .map(item => item.componentMaket)
+      .flat()
+      .filter(item => item.customAttribName)
+      .map(item =>{
+        Object.defineProperty(rezObj, item.customAttribName, {value: item.value, writable: true, enumerable: true, configurable: true})
+        Object.defineProperty(rezObj, item.customAttribName + "_column_name", {value: item.customAttribColumnName, writable: true, enumerable: true, configurable: true})
+      })
+    this.currentDocument.customAttrib = rezObj
   }
 
   private docSaved(message: string, message2: string) {
@@ -608,5 +677,13 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     resultList = asr.getPrintRules()
     return resultList
   }
+
+  isToolBarShow() {
+    if(this.currentDocument && this.currentDocument.docStep.filter(item => item.visible === true)[this.currentStepIndex])
+      return this.currentDocument.docStep.filter(item => item.visible === true)[this.currentStepIndex].isToolBar
+    return false
+  }
+
+
 }
 

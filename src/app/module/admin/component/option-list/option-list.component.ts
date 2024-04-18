@@ -1,6 +1,6 @@
 import { Component } from '@angular/core';
 import {IceMaketComponent} from "../../classes/icecomponentmaket";
-import {ControlPropType, ControlValue, MasterControl, StepControl} from "../../../../interfaces/interfaces";
+import {ControlPropType, ControlValue, MasterControl, OptionList, StepControl} from "../../../../interfaces/interfaces";
 import {MatDialogRef} from "@angular/material/dialog";
 import {DocumentService} from "../../../../services/document.service";
 import {MasterControlPropComponent} from "../master-control-prop/master-control-prop.component";
@@ -12,7 +12,7 @@ import {MasterControlPropComponent} from "../master-control-prop/master-control-
 export class OptionListComponent {
   currentComponent: IceMaketComponent
   currentDocId: number
-  localOptionList: Array<{item: string}> = []
+  localOptionList: OptionList[]  = []
 
 
   constructor(public dialogRef: MatDialogRef<MasterControlPropComponent>, private documentService: DocumentService) {
@@ -20,11 +20,11 @@ export class OptionListComponent {
 
   init(){
     if(this.currentComponent.optionList)
-      this.currentComponent.optionList.forEach(i => this.localOptionList.push({item:i}))
+      this.currentComponent.optionList.forEach(i => this.localOptionList.push({data:i.data,value: i.value}))
   }
 
   addRow() {
-    this.localOptionList.push({item:""})
+    this.localOptionList.push({data:"",value: ""})
   }
 
   removeRow() {
@@ -50,6 +50,6 @@ export class OptionListComponent {
 
   loadOptions(){
     this.currentComponent.optionList.splice(0,this.currentComponent.optionList.length)
-    this.localOptionList.forEach(i => this.currentComponent.optionList.push(i.item))
+    this.localOptionList.forEach(i => this.currentComponent.optionList.push({data:i.data,value: i.value}))
   }
 }

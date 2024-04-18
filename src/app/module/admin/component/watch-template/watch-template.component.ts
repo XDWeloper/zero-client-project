@@ -122,6 +122,8 @@ export class WatchTemplateComponent implements OnInit,AfterViewInit {
       compInstance.correctY = this.dialogCorrectY
       compInstance.stepNum = stepNum
       compInstance.required = comp.required
+      compInstance.enabled = comp.enabled ? comp.enabled : true
+      compInstance.visible = comp.visible ? comp.visible : true
       compInstance.textPosition = comp.textPosition
       compInstance.frameColor = comp.frameColor
       compInstance.maxLength = comp.maxLength

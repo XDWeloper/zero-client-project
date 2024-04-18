@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import {CommonModule} from '@angular/common';
 import { MainPageComponent } from './component/main-page/main-page.component';
 import {MatSidenavModule} from "@angular/material/sidenav";
 import {MatIconModule} from "@angular/material/icon";
@@ -30,9 +30,8 @@ import {MatSelectModule} from "@angular/material/select";
 import { OptionListComponent } from './component/option-list/option-list.component';
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {MatExpansionModule} from "@angular/material/expansion";
-import {DataSourceComponent} from "./component/data-source/data-source.component";
 import {RouterModule} from "@angular/router";
-import {ChangerWorkerComponent} from "./component/changer-worker/changer-worker.component";
+import {BrowserModule} from "@angular/platform-browser";
 
 
 @NgModule({
@@ -51,33 +50,31 @@ import {ChangerWorkerComponent} from "./component/changer-worker/changer-worker.
         OptionListComponent,
     ],
     exports: [],
-    imports: [
-        CommonModule,
-        RouterModule.forChild([
-            {path: '', component: MainPageComponent}
-        ]),
-        MatSidenavModule,
-        MatIconModule,
-        AngularSplitModule,
-        MatToolbarModule,
-        CdkDrag,
-        MatMenuModule,
-        MatTooltipModule,
-        MatTreeModule,
-        MatButtonModule,
-        CdkDragHandle,
-        MatDialogModule,
-        AngularEditorModule,
-        FormsModule,
-        MatInputModule,
-        MatDividerModule,
-        MatButtonToggleModule,
-        MatSelectModule,
-        MatSlideToggleModule,
-        MatExpansionModule,
-        DataSourceComponent,
-        ChangerWorkerComponent,
-    ]
+  imports: [
+    RouterModule.forChild([
+      {path: '', component: MainPageComponent}
+    ]),
+    MatSidenavModule,
+    MatIconModule,
+    AngularSplitModule,
+    MatToolbarModule,
+    CdkDrag,
+    MatMenuModule,
+    MatTooltipModule,
+    MatTreeModule,
+    MatButtonModule,
+    CdkDragHandle,
+    MatDialogModule,
+    AngularEditorModule,
+    FormsModule,
+    MatInputModule,
+    MatDividerModule,
+    MatButtonToggleModule,
+    MatSelectModule,
+    MatSlideToggleModule,
+    MatExpansionModule,
+    CommonModule
+  ]
 
 })
 export class AdminModule { }

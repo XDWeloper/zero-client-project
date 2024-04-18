@@ -3,6 +3,8 @@
 /*}*/
 
 
+.mat-tab-header{ display: none; }
+
 tr.example-element-row:hover {
   background: whitesmoke;
 }

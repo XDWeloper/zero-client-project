@@ -4,13 +4,24 @@
      class="absolute z-10 flex justify-center items-center rounded-lg m-1 border">
   <input
     class="w-full h-full  rounded-lg "
-    [ngClass]="inputType === 'button' ? 'cursor-pointer m-0.5 bg-primary-base text-white hover:bg-primary-dark'
+    [ngClass]="inputType === 'button' ?
+    ( enabled === true ? 'cursor-pointer m-0.5 bg-primary-base text-white hover:bg-primary-dark' : 'bg-primary-base text-white opacity-50')
     : 'bg-white text-textColor-primary hover:border-primary-base border p-2'"
     [maxlength]="maxLength" [minlength]="minLength" [max]="maxVal" [min]="minVal" [matTooltip]="checkedText"
-    *ngIf="inputType !== 'checkbox' && inputType !== 'number'"
+    *ngIf="inputType !== 'checkbox' && inputType !== 'number' && inputType !== 'summ'"
     [id]="componentID"
     [disabled]="!enabled"
     type="{{inputType}}" placeholder="{{placeHolder}}" [(ngModel)]="value" (click)="select($event)" [mask]="regExp">
+
+  <input
+    class="w-full h-full bg-white hover:border hover:border-primary-base dark:bg-slate-700 dark:text-white p-2 rounded-lg"
+    [maxlength]="maxLength" [minlength]="minLength" [max]="maxVal" [min]="minVal" [matTooltip]="checkedText"
+    *ngIf="inputType === 'summ'"
+    [id]="componentID"
+    [disabled]="!enabled"
+    thousandSeparator=" "
+    decimalMarker=","
+  type="text" placeholder="{{placeHolder}}" [(ngModel)]="value" (click)="select($event)" [mask]="'separator.2'" >
 
   <input
     class="w-full h-full bg-white hover:border hover:border-primary-base dark:bg-slate-700 dark:text-white p-2 rounded-lg"
@@ -20,13 +31,12 @@
     [disabled]="!enabled"
     thousandSeparator=" "
     decimalMarker=","
-  type="text" placeholder="{{placeHolder}}" [(ngModel)]="value" (click)="select($event)" [mask]="regExp">
+  type="text" placeholder="{{placeHolder}}" [(ngModel)]="value" (click)="select($event)" [mask]="'separator.0'" >
 
 
   <input
     class="w-full bg-white hover:border hover:border-primary-base dark:bg-slate-700 dark:text-white h-[50%] rounded-lg"
-    *ngIf="inputType === 'checkbox'" [disabled]="!enabled" [matTooltip]="checkedText"
-    type="checkbox" (click)="select($event)" [checked]="checked">
+    *ngIf="inputType === 'checkbox'" [disabled]="!enabled" type="checkbox" (click)="select($event)" [checked]="checked">
 </div>
 
 <!--onkeypress="return (event.charCode >= 48 && event.charCode <= 57);"-->

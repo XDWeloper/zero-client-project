@@ -1,6 +1,6 @@
 import {DocStat, IceComponentType} from "../constants";
-import {IceDataSourceWorker} from "../workers/IceDataSourceWorker";
-import {IWorker} from "../workers/workerModel";
+import {IceDataSource} from "../workers/IceDataSource";
+import {IDataSource, IWorker} from "../workers/workerModel";
 
 export interface ComponentRuleForPDF {
   isPrint: boolean
@@ -92,6 +92,7 @@ export interface IceDocument{
   responseDocReference?: string | undefined,
   docStep: IceStepMaket[]
   docAttrib: IceDocAttrib
+  customAttrib?: any
 }
 
 export type Role = "ROLE_user" | "ROLE_admin" | "ROLE_operator"
@@ -116,6 +117,8 @@ export interface StepTreeTempl {
   num: number
   name: string
   visible?: boolean
+  isToolBar?: boolean
+  stepEvent?: IceEvent[]
 }
 
 export interface ResponseTree {
@@ -146,7 +149,15 @@ export interface TextPosition {
   vertical: string
 }
 
-export type ComponentInputType = "text" | "number" | "datetime-local" | "date" | "time" | "week" | "month" | "checkbox" | "radio" | "color" | "button"
+export type ComponentInputType = "text" | "number" |"summ" | "datetime-local" | "date" | "time" | "week" | "month" | "checkbox" | "radio" | "color" | "button"
+
+export interface ComponentModifyField {
+  value: any
+  checkedText?: string | undefined
+  optionList?: string[] | undefined
+  enabled?: boolean
+  visible?: boolean
+}
 
 export interface ComponentMaket {
   cellNumber: number | undefined
@@ -171,13 +182,17 @@ export interface ComponentMaket {
   notification: string | undefined
   masterControlList: MasterControl[]
   checkedText?: string | undefined
-  optionList?: string[] | undefined
+  optionList?: OptionList[] | undefined
   enabled?: boolean
   visible?: boolean
   printRule: ComponentRuleForPDF
   tableProp?: TableProperties
-  dataSource?: IceDataSourceWorker[]
+//  dataSource?: IceDataSource[]
   componentEvent?: IceEvent[]
+  dataObject?: any
+  changeProp?: string
+  customAttribName?: string
+  customAttribColumnName?: string
 }
 
 export type FontWeight = "normal" | "bold" | "semiBold"
@@ -194,6 +209,7 @@ export class Header{
   fontWeight?: FontWeight | undefined
   fontItalic?: boolean
   subHeader: SubHeader[]
+  width?: number | undefined
 }
 
 export class SubHeader {
@@ -205,6 +221,7 @@ export class SubHeader {
   fontWeight?: FontWeight | undefined
   fontItalic?: boolean
   column: TableColumn
+  width?: number | undefined
 }
 
 export class TableColumn {
@@ -234,6 +251,7 @@ export interface IceStepMaket {
   componentMaket: ComponentMaket[]
   checkedText?: string | undefined
   visible?: boolean
+  isToolBar?: boolean
   stepEvent?: IceEvent[]
 }
 
@@ -245,10 +263,12 @@ export interface IceDocumentMaket{
   isLoaded?: boolean,
   docStep: IceStepMaket[]
   docAttrib?: IceDocAttrib
+  customAttrib?: any
 }
 
 
 export interface IceDocAttrib {
+  dataSourceList?: IDataSource[]              /** Дата сеты тут*/
   workerList?: IWorker[]                      /** Воркеры документа*/
   documentEventList?: IceEvent[]              /** События на уровне документа */
   componentValueList?: IIceComponentValue[]   /** Храним отдельно данные компонентов в виде: ключ/значение */
@@ -260,17 +280,19 @@ export interface IIceComponentValue{
   componentType: IceComponentType
   readOnly: boolean
   componentDescription?: String
+  dataObject?: any
 }
 
 export class IceComponentValue implements IIceComponentValue{
 
 
-  constructor(componentName: String, componentValue: any, componentType: IceComponentType, componentDescription: String, readOnly: boolean) {
+  constructor(componentName: String, componentValue: any, componentType: IceComponentType, componentDescription: String, readOnly: boolean, dataObject?: any) {
     this.componentName = componentName;
     this.componentValue = componentValue;
     this.componentType = componentType;
     this.componentDescription = componentDescription;
     this.readOnly = readOnly;
+    this.dataObject = dataObject
   }
 
   componentName: String
@@ -278,12 +300,15 @@ export class IceComponentValue implements IIceComponentValue{
   componentType: IceComponentType
   componentDescription: String;
   readOnly: boolean;
+  dataObject?: any
 }
 
 export interface IceEvent {
   eventName: string
-  workerIdList: number[]
+  workerIdList: {id: number, order: number}[]
 }
+
+export type OptionList = {data: any, value: string}
 
 export interface IceComponent {
   inputType: ComponentInputType;
@@ -309,12 +334,15 @@ export interface IceComponent {
   notification: string | undefined
   masterControlList: MasterControl[]
   checkedText?: string | undefined
-  optionList?: string[] | undefined
+  optionList?: OptionList[] | undefined
   enabled?: boolean
   visible?: boolean
   printRule: ComponentRuleForPDF
   tableProp?: TableProperties
   componentEvent?: IceEvent[]
+  dataObject?: any
+  customAttribName?: string
+  customAttribColumnName?: string
 }
 
 export class MasterControl{

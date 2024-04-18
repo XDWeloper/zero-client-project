@@ -117,7 +117,7 @@ export class LoginComponent implements OnInit {
 
     this.http.post(environment.bffURI + '/token', code, {
       headers: {
-        'Content-Type': 'application/json; charset=UTF-8' // обязательно нужно указывать
+        'Content-Type': 'application/json; charset=UTF-8'
       }
     }).subscribe({
       next: ((response: any) => {

@@ -2,7 +2,7 @@ import {
   AfterViewInit,
   ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
-  EventEmitter,
+  EventEmitter, Input,
   OnInit,
   Output,
   ViewChild
@@ -17,7 +17,7 @@ import {
   DOCUMENT_NAME_LOAD_ERROR,
   DOCUMENT_REMOVE_ERROR,
   ERROR,
-  TAB_DOCUMENT_LIST
+  TAB_DOCUMENT_LIST, TAB_DOCUMENT_SHOW
 } from "../../../../constants";
 import {MessageService} from "../../../../services/message.service";
 import {TabService} from "../../../../services/tab.service";
@@ -29,6 +29,7 @@ import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {HistoryDialogComponent} from "../../../../component/history-dialog/history-dialog.component";
 import {ComponentType} from "@angular/cdk/overlay";
 import {DocumentService} from "../../../../services/document.service";
+import {DocumentEditorComponent} from "../document-editor/document-editor.component";
 
 @Component({
   selector: 'app-document-table',
@@ -65,7 +66,19 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
   createDate: Date
   docStatus: string
   statusList:{status: string , name: string}[] = []
+  private _isOpenedTab: boolean = false
 
+  @Input() set isOpenedTab(value: boolean) {
+    // if(value === true)
+    //   this.refreshData()
+
+    this._isOpenedTab = value
+
+  }
+
+  get isOpenedTab(): boolean {
+    return this._isOpenedTab
+  }
 
   constructor(public backService: BackendService,
               private messageService: MessageService,
@@ -151,6 +164,9 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
             this.backService.removeDocument(id).subscribe({
               next: ((res) => {
                 this.refreshData()
+                /**Если документ открыт в редакторе, то сбросить*/
+                // if(DocumentEditorComponent.instance.currentDocument && id === DocumentEditorComponent.instance.currentDocument.id)
+                //   DocumentEditorComponent.instance.currentDocument = undefined
               }),
               error: ((err) => this.messageService.show(DOCUMENT_REMOVE_ERROR, err.error.message, ERROR))
             })
@@ -201,4 +217,7 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
   }
 
 
+  openDocEditor() {
+    this.tabService.openTab(TAB_DOCUMENT_SHOW)
+  }
 }

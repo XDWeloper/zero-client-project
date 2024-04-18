@@ -17,7 +17,7 @@
              [placeholder]= "placeHolder"
              type="search" id="search"
              class="block w-full p-4 pl-10 text-sm text-gray-900  rounded-lg bg-gray-50 focus:ring-blue-500 border focus:border-primary-base">
-      <button type="submit" (click)="openPlaceDialog()" [disabled] ="!enabled" class="button-style">Выбрать...</button>
+      <button *ngIf="enabled" type="submit" (click)="openPlaceDialog()" class="button-style">Выбрать...</button>
     </div>
 </div>
 

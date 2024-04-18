@@ -2,8 +2,6 @@ import {Injectable} from '@angular/core';
 import {EventObject, EventObjectType, IceDocument, IceEvent} from "../interfaces/interfaces";
 import {IceMaketComponent} from "../module/admin/classes/icecomponentmaket";
 import {IceComponentType} from "../constants";
-import {Observable, of, Subject} from "rxjs";
-import {EventType} from "@angular/router";
 import {WorkerService} from "./worker.service";
 
 export interface EventNameTitle {eventName: string, eventTitle: string}
@@ -14,16 +12,35 @@ export interface EventNameTitle {eventName: string, eventTitle: string}
 })
 export class EventService {
   private currentComponent: IceMaketComponent
+  isWorkerResize = false
 
-  constructor(private workerService:WorkerService) { }
+  static instance:EventService
+
+
+  constructor(private workerService:WorkerService) {
+    EventService.instance = this
+  }
 
   launchEvent(eventType: EventObject,currentDocument: IceDocument,workerEventList:IceEvent[],value?: any){
+    //console.log("before launchEvent",this.isWorkerResize)
+    if(this.isWorkerResize) return;
+
     if(workerEventList === undefined
       || !workerEventList.map(v => this.getEventObjectFromName(v.eventName)).includes(eventType)) return
-    let workerlistId = workerEventList
+
+    let workerListId = workerEventList
       .filter(value => this.getEventObjectFromName(value.eventName) === eventType)
       .map(value => value.workerIdList).flat()
-    this.workerService.startWorkers(workerlistId, value,currentDocument)
+
+    // if(eventType === EventObject.ON_STEP_OPEN){
+    //   console.log("eventType",eventType)
+    //   console.log("&&&&", workerEventList.filter(value => workerEventList.filter(value => this.getEventObjectFromName(value.eventName) === eventType)))
+    //
+    //   console.log("workerEventList",workerEventList)
+    //   console.log("workerListId",workerListId)
+    // }
+
+    this.workerService.startWorkers(workerListId, value,currentDocument)
   }
 
 

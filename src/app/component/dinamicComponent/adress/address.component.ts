@@ -5,7 +5,7 @@ import {
   ControlPropType,
   IceComponent,
   IceEvent,
-  MasterControl, PlaceObject,
+  MasterControl, OptionList, PlaceObject,
   TableProperties,
   TextPosition
 } from "../../../interfaces/interfaces";
@@ -74,7 +74,7 @@ export class AddressComponent implements IceComponent, OnDestroy {
 
   tableType: number;
 
-  optionList?: string[];
+  optionList?: OptionList[] | undefined
     printRule: ComponentRuleForPDF;
 
   ngOnInit(): void {
@@ -89,11 +89,11 @@ export class AddressComponent implements IceComponent, OnDestroy {
 
   private propControl() {
     this.changeValue$ = this.componentService.changeValue$.subscribe(item => {
+
       let componentId = item.componentId
       let value = item.value
 
       if(componentId === this.componentID && value === "NaN") {
-        console.log(this.componentName + "   checkedText ", this.checkedText)
         this.checkedText = item.checkedText
         this.changeDetection.detectChanges()
       }
@@ -103,9 +103,11 @@ export class AddressComponent implements IceComponent, OnDestroy {
       if (this.masterControlList && this.masterControlList.length > 0) {
         let list = this.masterControlList.filter(c => c.componentID === componentId)
         let control: ControlPropType = undefined
+
         if (list.length > 0)
           control = list.find(c => c.componentValue === value) ? list.find(c => c.componentValue === value).controlProp : undefined
-        if (control)
+
+        if (control){
           switch (control.toString()) {
             case "DISABLED":
               this.enabled = false;
@@ -120,6 +122,8 @@ export class AddressComponent implements IceComponent, OnDestroy {
               this.visible = true;
               break;
           }
+          this.changeDetection.detectChanges()
+        }
       }
     })
   }

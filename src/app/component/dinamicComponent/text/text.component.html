@@ -1,6 +1,6 @@
 <div [ngStyle]="{'height.px':height,'width.px':width}"
      [style.top.px]="top" [style.left.px]="left" [style.border-color]="frameColor"
-     class="absolute z-10 flex dark:text-white overflow-auto m-1"
+     class="absolute z-10 flex dark:text-white overflow-auto m-1 "
      [ngClass]="{
       'border':frameColor,
       'justify-start': textPosition.horizontal === 'left',
@@ -12,6 +12,14 @@
       'items-center': textPosition.vertical === 'center'}"
      *ngIf="visible">
   <div *ngIf="inputType === undefined || (inputType && inputType.length) < 1"
+       [ngClass]="{
+      'justify-start': textPosition.horizontal === 'left',
+      'justify-center': textPosition.horizontal === 'center',
+      'justify-end': textPosition.horizontal === 'right',
+      'justify-self-stretch': textPosition.horizontal === 'justify',
+      'items-start' : textPosition.vertical === 'top',
+      'items-end': textPosition.vertical === 'bottom',
+      'items-center': textPosition.vertical === 'center'}"
        [innerHTML]="sanitizer.bypassSecurityTrustHtml(value)">
   </div>
   <a  *ngIf="inputType && inputType.length > 0" [href]="inputType" [innerHTML]="sanitizer.bypassSecurityTrustHtml(value)"  target="_blank" class="underline text-primary-dark">

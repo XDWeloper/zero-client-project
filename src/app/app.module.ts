@@ -1,6 +1,4 @@
 import {NgModule} from '@angular/core';
-import {BrowserModule} from '@angular/platform-browser';
-
 import {AppRoutingModule} from './app-routing.module';
 import {AppComponent} from './app.component';
 import {MainScreenComponent} from './component/main-screen/main-screen.component';
@@ -42,7 +40,6 @@ import { ChangePlaceDialogComponent } from './component/change-place-dialog/chan
 import {MatButtonModule} from "@angular/material/button";
 import { DotPipePipe } from './pipe/dot-pipe.pipe';
 import { SelectComponent } from './component/dinamicComponent/select/select.component';
-import { ComponentFilterPipe } from './pipe/component-filter.pipe';
 
 
 @NgModule({
@@ -62,10 +59,8 @@ import { ComponentFilterPipe } from './pipe/component-filter.pipe';
     ChangePlaceDialogComponent,
     DotPipePipe,
     SelectComponent,
-
   ],
     imports: [
-        BrowserModule,
         AppRoutingModule,
         HttpClientModule,
         FormsModule,
@@ -105,7 +100,9 @@ import { ComponentFilterPipe } from './pipe/component-filter.pipe';
     },
   ],
     exports: [
-    ],
+        //      MessageDialogComponent
+    ]
+    ,
   bootstrap: [AppComponent]
 })
 export class AppModule {

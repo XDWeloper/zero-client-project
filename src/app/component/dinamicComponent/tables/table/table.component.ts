@@ -8,7 +8,7 @@ import {
   ControlPropType,
   Header,
   IceComponent,
-  MasterControl,
+  MasterControl, OptionList,
   SubHeader,
   TableProperties,
   TextPosition
@@ -67,7 +67,7 @@ export class TableComponent implements IceComponent, AfterViewInit{
   private changeValue$: Subscription
   tableType: number;
   checkedText?: string;
-  optionList?: string[];
+  optionList?: OptionList[] | undefined
   printRule: ComponentRuleForPDF;
   headerMaxHeight: number | undefined = undefined
   subHeaderMaxHeight: number | undefined = undefined
@@ -168,7 +168,6 @@ export class TableComponent implements IceComponent, AfterViewInit{
       newRow[value1.order] = value1.column.defaultValue
     })
 
-    console.log(newRow)
     this.tableData.push(newRow)
     this.setValue()
   }

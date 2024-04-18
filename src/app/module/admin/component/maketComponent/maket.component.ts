@@ -36,9 +36,9 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   private _isHover = false
 
 
-  private currentCell: DOMRect
-  private tableCorrectX: number = 0
-  private tableCorrectY: number = 0
+  currentCell: DOMRect
+  tableCorrectX: number = 0
+  tableCorrectY: number = 0
 
   private cellSubject$: Subscription
   private selectedComponent$: Subscription
@@ -57,6 +57,8 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
               private documentService: DocumentService, private changeDetection: ChangeDetectorRef) {
     documentService.lastComponentIndex++
     super(0, documentService.lastComponentIndex)
+    this.visible = true
+    this.enabled = true
   }
 
 
@@ -78,6 +80,15 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
     this.initComponent()
     if (this.textPosition === undefined)
       this.textPosition = {vertical: 'top', horizontal: 'left'}
+  }
+
+  setBound(val: DOMRect) {
+    if (this.cellNumber !== null) {
+      this.tableCorrectX = val.x
+      this.tableCorrectY = val.y
+      this.setCorrectBound()
+      this.initPositionOnMouseEvent()
+    }
   }
 
   get isHover(): boolean {
@@ -195,6 +206,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   }
 
   public setCorrectBound() {
+    if(!this.bound) return
     this.width = (this.cellService.getCellWidth() * this.bound.widthScale)
     this.height = (this.cellService.getCellHeight() * this.bound.heightScale)
     this.changeDetection.detectChanges()
@@ -205,18 +217,17 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
       this.isSelected = selID === this.componentID
     })
 
+    this.numObserv$ = this.numberObserve$.subscribe(v => {
+      //this.currentCell = this.cellService.getCellBound(v)
+      if ((!this.isHover && !this.isDragged && !this.isSelected) || this.isHover) {
+        this.setDragPosition();
+      }
+    })
+
+
     this.tableResize$ = this.cellService.tableResize$.subscribe(val => {
       if (val !== null) {
-        this.tableCorrectX = val.x
-        this.tableCorrectY = val.y
-        this.setCorrectBound()
-        this.initPositionOnMouseEvent()
-
-        this.numObserv$ = this.numberObserve$.subscribe(v => {
-          this.currentCell = this.cellService.getCellBound(v)
-          if ((!this.isHover && !this.isDragged && !this.isSelected) || this.isHover)
-            this.setDragPosition();
-        })
+        this.setBound(val)
       }
     })
 
@@ -226,6 +237,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   }
 
   private setDragPosition() {
+    if (!this.currentCell) return
     this.dragPosition = {
       x: this.currentCell.left - this.tableCorrectX - 1,
       y: this.currentCell.top - this.tableCorrectY - 1
@@ -236,7 +248,11 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   initPositionOnMouseEvent() {
     this.cellSubject$ = this.cellService.cellSubject$.subscribe(val => {
       if (val === null) return
+      if ((this.isSelected && !this.isResized && !this.isRightClicked && !this.isHover)) {
+        this.componentService.selectedComponent$.next(undefined)
+      }
       if ((this.isSelected && !this.isResized && !this.isRightClicked)) {
+        this.currentCell = this.cellService.getCellBound(val.number)
         this.cellNumber = val.number
       }
       this.isRightClicked = false

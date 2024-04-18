@@ -8,16 +8,18 @@ import {
   IceComponent,
   IceEvent,
   MasterControl,
+  OptionList,
   TableProperties,
   TextPosition
 } from "../../../interfaces/interfaces";
 import {AlertColor, IceComponentType} from "../../../constants";
 import {ComponentService} from "../../../services/component.service";
-import {of, Subscription} from "rxjs";
+import {Subscription} from "rxjs";
 
 @Component({
   selector: 'app-select',
   templateUrl: './select.component.html',
+
 })
 export class SelectComponent implements IceComponent {
 
@@ -51,7 +53,7 @@ export class SelectComponent implements IceComponent {
   notification: string | undefined;
   checked: boolean = false
   checkedText: string | undefined = undefined
-  optionList?: string[] | undefined
+  optionList?: OptionList[] | undefined
 
   private _value: any;
   height: any;
@@ -63,6 +65,10 @@ export class SelectComponent implements IceComponent {
   private changeValue$: Subscription
   enabled = true
   visible = true
+
+  comparedByObject(o1: OptionList, o2: OptionList): boolean {
+    return (o1 && o1.value) === (o2 && o2.value)
+  }
 
   ngOnInit(): void {
     this.height = this.cellService.getClientCellHeight() * this.componentBound.heightScale
@@ -78,7 +84,7 @@ export class SelectComponent implements IceComponent {
       let value = item.value
 
 
-      if(componentId === this.componentID && value === "NaN") {
+      if (componentId === this.componentID && value === "NaN") {
         this.checkedText = item.checkedText
       }
 
@@ -87,9 +93,9 @@ export class SelectComponent implements IceComponent {
       if (this.masterControlList) {
         let list = this.masterControlList.filter(c => c.componentID === componentId)
         let control: ControlPropType = undefined
-        if(list.length > 0)
+        if (list.length > 0)
           control = list.find(c => c.componentValue === value) ? list.find(c => c.componentValue === value).controlProp : undefined
-        if(control)
+        if (control)
           switch (control.toString()) {
             case "DISABLED":
               this.enabled = false;
@@ -113,20 +119,23 @@ export class SelectComponent implements IceComponent {
   }
 
   set value(value: any) {
-    this.localBorderColor = value === undefined && this.required ? AlertColor : this.frameColor
+    if(Array.isArray(value))
+      value = {... value[0]}
 
+    this.localBorderColor = value === undefined && this.required ? AlertColor : this.frameColor
     if (value === undefined) {
       //this._value = -888888888888
       this._value = value
       return
     }
-    this._value = value;
-    if(this.componentID) {
+
+    if (this.componentID) {
       this.componentService.setComponentValue({componentId: this.componentID, value: value})
     }
+    this._value = value;
   }
+
   changeComponent() {
     this.componentService.selectedDocumentComponent$.next(this)
   }
-
 }

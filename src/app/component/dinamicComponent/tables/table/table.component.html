@@ -21,8 +21,10 @@
 
 <ng-template #TableTemplate>
   <div class="flex flex-row headerContainerClass">
-    <div class="flex-1 border border-black " *ngFor="let header of tableProp.header">
-      <div class="text-center break-all border-b border-b-black headClass"
+    <div class="border border-black"
+         [ngClass]="header.width ? '': 'flex-1'" [ngStyle]="{'width': (header.width ? header.width : '100') + '%'}"
+         *ngFor="let header of tableProp.header">
+      <div class="text-center border-b border-b-black headClass"
            [innerHTML]="sanitizer.bypassSecurityTrustHtml(getNormalizeText(header))"
            [ngStyle]="{
            'color': header.textColor,
@@ -32,8 +34,10 @@
            'font-size': header.fontSize + 'px',
            'min-height': headerMaxHeight + 'px'}"></div>
       <div class="flex">
-        <div class=" flex-1" *ngFor="let subHeader of header.subHeader; let i = index">
-          <div class="text-center break-words border-b border-b-black subHeadClass"
+        <div class=""
+             [ngClass]="subHeader.width ?  '': 'flex-1'" [ngStyle]="{'width': (subHeader.width ? subHeader.width : '100') + '%'}"
+             *ngFor="let subHeader of header.subHeader; let i = index">
+          <div class="text-center border-b border-b-black subHeadClass text-balance"
                [ngClass]="{'border-r border-r-black': header.subHeader.length > (i + 1)  }"
                [innerHTML]="sanitizer.bypassSecurityTrustHtml(getNormalizeText(subHeader))"
                [ngStyle]="{

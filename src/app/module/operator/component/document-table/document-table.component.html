@@ -16,24 +16,35 @@
       <table class="w-full">
         <tbody>
         <tr>
-          <td class="w-[5%]"><input type="text" disabled class="w-full text-sm border border-gray-500 bg-gray-200"></td>
-          <td class="w-[30%]"><input [(ngModel)]="docName" type="text"
-                                     class="w-full text-sm border border-gray-500 hover:border-primary-light"
-                                     placeholder="Наименование"></td>
-          <td class="w-[10%]"><input [(ngModel)]="createDate" type="date"
-                                     class="w-full text-sm border border-gray-500 hover:border-primary-light"
-                                     placeholder="Дата"></td>
+          <td class="w-[5%] border border-gray-500">
+            <input type="text" disabled class="w-full text-sm bg-gray-200">
+          </td>
+          <td class="w-[15%] border border-gray-500 hover:border-primary-light">
+            <input [(ngModel)]="docName" type="text" class="w-full text-sm cursor-pointer" placeholder="Наименование документа">
+          </td>
+          <td class="w-[15%] border border-gray-500 hover:border-primary-light">
+            <input [(ngModel)]="orgName" type="text" class="w-full text-sm cursor-pointer" placeholder="Наименование организации">
+          </td>
+          <td class="w-[10%] border border-gray-500 hover:border-primary-light">
+            <input [(ngModel)]="inn" type="text" class="w-full text-sm cursor-pointer" placeholder="ИНН">
+          </td>
+          <td class="w-[10%] border border-gray-500 hover:border-primary-light">
+            <input [(ngModel)]="createDate" type="text" class="w-full text-sm cursor-pointer" placeholder="Дата создания" onfocus="(this.type='date')">
+          </td>
+          <td class="w-[10%] border border-gray-500 hover:border-primary-light">
+            <input [(ngModel)]="statusDate" type="text" class="w-full text-sm cursor-pointer" placeholder="Дата изменения" onfocus="(this.type='date')">
+          </td>
 
-          <td class="w-[20%]">
-            <select class="w-full text-sm border border-gray-500 bg-white hover:border-primary-light cursor-pointer"
-                    [(ngModel)]="docStatus">
-              <option *ngFor="let val of statusList" [value]=val.status>{{val.name}}</option>
+          <td class="w-[10%] border border-gray-500 hover:border-primary-light ">
+            <select class="w-full text-sm  bg-white cursor-pointer" [(ngModel)]="docStatus" [ngClass]="docStatus === undefined ? 'text-gray-500' : 'text-textColor-primary'">
+              <option value="undefined" disabled hidden>Статус</option>
+              <option class="text-textColor-primary" *ngFor="let val of statusList" [value]=val.status>{{ val.name }}</option>
             </select>
           </td>
 
-          <td class="w-[10%]"><input type="text" disabled class="w-full text-sm border border-gray-500 bg-gray-200">
+          <td class="w-[5%] border border-gray-500"><input type="text" disabled class="w-full text-sm bg-gray-200">
           </td>
-          <td class="w-[20%]"><input type="text" disabled class="w-full text-sm border border-gray-500 bg-gray-200">
+          <td class="w-[10%] border border-gray-500"><input type="text" disabled class="w-full text-sm bg-gray-200">
           </td>
         </tr>
         </tbody>
@@ -54,29 +65,45 @@
 
     <ng-container matColumnDef="id">
       <th class="w-[5%]" mat-header-cell *matHeaderCellDef>Ид</th>
-      <td class="w-[5%]" mat-cell *matCellDef="let row">{{row.id}}</td>
+      <td class="w-[5%]" mat-cell *matCellDef="let row">{{ row.id }}</td>
     </ng-container>
 
     <ng-container matColumnDef="docName">
-      <th class="w-[30%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Наименование документа</th>
-      <td class="w-[30%]" mat-cell *matCellDef="let row">{{row.docName}}</td>
+      <th class="w-[15%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Наименование документа</th>
+      <td class="w-[15%]" mat-cell *matCellDef="let row">{{ row.docName }}</td>
+    </ng-container>
+
+    <ng-container matColumnDef="orgName">
+      <th class="w-[15%]" mat-header-cell *matHeaderCellDef >Наименование организации</th>
+      <td class="w-[15%]" mat-cell
+          *matCellDef="let row">{{ row.customdata && row.customdata.name ? row.customdata.name : "" }}
+      </td>
+    </ng-container>
+
+    <ng-container matColumnDef="inn">
+      <th class="w-[10%]" mat-header-cell *matHeaderCellDef >ИНН</th>
+      <td class="w-[10%]" mat-cell
+          *matCellDef="let row">{{ row.customdata && row.customdata.inn ? row.customdata.inn : "" }}
+      </td>
     </ng-container>
 
     <ng-container matColumnDef="createDate">
       <th class="w-[10%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Дата создания</th>
-      <td class="w-[10%]" mat-cell *matCellDef="let row">{{row.createDate | date: 'dd.MM.yyyy' }}</td>
+      <td class="w-[10%]" mat-cell *matCellDef="let row">{{ row.createDate | date: 'dd.MM.yyyy' }}</td>
     </ng-container>
 
     <ng-container matColumnDef="statusDate">
       <th class="w-[10%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Дата статуса</th>
-      <td class="w-[10%]" mat-cell *matCellDef="let row">{{row.statusDate | date: 'dd.MM.yyyy' }}</td>
+      <td class="w-[10%]" mat-cell *matCellDef="let row">{{ row.statusDate | date: 'dd.MM.yyyy' }}</td>
     </ng-container>
 
     <ng-container matColumnDef="status">
-      <th class="w-[20%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Статус</th>
-      <td class="w-[20%]" [ngClass]="{'bg-cyan-100/50':row.status === 'CONTROL', 'bg-yellow-100/50':row.status === 'AGREE','bg-error-base/50': (row.status === 'REJECTED' || row.status === 'INCORRECT')}" mat-cell *matCellDef="let row">
+      <th class="w-[10%]" mat-header-cell *matHeaderCellDef mat-sort-header disableClear>Статус</th>
+      <td class="w-[10%]"
+          [ngClass]="{'bg-cyan-100/50':row.status === 'CONTROL', 'bg-yellow-100/50':row.status === 'AGREE','bg-error-base/50': (row.status === 'REJECTED' || row.status === 'INCORRECT')}"
+          mat-cell *matCellDef="let row">
         <div class="flex justify-between items-center w-full">
-          <span class="w-[90%]" >{{row.status | docStatus }}</span>
+          <span class="w-[90%]">{{ row.status | docStatus }}</span>
           <mat-icon *ngIf="row.statusText" (click)="onInfoClick(row.statusText)"
                     class="text-yellow-300 cursor-pointer w-[10%]">info
           </mat-icon>

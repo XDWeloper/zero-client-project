@@ -1,24 +1,25 @@
-import {AfterViewInit, Component, OnDestroy, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {User} from "../../../../model/User";
 import {DOCUMENT_LOAD_ERROR, ERROR, TAB_DOCUMENT_LIST, TAB_DOCUMENT_SHOW} from "../../../../constants";
 import {MessageService} from "../../../../services/message.service";
 import {BackendService} from "../../../../services/backend.service";
-import {EventObject, IceDocument, OpenDocType} from "../../../../interfaces/interfaces";
+import {EventObject, IceDocument, OpenDocType, ResponseTree} from "../../../../interfaces/interfaces";
 import {DocumentEditorComponent} from "../document-editor/document-editor.component";
 import {TabService} from "../../../../services/tab.service";
-import {Subscription} from "rxjs";
+import {filter, Subscription} from "rxjs";
 import {Router} from "@angular/router";
 import {TimeService} from "../../../../services/time.service";
 import {KeycloakService} from "../../../../services/keycloak.service";
 import {EventService} from "../../../../services/event.service";
 import {WorkerService} from "../../../../services/worker.service";
+import {DataSourceService} from "../../../../services/data-source.service";
 
 @Component({
   selector: 'app-main-page',
   templateUrl: './main-page-component-client.component.html',
   styleUrls: ['./main-page.css']
 })
-export class MainPageComponentClient implements AfterViewInit, OnDestroy {
+export class MainPageComponentClient implements AfterViewInit, OnDestroy, OnInit {
   currentTabNum: number
   user:User
   changeDocId: number | undefined
@@ -28,18 +29,22 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
   requestUserProfile$: Subscription
   getDocumentFull$: Subscription
   openDocType: OpenDocType = undefined
+  protected maketId: number | undefined = undefined
+
 
   @ViewChild(DocumentEditorComponent) editorComponent: DocumentEditorComponent;
   tabDone: boolean;
 
   constructor(private messageService: MessageService,
               private backService: BackendService,
-              tabService: TabService,
+              private tabService: TabService,
               private router: Router,
               private timeService: TimeService,
               private keycloakService: KeycloakService,
               private eventService: EventService,
-              private workerService: WorkerService) {
+              private workerService: WorkerService,
+              private dataSourceService: DataSourceService,
+              private backendService: BackendService) {
     /**Разрешить обновление токенов*/
     timeService.isRefreshToken = true
 
@@ -51,7 +56,16 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
       this.router.navigate(["/"])
 
     this.onTabChanged$ = tabService.onTabChanged().subscribe(tab => this.currentTabNum = tab)
+
+    this.backendService.getMaketNameList().subscribe(res => {
+      let respTree = (res.content as ResponseTree[]).filter(value => value.isActive)
+       if(respTree.length === 1)
+        this.maketId = respTree[0].id
+    })
   }
+
+  ngOnInit(): void {
+    }
 
   ngOnDestroy(): void {
     if(this.requestUserProfile$)
@@ -63,6 +77,11 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
     }
 
   ngAfterViewInit(): void {
+
+    let header = document.getElementsByClassName('mat-mdc-tab-header')
+    if(header[0])
+      header[0].setAttribute("style", "display:none")
+
   }
 
   openDoc(doc: {"rowId": number, "openType": OpenDocType}) {
@@ -75,15 +94,23 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
   loadDocumentForEdit(id: number){
     this.getDocumentFull$ = this.backService.getDocumentFull(id).subscribe({
       next: ((res: IceDocument) => {
+        if(!res) return
+
+        /**Создаем воркеры*/
+        if(res.docAttrib && res.docAttrib.workerList)
+          this.workerService.createWorker(res)
+        /**Создаем источники данных*/
+        this.dataSourceService.createDataSourceList(res)
+
+        /**Создаем событие открытие документа*/
+        if(!this.eventService.isWorkerResize)
+          this.eventService.launchEvent(EventObject.ON_DOCUMENT_OPEN, res,res.docAttrib.documentEventList)
+        else
+          this.eventService.isWorkerResize = false
+
         this.tempOpenedComponent = res
         //this.openedDocument = res
         this.currentTabNum = TAB_DOCUMENT_SHOW
-        /**Создаем воркеры*/
-        if(this.tempOpenedComponent.docAttrib && this.tempOpenedComponent.docAttrib.workerList)
-          this.workerService.createWorker(this.tempOpenedComponent)
-
-        /**Создаем событие открытие докуента*/
-        this.eventService.launchEvent(EventObject.ON_DOCUMENT_OPEN, this.tempOpenedComponent,this.tempOpenedComponent.docAttrib.documentEventList)
 
       }),
       error: (err => {
@@ -94,7 +121,7 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
   }
 
   tabChangeDone() {
-    if(this.currentTabNum == TAB_DOCUMENT_LIST){
+    if(this.currentTabNum === TAB_DOCUMENT_LIST){
       this.openedDocument = undefined
       this.openDocType = undefined
     }
@@ -110,4 +137,9 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
       complete:(() => this.router.navigate(["/"]))
     })
   }
+
+  openDocList() {
+    this.tabService.openTab(TAB_DOCUMENT_LIST)
+  }
+
 }

@@ -1,11 +1,21 @@
 <div class="mat-elevation-z8 w-[98%] m-auto rounded-t-lg mt-4 flex items-center justify-start">
+
   <mat-icon class="absolute top-7 left-5 scale-100 cursor-pointer z-[1000] hover:scale-125 duration-300"
             (click)="refreshData()">refresh
   </mat-icon>
 
+
+<div class=" w-full relative">
+    <button (click)="openDocEditor()"
+      class="absolute top-2 right-0.5 rounded-md bg-error-base px-2 py-1 text-white hover:bg-warning-base duration-300 z-[1000] cursor-pointer flex justify-center items-center gap-1">
+      <mat-icon class="scale-75">assignment</mat-icon>
+      <span class="">Создать документ</span>
+    </button>
+
+
   <mat-expansion-panel [(expanded)]="filterExpanded" hideToggle class="w-full">
     <mat-expansion-panel-header>
-      <mat-panel-title>
+      <mat-panel-title class="">
         <mat-icon class="ml-3 scale-100 cursor-pointer z-[1000] hover:scale-125 duration-300 "
                   [ngClass]="filterExpanded ? 'rotate-180': 'rotate-0'">filter_list
         </mat-icon>
@@ -45,6 +55,7 @@
       <button mat-button color="primary" (click)="applyFilter()">Применить</button>
     </mat-action-row>
   </mat-expansion-panel>
+</div>
 </div>
 
 <div class="h-2"></div>

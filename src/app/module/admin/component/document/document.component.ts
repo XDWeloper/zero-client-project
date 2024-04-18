@@ -2,6 +2,7 @@ import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {NestedTreeControl} from "@angular/cdk/tree";
 import {MatTreeNestedDataSource} from "@angular/material/tree";
 import {
+  ComponentMaket,
   DocumentTreeTempl,
   IceDocumentMaket,
   ResponseTree,
@@ -24,6 +25,8 @@ import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {BankDocumentListComponent} from "../../../operator/component/bank-document-list/bank-document-list.component";
 import {DocumentSettingsComponent} from "../document-settings/document-settings.component";
 import {StepSettingsComponent} from "../step-settings/step-settings.component";
+import {ModifiedService} from "../../../../services/modified.service";
+import {openDialog} from "../../util";
 
 
 @Component({
@@ -62,7 +65,8 @@ export class DocumentComponent implements OnInit {
   @Output()
   currentDocAndStep = new EventEmitter()
 
-   set isModified(value: boolean) {
+  set isModified(value: boolean) {
+    this.modifiedService.setModified(value)
     this._isModified = value;
     if (this.currentStep != undefined) {
       this.documentService.getDocById(this.currentStep.parentId).isModified = value
@@ -93,8 +97,9 @@ export class DocumentComponent implements OnInit {
               private backendService: BackendService,
               private messageService: MessageService,
               private componentService: ComponentService,
-              public dialog: MatDialog
-              ) {
+              public dialog: MatDialog,
+              private modifiedService: ModifiedService
+  ) {
     this.loadMaketNameList()
   }
 
@@ -107,7 +112,7 @@ export class DocumentComponent implements OnInit {
           respTree.forEach(maket => {
             let steps: StepTreeTempl[] = []
             maket.docStep.forEach(step => {
-              steps.push({num: step.stepNum, name: step.stepName, parentId: maket.id,visible: step.visible})
+              steps.push({num: step.stepNum, name: step.stepName, parentId: maket.id, visible: step.visible})
             })
             this.documentService.docTree.push({
               id: maket.id,
@@ -133,7 +138,14 @@ export class DocumentComponent implements OnInit {
 
   ngOnInit(): void {
     this.componentService.isModifyed$.subscribe({
-      next:(val => this.isModified = val )
+      next: (val => this.isModified = val)
+    })
+    this.modifiedService.modify$.subscribe({
+      next: (value => {
+          if (value === true)
+            this.saveChanges()
+        }
+      )
     })
   }
 
@@ -142,8 +154,8 @@ export class DocumentComponent implements OnInit {
   }
 
   stepChange(step: StepTreeTempl) {
-    if(step.num === 0) return
-    if(this.isStepEdit === true){
+    if (step.num === 0) return
+    if (this.isStepEdit === true) {
       this.clearEditStepData();
     }
 
@@ -197,18 +209,19 @@ export class DocumentComponent implements OnInit {
 
   /**Удаление макета*/
   delDoc(doc: DocumentTreeTempl) {
-    this.messageService.show("Удалить макет?", "Макет будет удален безвозвратно!", INFO,["YES", "CANCEL"])
+    this.messageService.show("Удалить макет?", "Макет будет удален безвозвратно!", INFO, ["YES", "CANCEL"])
       .subscribe({
-      next: value => {
-        if(value === "YES") {
-          this.deleteMaket(doc)
+        next: value => {
+          if (value === "YES") {
+            this.deleteMaket(doc)
+          }
+        },
+        error: err => {
         }
-      },
-      error: err => {}
-    })
+      })
   }
 
-  deleteMaket(doc: DocumentTreeTempl){
+  deleteMaket(doc: DocumentTreeTempl) {
     this.backendService.deleteMaket(doc.id).subscribe({
       next: (res => {
         this.isModified = false
@@ -249,7 +262,8 @@ export class DocumentComponent implements OnInit {
       num: newStepNum,
       name: "Страница " + newStepNum,
       parentId: doc.id,
-      visible: true
+      visible: true,
+      isToolBar: true
     }
 
     this.documentService.addStep(doc, this.currentEditStep)
@@ -351,16 +365,17 @@ export class DocumentComponent implements OnInit {
               isLoaded: true,
               docAttrib: res.docAttrib,
             }
-            )
-          //this.normalizeComponentId() Если в друг произошло за двоение ид компонентов(чего быть не должно!!!) можно это запустить для нормализации идешек.
+          )
+          //this.normalizeComponentId() //Если в друг произошло за двоение ид компонентов(чего быть не должно!!!) можно это запустить для нормализации идешек.!!!
+          //this.resetComponentID() //Полностью обновить все ИД. Перед применением хорошо подумать !!!
         }),
       })
   }
 
   saveChanges() {
-
     if (this.currentStep && this.currentDocument) {
       this.currentStep.visible = this.documentService.getStep(this.currentDocument.id, this.currentStep.num).visible
+      this.currentStep.isToolBar = this.documentService.getStep(this.currentDocument.id, this.currentStep.num).isToolBar
       this.documentService.addTemplate(this.currentDocument, this.currentStep, this.componentService.componentCollection)
     }
 
@@ -373,18 +388,15 @@ export class DocumentComponent implements OnInit {
             newDocTree.id = res.id
             newDocTree.isModified = false
             modifyedMaket.docId = res.id
-            let i
-            for (i = 0; i < newDocTree.children.length; i++) {
+            for (let i = 0; i < newDocTree.children.length; i++) {
               newDocTree.children[i].parentId = res.id
             }
             this.refreshTree()
             this.isModified = false
           }),
-          error: (err => this.messageService.show("Ошибка  сохранения макета",err.error.message,ERROR))
+          error: (err => this.messageService.show("Ошибка  сохранения макета", err.error.message, ERROR))
         })
       } else {
-
-        console.log("modifyedMaket  ",modifyedMaket)
         this.backendService.updateMaket(modifyedMaket).subscribe({
           next: (() => {
             this.documentService.getDocById(modifyedMaket.docId).isModified = false
@@ -402,7 +414,16 @@ export class DocumentComponent implements OnInit {
     this.documentService.saveTemplate(this.currentDocument)
   }
 
+  // private resetComponentID(){
+  //   console.log("------------ resetComponentID")
+  //   this.documentService.getTemplateByDocId(this.currentDocument.id).docStep.map(s => s.componentMaket).flat(1)
+  //     .forEach((value, index) => {
+  //       value.componentID = index
+  //     })
+  // }
+
   // private normalizeComponentId() {
+  //   console.log("--------------нормализация ИД")
   //   let componentIdArray = this.documentService.getTemplateByDocId(this.currentDocument.id).docStep.map(s => s.componentMaket).flat(1).map(c => c.componentID)
   //   let dublArray = new Array(400)
   //   dublArray.fill(0,0,199)
@@ -424,34 +445,47 @@ export class DocumentComponent implements OnInit {
   //
   //   componentIdArray = this.documentService.getTemplateByDocId(this.currentDocument.id).docStep.map(s => s.componentMaket).flat(1).map(c => c.componentID)
   // }
+
   stepSettings(stepNode: StepTreeTempl) {
-    console.log(stepNode)
-    let componentRef = this.openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration,StepSettingsComponent)
+    let componentRef = openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration, StepSettingsComponent,this.dialog)
+    componentRef.componentInstance.currentStep = this.documentService
+      .getTemplateByDocId(stepNode.parentId)
+      .docStep.find(item => item.stepNum === stepNode.num)
+    componentRef.componentInstance.workerList = this.documentService.getTemplateByDocId(stepNode.parentId).docAttrib.workerList
+    componentRef.afterClosed().subscribe({
+      next: value => {
+        if (value === 1)
+          this.setDocModified()
+      }
+    })
 
   }
 
   documentSettings(docNode: DocumentTreeTempl) {
     let currentMaket: IceDocumentMaket = this.documentService.getTemplateByDocId(docNode.id)
-    let componentRef = this.openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration,DocumentSettingsComponent)
+    let componentRef = openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration, DocumentSettingsComponent,this.dialog)
     componentRef.componentInstance.currentMaket = currentMaket
     componentRef.afterClosed().subscribe({
       next: value => {
-        if(value === 1) {
-          this.documentService.getDocById(currentMaket.docId).isModified = true
-          this.isModified = true
-        }
+        if (value === 1)
+          this.setDocModified()
       }
     })
   }
 
-
-  openDialog<T>(enterAnimationDuration: string, exitAnimationDuration: string, component: ComponentType<T>): MatDialogRef<any> {
-    return this.dialog.open(component, {
-      width: '' + (window.innerWidth * 0.8) + 'px',
-      height: '' + (window.innerHeight * 0.8) + 'px',
-      enterAnimationDuration,
-      exitAnimationDuration,
-    })
+  setDocModified() {
+    this.documentService.getDocById(this.currentDocument.id).isModified = true
+    this.isModified = true
   }
+
+
+  // openDialog<T>(enterAnimationDuration: string, exitAnimationDuration: string, component: ComponentType<T>): MatDialogRef<any> {
+  //   return this.dialog.open(component, {
+  //     width: '' + (window.innerWidth * 0.8) + 'px',
+  //     height: '' + (window.innerHeight * 0.8) + 'px',
+  //     enterAnimationDuration,
+  //     exitAnimationDuration,
+  //   })
+  // }
 
 }

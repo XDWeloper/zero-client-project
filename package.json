@@ -27,6 +27,7 @@
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.7.0",
     "ng-mat-select-infinite-scroll": "^4.0.0",
+    "ngx-json-viewer": "^3.2.1",
     "ngx-mask": "^15.1.0",
     "ngx-mat-select-search": "^7.0.2",
     "rxjs": "~7.5.0",

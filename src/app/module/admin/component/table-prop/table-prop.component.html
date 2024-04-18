@@ -14,8 +14,9 @@
     <div class="h-full flex flex-col mt-1">
       <div class="flex-1 flex flex-row">
         <div class="flex-1 h-full border flex p-0.5">
-          <div class="flex-1 h-full border" *ngFor="let column of tableProp.header" (click)="currentHeader = column"
-               [ngClass]="currentHeader && currentHeader.order === column.order ? 'border-primary-dark' : ''">
+          <div class=" h-full border" *ngFor="let column of tableProp.header" (click)="currentHeader = column"
+               [ngClass]="[currentHeader && currentHeader.order === column.order ? 'border-primary-dark' : '',column.width ?  '': 'flex-1']"
+               [ngStyle]="{'width': (column.width ? column.width : '100') + '%'}">
             <div class="h-2 bg-yellow-500 cursor-pointer hover:bg-yellow-700 duration-300"
                  (click)="currentHeader = column; currentSubHeader = undefined"
                  [ngClass]="currentHeader &&  currentHeader.order === column.order ? 'bg-yellow-700' : 'bg-yellow-500'"></div>
@@ -24,7 +25,9 @@
                       [(ngModel)]="column.title"></textarea>
 
             <div class="flex-1 flex">
-              <div class="border w-full" *ngFor="let subTitleColumn of column.subHeader">
+              <div class="border" *ngFor="let subTitleColumn of column.subHeader"
+                   [ngClass]="[subTitleColumn.width ?  '': 'flex-1']"
+                   [ngStyle]="{'width': (subTitleColumn.width ? subTitleColumn.width : '100') + '%'}">
                 <div class="h-2 bg-yellow-500 cursor-pointer hover:bg-yellow-700 duration-300"
                      (click)="currentSubHeader = subTitleColumn; currentHeader = column"
                      [ngClass]="(currentSubHeader && currentSubHeader.order === subTitleColumn.order && currentHeader && currentHeader.order === column.order) ? 'bg-yellow-700' : 'bg-yellow-500'"></div>
@@ -35,12 +38,19 @@
           </div>
         </div>
         <div class="flex-wrap h-full p-1 ">
-          <mat-icon class="text-green-500 cursor-pointer block" matTooltip="Добавить заголовок" (click)="addColumn()">add_circle</mat-icon>
-          <mat-icon *ngIf="currentHeader" class="text-error-base mt-1  cursor-pointer block" matTooltip="Удалить заголовок" (click)="removeColumn()">remove_circle
+          <mat-icon class="text-green-500 cursor-pointer block" matTooltip="Добавить заголовок" (click)="addColumn()">
+            add_circle
+          </mat-icon>
+          <mat-icon *ngIf="currentHeader" class="text-error-base mt-1  cursor-pointer block"
+                    matTooltip="Удалить заголовок" (click)="removeColumn()">remove_circle
           </mat-icon>
           <div class="border-t w-full h-4 mt-4"></div>
-          <mat-icon *ngIf="currentHeader && currentSubHeader === undefined " class="text-green-500 cursor-pointer block" matTooltip="Добавить подзаголовок" (click)="addSubHeader()">add_circle</mat-icon>
-          <mat-icon *ngIf="currentHeader && currentSubHeader" class="text-error-base cursor-pointer block" matTooltip="Удалить подзаголовок" (click)="removeSubHeader()">remove_circle</mat-icon>
+          <mat-icon *ngIf="currentHeader && currentSubHeader === undefined " class="text-green-500 cursor-pointer block"
+                    matTooltip="Добавить подзаголовок" (click)="addSubHeader()">add_circle
+          </mat-icon>
+          <mat-icon *ngIf="currentHeader && currentSubHeader" class="text-error-base cursor-pointer block"
+                    matTooltip="Удалить подзаголовок" (click)="removeSubHeader()">remove_circle
+          </mat-icon>
         </div>
       </div>
       <div class="flex-initial h-20">
@@ -88,10 +98,17 @@
     </div>
     <mat-checkbox class="-mt-2" [(ngModel)]="currentHeader.fontItalic">Italic</mat-checkbox>
     <div class="">
-      <input type="number" class="h-6 w-full border border-primary-dark" [mask]="fontSizeMask"
+      <input type="number" class="h-6 w-full border border-primary-dark" [max]="99"
              [(ngModel)]="currentHeader.fontSize">
       <div class="text-center">Размер текста заголовка</div>
     </div>
+    <div class="">
+      <input type="text" class="w-full h-6 border border-primary-dark"
+             [mask]="'separator'"
+             [(ngModel)]="currentHeader.width">
+      <div class="text-center">Ширина %</div>
+    </div>
+
   </div>
 </ng-template>
 
@@ -116,7 +133,7 @@
     </div>
     <mat-checkbox class="-mt-2" [(ngModel)]="currentSubHeader.fontItalic">Italic</mat-checkbox>
     <div class="">
-      <input type="number" class="w-full h-6 border border-primary-dark" [mask]="fontSizeMask"
+      <input type="number" class="w-full h-6 border border-primary-dark" [max]="99"
              [(ngModel)]="currentSubHeader.fontSize">
       <div class="text-center">Размер текста подзаголовка</div>
     </div>
@@ -137,12 +154,19 @@
              [(ngModel)]="currentSubHeader.column.defaultValue">
       <div class="text-center">Значение по умолчанию</div>
     </div>
+    <div class="">
+      <input type="text" class="w-full h-6 border border-primary-dark"
+             [mask]="'separator'"
+             [(ngModel)]="currentSubHeader.width">
+      <div class="text-center">Ширина %</div>
+    </div>
   </div>
 </ng-template>
 
 <ng-template #TableTemplate>
-  <div class="flex flex-row headerContainerClass" >
-    <div class="flex-1 border border-black" *ngFor="let header of tableProp.header" >
+  <div class="flex flex-row headerContainerClass">
+    <div class=" border border-black" [ngClass]="header.width ? '': 'flex-1'" [ngStyle]="{'width': (header.width ? header.width : '100') + '%'}"
+         *ngFor="let header of tableProp.header">
       <div class="text-center break-all border-b border-b-black headClass"
            [innerHTML]="sanitizer.bypassSecurityTrustHtml(getNormalizeText(header))"
            [ngStyle]="{
@@ -153,7 +177,8 @@
            'font-size': header.fontSize + 'px',
            'min-height': headerMaxHeight + 'px'}"></div>
       <div class="flex">
-        <div class=" flex-1" *ngFor="let subHeader of header.subHeader; let i = index">
+        <div class="" [ngClass]="subHeader.width ?  '': 'flex-1'" [ngStyle]="{'width': (subHeader.width ? subHeader.width : '100') + '%'}"
+             *ngFor="let subHeader of header.subHeader; let i = index">
           <div class="text-center break-words border-b border-b-black subHeadClass"
                [ngClass]="{'border-r border-r-black': header.subHeader.length > (i + 1)  }"
                [innerHTML]="sanitizer.bypassSecurityTrustHtml(getNormalizeText(subHeader))"
@@ -164,7 +189,8 @@
            'font-style': subHeader.fontItalic ? 'italic' : 'normal',
            'font-size': subHeader.fontSize + 'px',
            'min-height': subHeaderMaxHeight + 'px'}"></div>
-          <div [ngSwitch]="subHeader.column.columnType"  class="" [ngClass]="{'border-r border-r-black': header.subHeader.length > (i + 1)  }">
+          <div [ngSwitch]="subHeader.column.columnType" class=""
+               [ngClass]="{'border-r border-r-black': header.subHeader.length > (i + 1)  }">
             <ng-template ngSwitchCase="area"><textarea class="w-full h-full border"
                                                        [value]="subHeader.column.defaultValue"
                                                        [mask]="subHeader.column.columnMask"></textarea></ng-template>

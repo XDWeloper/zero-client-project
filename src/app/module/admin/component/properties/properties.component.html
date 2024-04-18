@@ -14,10 +14,11 @@
 
     <p *ngIf="currentComponent.componentType === 'input'" class="col-span-4">Тип ввода</p>
     <select *ngIf="currentComponent.componentType === 'input'"
-            class="col-span-8 w-[90%] text-center rounded-md dark:bg-slate-700"
+            class="col-span-8 w-[90%] text-center rounded-md dark:bg-slate-700 bg-white h-[20px]"
             [(ngModel)]="currentComponent.inputType">
       <option selected value="text">текст</option>
       <option value="number">число</option>
+      <option value="summ">сумма</option>
       <option value="datetime-local">дата время</option>
       <option value="date">дата</option>
       <option value="time">время</option>
@@ -29,10 +30,30 @@
       <option value="button">кнопка</option>
     </select>
 
+    <!--    Доп. атрибуты-->
+    <mat-accordion
+      *ngIf="currentComponent.componentType === IceComponentType.INPUT && currentComponent.inputType !== 'button'"
+      class="col-span-12 w-[95%] text-center rounded-md bg-gray-200 border border-primary-light relative">
+      <mat-expansion-panel hideToggle [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <p>Дополнительные атрибуты</p>
+          </mat-panel-title>
+          <mat-icon [ngClass]="(currentComponent.customAttribName) ? 'text-error-base' : 'text-primary-dark'">view_column</mat-icon>
+        </mat-expansion-panel-header>
+        <div class="w-full border-t border-t-primary-light grid grid-cols-12 gap-y-0.5 py-1 ">
+          <span class="col-span-5 text-left">Имя атрибута</span>
+          <input class="col-span-7 rounded-md border h-full" type="text" [(ngModel)]="currentComponent.customAttribName">
+          <span class="col-span-5 text-left">Имя колонки</span>
+          <input class="col-span-7 rounded-md border h-full" type="text"  [(ngModel)]="currentComponent.customAttribColumnName">
+        </div>
+        </mat-expansion-panel>
+    </mat-accordion>
+
     <!--    параметры печати-->
     <mat-accordion
       *ngIf="currentComponent.inputType !== 'button'"
-      class="col-span-12 w-[95%] text-center rounded-md dark:bg-slate-700 bg-gray-200 border border-primary-light relative">
+      class="mt-2 col-span-12 w-[95%] text-center rounded-md dark:bg-slate-700 bg-gray-200 border border-primary-light relative">
       <mat-expansion-panel hideToggle [expanded]="false">
         <mat-expansion-panel-header>
           <mat-panel-title>
@@ -132,6 +153,16 @@
     <div class="col-span-full mt-4 " *ngIf="currentComponent.componentType !== 'text' && currentComponent.inputType != 'button'">
       <input id="reqCheck" class="rounded-md" type="checkbox"[(ngModel)]="currentComponent.required">
       <label for="reqCheck"  class="ml-4">Обязательно для заполнения</label>
+    </div>
+
+    <div class="col-span-full mt-4 ">
+      <input id="visibleCheck" class="rounded-md" type="checkbox" [(ngModel)]="currentComponent.visible">
+      <label for="visibleCheck"  class="ml-4">Видимый</label>
+    </div>
+
+    <div class="col-span-full mt-4">
+      <input id="enabledCheck" class="rounded-md" type="checkbox"[(ngModel)]="currentComponent.enabled">
+      <label for="enabledCheck"  class="ml-4">Активный(enabled)</label>
     </div>
 
     <span

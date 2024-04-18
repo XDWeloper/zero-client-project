@@ -19,8 +19,8 @@
       <as-split-area class="bg-gray-200 dark:bg-dark-background duration-300 overflow-y-hidden"
                      [size]="docPanelCurrentSize"
                      [minSize]="docPanelCloseWidth"
-                     [maxSize]="docPanelOpenWidth"
-                     (transitionend)="transEnd()">
+                     [maxSize]="docPanelOpenWidth">
+<!--                     (transitionend)="transEnd()">-->
         <!--панель документов-->
         <app-document [docPanelCurrentSize]="docPanelCurrentSize"
                       [docPanelOpenWidth]="docPanelOpenWidth"
@@ -77,27 +77,6 @@
             </div>
           </div>
         </div>
-        <div *ngIf="currentTemplate " class="mt-2 flex min-h-[10%]">
-          <div class="w-10 "></div>
-          <div class="w-[90%] mx-auto border border-primary-base p-1 flex flex-wrap" (contextmenu)="rightClick($event)" (click)="workerMenuOpen=false">
-          <app-data-source
-                            *ngFor="let dataSource of getWorkerList('NETDATASOURCE')"
-                           [worker]="dataSource"
-                           [currentTemplate]="currentTemplate"
-                           (currentWorker)="currentWorker = $event"
-                           (mouseenter)="currentWorker = dataSource"
-                           (mouseleave)="currentWorker = undefined"></app-data-source>
-          <app-changer-worker
-                            *ngFor="let dataSource of getWorkerList('FIELDCHANGER'); let i = index"
-                           [worker]="dataSource"
-                           [currentTemplate]="currentTemplate"
-                           (currentWorker)="currentWorker = $event"
-                           (mouseenter)="currentWorker = dataSource"
-                           (mouseleave)="currentWorker = undefined"></app-changer-worker>
-            <!--                           [worker]="currentTemplate.docAttrib.workerList[i]"-->
-          </div>
-        </div>
-
         <app-right-click-menu *ngIf="!isMenuHidden"
                               [x]="xPosTabMenu"
                               [y]="yPosTabMenu"
@@ -111,8 +90,8 @@
       <as-split-area class="bg-gray-200 dark:bg-dark-background duration-300"
                      [size]="propPanelCurrentSize"
                      [minSize]="propPanelCloseWidth"
-                     [maxSize]="propPanelOpenWidth "
-                     (transitionend)="transEnd()">
+                     [maxSize]="propPanelOpenWidth ">
+<!--                     (transitionend)="transEnd()">-->
         <div
           class="relative w-full h-10 bg-primary-base dark:bg-dark-background text-center text-white text-lg border border-solid border-primary-base">
           <p *ngIf="propPanelCurrentSize > propPanelOpenWidth / 2"
@@ -134,19 +113,4 @@
 
 <div *ngIf="isBlock" class="absolute top-0  left-0 w-screen h-screen z-100000 bg-gray-400 opacity-50"></div>
 
-<div *ngIf="workerMenuOpen && !currentWorker" (mouseleave)="workerMenuOpen = false"
-     class="border border-primary-light bg-white rounded-md absolute p-2"
-     [ngStyle]="{'left.px': workerMenuPosition.x, 'top.px': workerMenuPosition.y}">
-  <ul class="list-group">
-    <li class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-sm w-full" (click)="addDataSource('NETDATASOURCE')">
-      <mat-icon class="text-primary-light">cloud_download</mat-icon>
-      <span class="ml-2">Добавить обработчик источник данных</span>
-    </li>
-    <li class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-sm w-full" (click)="addDataSource('FIELDCHANGER')">
-      <mat-icon class="text-info-base">settings_ethernet</mat-icon>
-      <span class="ml-2">Добавить обработчик полей компонента</span>
-    </li>
-  </ul>
-
-</div>
 

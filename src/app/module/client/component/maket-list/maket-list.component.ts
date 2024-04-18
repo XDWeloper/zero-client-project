@@ -6,6 +6,7 @@ import {ResponseTree} from "../../../../interfaces/interfaces";
 import {BackendService} from "../../../../services/backend.service";
 import {ERROR, MAKET_NAME_LOAD_ERROR} from "../../../../constants";
 import {MessageService} from "../../../../services/message.service";
+import {filter, tap} from "rxjs";
 
 @Component({
   selector: 'app-maket-list',
@@ -33,6 +34,8 @@ export class MaketListComponent implements AfterViewInit, OnInit{
       {
         next: ((res) => {
           let respTree = res.content as ResponseTree[]
+
+          respTree = respTree.filter(value => value.isActive)
 
          this.data = new MatTableDataSource<ResponseTree>(respTree)
           this.resultsLength = res.totalElements

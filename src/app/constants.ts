@@ -1,4 +1,5 @@
 import {AngularEditorConfig} from "@kolkov/angular-editor";
+import {ActionObjectType} from "./workers/workerModel";
 
 
 export const APP_VERSION="2.0.1"
@@ -38,7 +39,8 @@ export const CHANGE_STATUS_TO_REJECT = "Документ отвергнут"
 export const GET_DOCUMENT_STATUS_HISTORY_ERROR = "Ошибка получения истории изменения статусов"
 
 export const SET_COMPONENT_NAME_DUPLICATE = "Данное имя компонента уже используется"
-
+export const MAKET_CLOSE_NOT_SAVE = "Не сохраненные данные будут утеряны. Хотите сохранить?"
+export const MAKET_CLOSE_NOT_SAVE_FULL_MESSAGE = "Если хотите сохранить изменения нажмите кнопку ДА."
 
 export const ERROR = "ERROR"
 export const INFO = "INFO"
@@ -47,10 +49,49 @@ export const TAB_DOCUMENT_LIST = 0
 export const TAB_DOCUMENT_SHOW = 1
 
 export const AlertColor = "#c80082"
+export const oneHour = 3_600_000
 export const fiveMin = 300_000
 export const freeMin = 180_000
 
+export enum IceComponentType{
+  TEXT  = "text",
+  INPUT = "input",
+  AREA  = "area",
+  TABLE = "table",
+  SELECT= "select",
+  PLACE = "place",
+  UPLOAD= "upload",
+  BUTTON = "button"
+}
 
+export interface ObjectField {
+  fieldName: string,
+  fieldString: string,
+  fieldType:string,
+  objectType: ActionObjectType,
+  componentType: IceComponentType[]
+}
+
+export const  ObjectEditedFields:ObjectField[] =[
+  {fieldName: "docName", fieldString: "Наименование документа",fieldType:"string",objectType: "DOCUMENT",componentType:[]},
+  {fieldName: "isActive", fieldString: "Активен",fieldType:"boolean",objectType: "DOCUMENT",componentType:[]},
+
+  {fieldName: "stepName", fieldString: "Наименование страницы",fieldType:"string",objectType: "PAGE",componentType:[]},
+  {fieldName: "checkedText", fieldString: "Текст проверки",fieldType:"string",objectType: "PAGE",componentType:[]},
+  {fieldName: "visible", fieldString: "Видимость страницы",fieldType:"boolean",objectType: "PAGE",componentType:[]},
+  {fieldName: "isToolBar", fieldString: "Видимость панели инструментов",fieldType:"boolean",objectType: "PAGE",componentType:[]},
+
+  {fieldName: "value", fieldString: "Значение компонента",fieldType:"any",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE]},
+  {fieldName: "optionList", fieldString: "Набор значений",fieldType:"any",objectType: "COMPONENT",componentType:[IceComponentType.SELECT]},
+  // {fieldName: "dataObject", fieldString: "Объект данных",fieldType:"any",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA]},
+  {fieldName: "placeHolder", fieldString: "Подсказка",fieldType:"string",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE]},
+  {fieldName: "required", fieldString: "Обязательно для заполнения",fieldType:"boolean",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE]},
+  {fieldName: "enabled", fieldString: "Активность",fieldType:"boolean",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE]},
+  {fieldName: "visible", fieldString: "Видимость",fieldType:"boolean",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE]},
+  {fieldName: "textColor", fieldString: "Цвет текста",fieldType:"color",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE]},
+  {fieldName: "backgroundColor", fieldString: "Цвет фона",fieldType:"color",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE]},
+  {fieldName: "frameColor", fieldString: "Цвет рамки",fieldType:"color",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE]},
+]
 
 export type DocNameEdit = {
   docName: string
@@ -63,16 +104,6 @@ export const tableList = [
   {num:3,text:"Произвольная таблица"}
 ]
 
-export enum IceComponentType{
-  TEXT  = "text",
-  INPUT = "input",
-  AREA  = "area",
-  TABLE = "table",
-  SELECT= "select",
-  PLACE = "place",
-  UPLOAD= "upload",
-  BUTTON = "button"
-}
 export enum CellType {
   admin= "admin",
   client = "client"

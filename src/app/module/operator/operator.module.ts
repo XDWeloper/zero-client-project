@@ -21,6 +21,7 @@ import {MatDatepickerModule} from "@angular/material/datepicker";
 import {FormsModule} from "@angular/forms";
 import {DocStatusPipe} from "../../pipe/doc-status.pipe";
 import {StatusReasonComponent} from "../../component/status-reason/status-reason.component";
+import {MatButtonModule} from "@angular/material/button";
 
 
 
@@ -54,7 +55,8 @@ import {StatusReasonComponent} from "../../component/status-reason/status-reason
         MatDatepickerModule,
         FormsModule,
         DocStatusPipe,
-        StatusReasonComponent
+        StatusReasonComponent,
+        MatButtonModule
     ]
 })
 export class OperatorModule { }

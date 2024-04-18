@@ -4,7 +4,7 @@ import {
   ComponentBound, ComponentInputType, ComponentRuleForPDF,
   IceComponent,
   IceEvent,
-  MasterControl,
+  MasterControl, OptionList,
   TableProperties,
   TextPosition
 } from "../../../../interfaces/interfaces";
@@ -71,7 +71,7 @@ export class InformationCompanyParticipantsTableComponent implements IceComponen
   tableType: number;
 
   checkedText?: string;
-    optionList?: string[];
+    optionList?: OptionList[] | undefined
     printRule: ComponentRuleForPDF;
 
 

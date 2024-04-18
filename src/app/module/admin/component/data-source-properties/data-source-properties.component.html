@@ -1,0 +1,279 @@
+<div class="w-full h-full">
+  <!--  Настройка источника данных-->
+  <div class="w-full h-full  bg-white flex flex-col p-1">
+
+    <mat-icon class="close-button" (click)="dialogRef.close(0)">close</mat-icon>
+
+    <p class="text-center text-lg flex-none">Настройка источника данных</p>
+
+    <div class="flex-none flex">
+      <app-ice-input class="flex-1" [(ngModel)]="localDataSource.name" [label]="'Наименование источника'"
+                     [inputType]="'text'"></app-ice-input>
+      <app-ice-input class="ml-1 flex-wrap" [ngModel]="localDataSource.id" [label]="'Идентификатор'"
+                     [readonly]="true"></app-ice-input>
+    </div>
+
+    <div class="border p-1">
+      <mat-slide-toggle [(ngModel)]="isNativeSource" color="accent">
+        <span class="ml-2"> {{ nativeString }}
+          <span *ngIf="isNativeSource" class="text-primary-dark">{{ ' ' + bffUrl + ' ' }}</span>
+          <span *ngIf="isNativeSource"> Метод: "POST")</span>
+        </span>
+      </mat-slide-toggle>
+    </div>
+
+    <div class="flex-none items-center relative gap-1 flex">
+
+      <div class="flex-none relative">
+        <select class="peer h-full w-full rounded-[7px] border border-gray-200 border-t-transparent bg-transparent px-3 py-2.5
+                     font-sans text-sm font-normal text-gray-700 outline outline-0 transition-all placeholder-shown:border
+                     placeholder-shown:border-gray-200 placeholder-shown:border-t-gray-200 focus:border-2 focus:border-primary-base
+                     focus:border-t-transparent focus:outline-0 disabled:border-0 disabled:bg-gray-50 dark:text-white dark:border-gray-50"
+                [(ngModel)]="localDataSource.method">
+          <option value="GET">GET</option>
+          <option value="POST">POST</option>
+          <option value="PUT">PUT</option>
+          <option value="DELETE">DELETE</option>
+          <option value="PUTCH">PATCH</option>
+        </select>
+        <label
+          class="before:content[' '] after:content[' '] pointer-events-none absolute left-0 -top-1.5 flex h-full w-full select-none
+      text-[11px] font-normal leading-tight text-gray-400 transition-all before:pointer-events-none before:mt-[6.5px]
+      before:mr-1 before:box-border before:block before:h-1.5 before:w-2.5 before:rounded-tl-md before:border-t before:border-l
+      before:border-gray-200 before:transition-all after:pointer-events-none after:mt-[6.5px] after:ml-1 after:box-border
+      after:block after:h-1.5 after:w-2.5 after:flex-grow after:rounded-tr-md after:border-t after:border-r after:border-gray-200
+      after:transition-all peer-placeholder-shown:text-sm peer-placeholder-shown:leading-[3.75] peer-placeholder-shown:text-gray-500
+      peer-placeholder-shown:before:border-transparent peer-placeholder-shown:after:border-transparent peer-focus:text-[11px]
+      peer-focus:leading-tight peer-focus:text-primary-base peer-focus:before:border-t-2 peer-focus:before:border-l-2
+      peer-focus:before:border-primary-base peer-focus:after:border-t-2 peer-focus:after:border-r-2 peer-focus:after:border-primary-base
+      peer-disabled:text-transparent peer-disabled:before:border-transparent peer-disabled:after:border-transparent
+      peer-disabled:peer-placeholder-shown:text-gray-500 dark:peer-focus:text-white ">
+          Метод
+        </label>
+      </div>
+
+      <app-ice-input class="flex-1 -mt-2 ml-1" [(ngModel)]="localDataSource.url" [label]="'URL запроса'"
+                     [inputType]="'url'" (isValid)="urlIsValid = $event"></app-ice-input>
+      <button class="flex-wrap bg-primary-base text-white  font-medium rounded-lg text-sm px-4 py-2 "
+              [ngClass]="!localDataSource.method || !urlIsValid ? 'cursor-auto opacity-50 hover:bg-primary-base cursor-not-allowed' : 'hover:bg-primary-light cursor-pointer'"
+              (click)="testConnection()">Получить данные
+      </button>
+    </div>
+
+    <mat-tab-group class="flex-1 overflow-auto" (animationDone)="selectTab()"
+                   (selectedIndexChange)="selectedTabIndex = $event">
+
+      <mat-tab> <!-- Вкладка данные-->
+        <ng-template mat-tab-label>
+          <mat-icon class="text-primary-base">assignment</mat-icon>
+          Полученные данные
+        </ng-template>
+        <div *ngIf="responseJsonData" class="p-1 h-full border ">
+          <ngx-json-viewer [json]="responseJsonData" [expanded]="true"  (dblclick)="select($event)" ></ngx-json-viewer>
+        </div>
+
+
+      </mat-tab>
+
+      <mat-tab> <!-- Вкладка Переменные запроса-->
+        <ng-template mat-tab-label>
+          <mat-icon class="text-error-base">playlist_add</mat-icon>
+          Переменные запроса
+        </ng-template>
+        <div class="border h-full p-2 flex flex-col">
+
+          <div class="flex-none border-b flex">
+            <p class="text-center w-[45%]">Ключ</p>
+            <p class="text-center w-[45%]">Значение</p>
+            <p class="text-center w-[10%]">Авто</p>
+          </div>
+          <div class="flex-1 overflow-auto">
+            <div *ngFor="let pv of localDataSource.pathVariables; let i = index" class="flex p-1">
+              <input [(ngModel)]="pv.key" class="w-[45%] pl-1" placeholder="Имя переменной"
+                     [ngClass]="{'bg-gray-200': i%2 === 0}">
+
+              <div class="w-[45%] ml-1 flex">
+                <input class="flex-1 pl-1" [(ngModel)]="pv.value" placeholder="Значение переменной"
+                       [ngClass]="{'bg-gray-200': i%2 === 0}" [readOnly]="pv.isAutoFill">
+                <button *ngIf="pv.isAutoFill" (click)="setAutoFillComponent(i,'path')"
+                        class="bg-white px-4 mx-0.5 rounded-md border border-primary-dark flex-none ml-1">...
+                </button>
+              </div>
+              <div class="w-[10%] flex justify-center items-center">
+                <mat-slide-toggle [(ngModel)]="pv.isAutoFill"></mat-slide-toggle>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex-none">
+            <div class="flex justify-start items-center border bg-primary-base">
+              <mat-icon class="text-green-500 cursor-pointer" matTooltip="Добавить строку" (click)="addRowPathValue()">
+                add
+              </mat-icon>
+              <mat-icon class="text-error-base cursor-pointer" matTooltip="Удалить строку"
+                        (click)="removeRowPathValue()">remove
+              </mat-icon>
+              <mat-icon class="text-error-base cursor-pointer" matTooltip="Очистить таблицу"
+                        (click)="clearTablePathValue()">close
+              </mat-icon>
+            </div>
+            <p class="">«+» - добавить строку, «-» - убрать строку </p>
+          </div>
+        </div>
+      </mat-tab>
+      <mat-tab> <!-- Вкладка Тело запроса-->
+        <ng-template mat-tab-label>
+          <mat-icon class="text-warning-base">playlist_add</mat-icon>
+          Тело запроса
+        </ng-template>
+
+        <div class="border h-full p-2 flex flex-col">
+
+          <div class="flex-none border-b flex">
+            <p class="text-center w-[45%]">Ключ</p>
+            <p class="text-center w-[45%]">Значение</p>
+            <p class="text-center w-[10%]">Авто</p>
+          </div>
+          <div class="flex-1 overflow-auto">
+            <div *ngFor="let bv of localDataSource.bodyVariables; let i = index" class="flex p-1">
+              <input [(ngModel)]="bv.key" class="w-[45%] pl-1" placeholder="Имя переменной"
+                     [ngClass]="{'bg-gray-200': i%2 === 0}">
+
+              <div class="w-[45%] ml-1 flex">
+                <input class="flex-1 pl-1" [(ngModel)]="bv.value" placeholder="Значение переменной"
+                       [ngClass]="{'bg-gray-200': i%2 === 0}" [readOnly]="bv.isAutoFill">
+                <button *ngIf="bv.isAutoFill" (click)="setAutoFillComponent(i,'body')"
+                        class="bg-white px-4 mx-0.5 rounded-md border border-primary-dark flex-none ml-1">...
+                </button>
+              </div>
+              <div class="w-[10%] flex justify-center items-center">
+                <mat-slide-toggle [(ngModel)]="bv.isAutoFill"></mat-slide-toggle>
+              </div>
+
+            </div>
+          </div>
+
+          <div class="flex-none">
+            <div class="flex justify-start items-center border bg-primary-base">
+              <mat-icon class="text-green-500 cursor-pointer" matTooltip="Добавить строку" (click)="addRowBodyValue()">
+                add
+              </mat-icon>
+              <mat-icon class="text-error-base cursor-pointer" matTooltip="Удалить строку"
+                        (click)="removeRowBodyValue()">remove
+              </mat-icon>
+              <mat-icon class="text-error-base cursor-pointer" matTooltip="Очистить таблицу"
+                        (click)="clearTableBodyValue()">close
+              </mat-icon>
+            </div>
+            <p class="">«+» - добавить строку, «-» - убрать строку </p>
+          </div>
+
+        </div>
+
+      </mat-tab>
+    </mat-tab-group>
+    <div class="h-1 flex-none"></div>
+    <div class="flex-none border-t border-t-primary-dark flex justify-end items-center pt-0.5 gap-1">
+      <button class="flex-none button-style right-0 bottom-0 relative" (click)="SaveAndClose()">Сохранить</button>
+    </div>
+
+    <ng-container [ngTemplateOutlet]="relationField"></ng-container>
+    <ng-container [ngTemplateOutlet]="errorDialog"></ng-container>
+    <ng-container [ngTemplateOutlet]="dynamicVar"></ng-container>
+
+
+
+  </div>
+
+  <!--  Показывать ошибки-->
+  <ng-template #errorDialog>
+  <div *ngIf="localErrorText"
+       class="absolute h-full w-full bg-gray-200 z-50 bg-opacity-50 flex justify-center items-center">
+    <div class="h-[30%] w-[50%] border border-primary-base bg-white flex flex-col z-10000">
+      <div class="flex-1 flex justify-center items-center">
+        <div class="text-center text-error-base">{{ localErrorText }}</div>
+      </div>
+      <div class=" border border-t p-1 flex justify-end">
+        <button class="footer-button-style" (click)="localErrorText = ''">Понятно</button>
+      </div>
+    </div>
+  </div>
+  </ng-template>
+
+  <!--Сопряжение с компонентами для полейц запросов и body-->
+  <ng-template #relationField>
+    <div *ngIf="showComponentRelationDialog"
+         class="absolute top-0 left-0 h-full w-full flex justify-center items-center bg-gray-200 z-50 bg-opacity-50">
+      <!--Настройка сопряжения с компонентом-->
+      <div class="w-[80%] h-[80%] border border-primary-dark rounded-md bg-white p-1 relative flex flex-col gap-0.5">
+        <mat-icon class="close-button" (click)="showComponentRelationDialog = false">close</mat-icon>
+
+        <p class="text-center text-lg flex-none">Настройка сопряжения с компонентом</p>
+        <div class="flex-none flex border text-lg">
+          <div class="flex-1 text-center">{{ editVariable.key }}</div>
+          <div class="flex-none text-center text-warning-base animate-pulse"> >></div>
+          <div class="flex-1 text-center">{{ tempComponentName }}</div>
+        </div>
+
+        <div class="flex mt-1">
+          <div class="w-[5%] text-center">Ид</div>
+          <div class="w-[55%]  text-center">Имя компонента</div>
+          <div class="w-[40%]  text-center">Тип компонента</div>
+        </div>
+
+        <div class="flex-1 overflow-auto border rounded-t-lg p-0.5">
+          <div
+            class="flex cursor-pointer border border-white text-base  hover:border-primary-light hover:animate-pulse duration-200 rounded-lg"
+            [ngClass]="{'bg-gray-200': i%2 != 0}"
+            (click)="changeComponentForRelation(component);tempComponentName = component.componentName"
+            *ngFor="let component of currentTemplateComponentList | componentFilter: searchText; let i = index">
+            <div class="w-[10%] ">{{ component.componentID }}</div>
+            <div class="w-[70%]">{{ component.componentName }}</div>
+            <div class="w-[20%]">{{ component.componentType }}</div>
+          </div>
+        </div>
+
+        <div class="flex-none  border-t border-t-primary-dark flex justify-end items-center pt-0.5 gap-1">
+
+          <div class="relative w-full">
+            <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
+              <svg class="w-4 h-4 text-gray-500 dark:text-gray-400" aria-hidden="true"
+                   xmlns="http://www.w3.org/2000/svg"
+                   fill="none" viewBox="0 0 20 20">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                      d="m19 19-4-4m0-7A7 7 0 1 1 1 8a7 7 0 0 1 14 0Z"/>
+              </svg>
+            </div>
+            <input type="search" [(ngModel)]="searchText"
+                   class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+                   placeholder="Поиск компонента, ид, имя, тип..." required>
+          </div>
+
+          <button class="button-style right-0 bottom-0 relative" (click)="SaveAndCloseRelation()">Сохранить</button>
+        </div>
+
+      </div>
+
+    </div>
+  </ng-template>
+
+  <!--  Запросить значение динамических полей-->
+  <ng-template #dynamicVar>
+  <div *ngIf="isDynamicVarDialog"
+       class="absolute h-full w-full bg-gray-200 z-50 bg-opacity-50 flex justify-center items-center">
+    <div class="h-[50%] w-[50%] border border-primary-base bg-white flex flex-col z-10000 p-1">
+      <p class="text-center">Установите значения динамических переменных</p>
+      <div class="flex-1 border overflow-auto">
+        <div class="flex p-1" *ngFor="let item of localDataSource.dynamicPathVariables;">
+          <div class="w-[50%]" > {{ item.key }}</div>
+          <input class="w-[50%] border cursor-pointer bg-white" [(ngModel)]="item.value" [placeholder]="'Установите значение'"/>
+        </div>
+      </div>
+      <div class=" border border-t p-1 flex justify-end">
+        <button class="footer-button-style" (click)="setDynamicVar(); isDynamicVarDialog = false">Применить</button>
+      </div>
+    </div>
+  </div>
+  </ng-template>
+
+</div>

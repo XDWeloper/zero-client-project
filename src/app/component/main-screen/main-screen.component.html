@@ -1,2 +1,5 @@
-<div class="spinner" *ngIf="spinnerService.visibility | async"></div>
+<div *ngIf="spinnerService.visibility | async"
+     class="absolute h-screen w-screen flex justify-center items-center bg-gray-200 z-50 bg-opacity-50">
+  <div class="spinner z-10000" ></div>
+</div>
 

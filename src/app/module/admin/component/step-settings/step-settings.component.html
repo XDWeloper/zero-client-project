@@ -5,7 +5,7 @@
 
   <p class="text-center text-lg flex-none">Настройка страницы</p>
 
-  <mat-tab-group class="flex-1 overflow-auto">
+  <mat-tab-group class="flex-1 overflow-auto" (animationDone)="selectTab()">
 
     <mat-tab> <!-- Вкладка визуальные настройки-->
       <ng-template mat-tab-label>
@@ -19,6 +19,13 @@
         <mat-icon>playlist_add</mat-icon>
         Обработчики
       </ng-template>
+      <div class="w-full h-full p-1 rounded-md flex flex-col">
+        <app-change-worker class="flex-1 border p-2"
+                           [eventList]="eventList"
+                           [allWorkerList]="workerList"
+                           [(ngModel)]="localEvent">
+        </app-change-worker>
+      </div>
     </mat-tab>
 
     <mat-tab> <!-- Вкладка разное-->

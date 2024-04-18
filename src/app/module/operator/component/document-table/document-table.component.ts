@@ -48,7 +48,7 @@ import {DocumentService} from "../../../../services/document.service";
   ]
 })
 export class DocumentTableComponent implements AfterViewInit, OnInit {
-  displayedColumns: string[] = ['id', 'docName', 'createDate', 'statusDate','status', 'document', 'operation'];
+  displayedColumns: string[] = ['id', 'docName','orgName','inn', 'createDate', 'statusDate','status', 'document', 'operation'];
   data: IceDocument[] = []
   length = 50;
   pageSize = 10;
@@ -63,8 +63,11 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
   step: number;
   filterExpanded = false
   docName: string
-  createDate: Date
-  docStatus: string
+  createDate: Date | undefined = undefined
+  statusDate: Date | undefined = undefined
+  docStatus: string | undefined = undefined
+  orgName: string;
+  inn: string;
 
 
   constructor(public backService: BackendService,
@@ -101,7 +104,10 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
             this.sort.direction,
             this.docName,
             this.createDate,
-            this.docStatus
+            this.docStatus,
+            this.inn,
+            this.orgName,
+            this.statusDate,
           )//.pipe(catchError(() => observableOf(null)));
         }),
         map(data => {
@@ -160,7 +166,11 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
   clearFilter() {
     this.docName = undefined
     this.createDate = undefined
+    this.statusDate = undefined
     this.docStatus = undefined
+    this.inn = undefined
+    this.orgName = undefined
+
     //this.changeDetection.detectChanges()
   }
 

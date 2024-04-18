@@ -43,7 +43,7 @@ export class TablePropComponent implements OnInit, AfterViewInit {
   currentHeader: Header
   currentSubHeader: SubHeader
   errorMessage: string | undefined
-  fontSizeMask: string = "99";
+  fontSizeMask: string = "00";
   headerMaxHeight: number | undefined = undefined
   subHeaderMaxHeight: number | undefined = undefined
 

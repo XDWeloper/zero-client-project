@@ -1,8 +1,16 @@
 
 
-<div class="w-screen h-screen dark:bg-slate-700 bg-white">
+<div class="w-screen h-screen dark:bg-slate-700 bg-white relative">
   <div class="container h-full overflow-auto dark:bg-dark-background bg-cyan-50 bg-opacity-50" >
     <div class="w-full bg-primary-dark  dark:bg-dark-background flex items-center relative h-16 dark:border-b rounded-lg">
+
+      <button *ngIf="this.currentTabNum === 1"
+        (click)="openDocList()"
+        class="absolute top-4 left-2 rounded-md bg-error-base px-2 py-1 text-white hover:bg-warning-base duration-300 cursor-pointer flex justify-center items-center gap-1 z-10">
+        <mat-icon class="scale-75">arrow_back</mat-icon>
+        <span class="">Документы пользователя</span>
+      </button>
+
       <div class="absolute text-lg text-center text-gray-100 w-full">Личный кабинет клиента ({{user ? user.name : ""}}) </div>
       <!--    <img src="https://www.cmrbank.ru/i/logo.png" alt="" class="bg-transparent/60 p-2">-->
       <div class="absolute right-2 mt-2" matTooltip="Выход">
@@ -14,13 +22,13 @@
 
     </div>
 
-    <mat-tab-group [(selectedIndex)]="currentTabNum" (animationDone)="tabChangeDone()">
+    <mat-tab-group [(selectedIndex)]="currentTabNum" (animationDone)="tabChangeDone()" >
           <mat-tab >
-            <ng-template mat-tab-label >
-              <mat-icon >assignment</mat-icon>
-              <span class="ml-2">Документы пользователя</span>
-            </ng-template>
-            <app-document-table (openDocId)="openDoc($event)"></app-document-table>
+<!--            <ng-template mat-tab-label >-->
+<!--              <mat-icon >assignment</mat-icon>-->
+<!--              <span class="ml-2">Документы пользователя</span>-->
+<!--            </ng-template>-->
+            <app-document-table (openDocId)="openDoc($event)" [isOpenedTab] = !tabDone></app-document-table>
           </mat-tab>
 
       <mat-tab>
@@ -31,12 +39,12 @@
           </ng-template>
         </div>
         <div *ngIf="!openDocType">
-          <ng-template mat-tab-label>
-            <mat-icon>border_color</mat-icon>
-            <span class="ml-2">Создать документ</span>
-          </ng-template>
+<!--          <ng-template mat-tab-label>-->
+<!--            <mat-icon>border_color</mat-icon>-->
+<!--            <span class="ml-2">Создать документ</span>-->
+<!--          </ng-template>-->
         </div>
-        <app-document-editor [currentDocument]="openedDocument" [openType]="openDocType" [isOpenedTab] = tabDone></app-document-editor>
+        <app-document-editor [currentDocument]="openedDocument" [openType]="openDocType" [isOpenedTab] = tabDone [maketId]="maketId"></app-document-editor>
       </mat-tab>
     </mat-tab-group>
   </div>

@@ -2,7 +2,7 @@ import {Injectable, OnDestroy} from '@angular/core';
 import {interval, Subscription} from "rxjs";
 import {KeycloakService} from "./keycloak.service";
 import {Router} from "@angular/router";
-import {fiveMin, freeMin} from "../constants";
+import {fiveMin, freeMin, oneHour} from "../constants";
 
 @Injectable({
   providedIn: 'root'
@@ -36,7 +36,7 @@ export class TimeService implements OnDestroy{
     this.inter = interval(10_000).subscribe(() => {
       let newTime = new Date().getTime()
       //console.log("logout time: " + (newTime - this.lastRequestTime))
-      if (newTime - this.lastRequestTime > fiveMin && this.isLogout) {
+      if (newTime - this.lastRequestTime > oneHour && this.isLogout) {
         this.keyCloakService.logoutAction().subscribe({
           complete: () => this.router.navigate(['/'])
         })

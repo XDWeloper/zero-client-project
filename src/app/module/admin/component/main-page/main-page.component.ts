@@ -1,4 +1,5 @@
 import {
+  ChangeDetectionStrategy, ChangeDetectorRef,
   Component,
   ComponentRef,
   ElementRef,
@@ -20,6 +21,8 @@ import {
   docPanelCloseWidth,
   docPanelOpenWidth,
   IceComponentType,
+  MAKET_CLOSE_NOT_SAVE,
+  MAKET_CLOSE_NOT_SAVE_FULL_MESSAGE,
   propPanelCloseWidth,
   propPanelOpenWidth
 } from "../../../../constants";
@@ -38,13 +41,16 @@ import {TimeService} from "../../../../services/time.service";
 import {KeycloakService} from "../../../../services/keycloak.service";
 import {MessageService} from "../../../../services/message.service";
 import {TablePropComponent} from "../table-prop/table-prop.component";
-import {IceDataSourceWorker } from "../../../../workers/IceDataSourceWorker";
-import {FieldChangerWorker} from "../../../../workers/FiedChangerWorker";
-import {IDataSource, IWorker, WorkerType} from "../../../../workers/workerModel";
+import {IWorker} from "../../../../workers/workerModel";
+import {ModifiedService} from "../../../../services/modified.service";
+import {openDialog} from "../../util";
+import {DataSourceDialogComponent} from "../data-sourse-dialog/data-source-dialog.component";
+import {WorkerDialogComponent} from "../worker-dialog/worker-dialog.component";
 
 @Component({
   selector: 'app-main-page',
   templateUrl: './main-page.component.html',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class MainPageComponent implements OnInit, OnDestroy {
 
@@ -93,7 +99,9 @@ export class MainPageComponent implements OnInit, OnDestroy {
               private backService: BackendService,
               private timeService: TimeService,
               private keycloakService: KeycloakService,
-              private messageService: MessageService) {
+              private messageService: MessageService,
+              private modifiedService:ModifiedService,
+              private changeDetection: ChangeDetectorRef) {
 
     /**Разрешить обновление токенов*/
     timeService.isRefreshToken = true
@@ -220,7 +228,10 @@ export class MainPageComponent implements OnInit, OnDestroy {
       this.componentRef.instance.optionList = compMaket.optionList
       this.componentRef.instance.tableProp = compMaket.tableProp
       this.componentRef.instance.componentEvent = compMaket.componentEvent
-
+      this.componentRef.instance.visible = compMaket.visible
+      this.componentRef.instance.enabled = compMaket.enabled
+      this.componentRef.instance.customAttribName = compMaket.customAttribName
+      this.componentRef.instance.customAttribColumnName = compMaket.customAttribColumnName
     } else {
       this._modify = true
     }
@@ -230,9 +241,12 @@ export class MainPageComponent implements OnInit, OnDestroy {
       newLine: true,
       order: this.documentService.getLastOrder(this.currentDoc.id)
     }
+    this.componentService.addComponent(this.componentRef);
 
-
-    this.componentService.addComponent(this.componentRef)
+    if(this.componentRef.instance) {
+      (this.componentRef.instance as MaketComponent).setBound(this.mainContainer.nativeElement.getBoundingClientRect());
+      (this.componentRef.instance as MaketComponent).currentCell = this.cellService.getCellBound((this.componentRef.instance as MaketComponent).cellNumber)
+    }
   }
 
   ngOnInit(): void {
@@ -269,6 +283,8 @@ export class MainPageComponent implements OnInit, OnDestroy {
     if ($event === 'delete') {
       this.isMenuHidden = true
       this.componentService.removeComponent(this.currentComponentID)
+      this.documentService.removeComponent(this.currentComponentID)
+      this.componentService.selectedComponent$.next(undefined)
       this._modify = true
     }
     if ($event === 'edit') {
@@ -296,7 +312,6 @@ export class MainPageComponent implements OnInit, OnDestroy {
         this.openWatchDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration)
         break;
       case 'reordering' :
-
         this.messageService.show("Переупорядочивание компонентов для печати",
           "Внимание! Выполнение данного действия приведет изменению порядка элементов при выводе на печать данного этапа.",
           "INFO", ["YES", "CANCEL"]).subscribe(value => {
@@ -305,6 +320,13 @@ export class MainPageComponent implements OnInit, OnDestroy {
           }
         })
         break;
+      case "dataSources":
+        this.openDataSourceDialog()
+        break
+      case "workers":
+        this.openWorkerDialog()
+        break
+
     }
   }
 
@@ -331,7 +353,6 @@ export class MainPageComponent implements OnInit, OnDestroy {
   }
 
   openWatchDialog(enterAnimationDuration: string, exitAnimationDuration: string): void {
-
     let componentRef = this.dialog.open(WatchTemplateComponent, {
       width: '' + (window.innerWidth - (window.innerWidth / 5)) + 'px',
       height: '' + (window.innerHeight - (window.innerHeight / 10)) + 'px',
@@ -358,14 +379,16 @@ export class MainPageComponent implements OnInit, OnDestroy {
       this.currentStep = this.currentDoc.children.find(p => p.num === docAndStep.currentStepNum)
 
     if (this.currentDoc && this.currentStep) {
-      this.transEnd()
+      //this.transEnd()
       this.restoreComponents(this.documentService.getComponentCollections(this.currentDoc, this.currentStep))
       this.currentStep.visible = this.documentService.getTemplateByDocId(this.currentDoc.id).docStep.find(s => s.stepNum === this.currentStep.num).visible
     }
-    this.currentTemplate = this.documentService.getTemplateByDocId(this.currentDoc.id)
+    if(this.currentDoc)
+      this.currentTemplate = this.documentService.getTemplateByDocId(this.currentDoc.id)
+
     if(!this.currentTemplate.docAttrib){
-      this.currentTemplate.docAttrib = {workerList: [],documentEventList: []}
-    }
+        this.currentTemplate.docAttrib = {workerList: [],documentEventList: []}
+      }
   }
 
   private restoreComponents(componentCollections: ComponentMaket[]) {
@@ -376,6 +399,21 @@ export class MainPageComponent implements OnInit, OnDestroy {
   }
 
   exit() {
+    if(this.modifiedService.getModified()){
+      this.messageService.show(MAKET_CLOSE_NOT_SAVE,MAKET_CLOSE_NOT_SAVE_FULL_MESSAGE,"INFO",["YES","NO"])
+        .subscribe(value => {
+          if(value === "YES"){
+            this.modifiedService.modify$.next(true)
+          } else{
+            this.logoutAndExit()
+          }
+        })
+    } else {
+      this.logoutAndExit()
+    }
+  }
+
+  logoutAndExit(){
     this.keycloakService.logoutAction().subscribe({
       complete: (() => this.router.navigate(["/"]))
     })
@@ -392,10 +430,8 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
   private openTablePropDialog(currentTableComponent: IceMaketComponent) {
     this.isBlock = true
-    let componentRef = this.dialog.open(TablePropComponent, {
-      enterAnimationDuration: dialogOpenAnimationDuration,
-      exitAnimationDuration: dialogCloseAnimationDuration
-    })
+    let componentRef = openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration,TablePropComponent, this.dialog)
+
     this.currentComponentID = currentTableComponent.componentID
     componentRef.componentInstance.currentTableComponent = currentTableComponent
     componentRef.afterClosed().subscribe(value => {
@@ -403,49 +439,26 @@ export class MainPageComponent implements OnInit, OnDestroy {
         if(value === -1 && currentTableComponent.tableProp === undefined){
           this.selectMenu("delete")
         }
+        this.changeDetection.detectChanges()
       }
     )
 
   }
 
-  rightClick($event: MouseEvent) {
-    $event.preventDefault();
-    this.workerMenuPosition = {x: $event.x, y: $event.y}
-    this.workerMenuOpen = this.currentWorker === undefined
-    //this.modify = true
+  private openDataSourceDialog() {
+    let componentRef = openDialog<DataSourceDialogComponent>(dialogOpenAnimationDuration, dialogCloseAnimationDuration,DataSourceDialogComponent, this.dialog)
+    componentRef.componentInstance.currentTemplate = this.currentTemplate
+    componentRef.afterClosed().subscribe({next: res => this.modify = res === 1})
   }
 
-  addDataSource(workerType: WorkerType) {
-    this.currentTemplate = this.documentService.getTemplateByDocId(this.currentDoc.id)
-    if(!this.currentTemplate.docAttrib.workerList)
-      this.currentTemplate.docAttrib.workerList = []
+  private openWorkerDialog() {
+    if(WorkerDialogComponent.isOpen === true) return
 
-    let newWorker:IWorker
-    if(workerType === "NETDATASOURCE")
-      newWorker = new IceDataSourceWorker(
-        this.getDataSourceNextID(),
-        "Источник данных " + this.currentTemplate.docAttrib.workerList.length,
-        "NETDATASOURCE")
-    if(workerType === "FIELDCHANGER")
-      newWorker = new FieldChangerWorker(
-        this.getDataSourceNextID(),
-        "Обработчик " + this.currentTemplate.docAttrib.workerList.length,
-        "FIELDCHANGER")
-
-    if(!newWorker) return
-
-    this.currentTemplate.docAttrib.workerList.push(newWorker)
-    this.modify = true
-    this.workerMenuOpen = false
+    let componentRef = openDialog<WorkerDialogComponent>(dialogOpenAnimationDuration, dialogCloseAnimationDuration,WorkerDialogComponent, this.dialog)
+    componentRef.componentInstance.currentTemplate = this.currentTemplate
+    componentRef.afterClosed().subscribe({next: res => {
+        this.modify = res === 1
+        WorkerDialogComponent.isOpen = false
+      }})
   }
-
-  private getDataSourceNextID(): number {
-    return this.currentTemplate.docAttrib.workerList.length > 0 ? Math.max( ...this.currentTemplate.docAttrib.workerList.map(value => value.id) ) + 1 : 0
-  }
-
-  getWorkerList(workerType: WorkerType):IWorker[] {
-    return this.currentTemplate.docAttrib.workerList.filter(item => item.type === workerType).sort((a, b) => a.id - b.id)
-  }
-
-  //protected readonly IceDataSourceWorker = IceDataSourceWorker;
 }

@@ -1,12 +1,15 @@
 import {ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy} from '@angular/core';
 import {
-  ComponentBound, ComponentInputType, ComponentRuleForPDF,
+  ComponentBound,
+  ComponentInputType,
+  ComponentRuleForPDF,
   ControlPropType,
   DialogButtonType,
   IceComponent,
   IceDocument,
   IceEvent,
   MasterControl,
+  OptionList,
   TableProperties,
   TextPosition,
   UploadFile
@@ -100,14 +103,15 @@ export class UploadComponent implements IceComponent, OnDestroy {
   }
 
   tableProp?: TableProperties;
-    componentEvent?: IceEvent[];
-    update(): void {
-        throw new Error('Method not implemented.');
-    }
+  componentEvent?: IceEvent[];
+
+  update(): void {
+    throw new Error('Method not implemented.');
+  }
 
   tableType: number;
-    checkedText?: string;
-    optionList?: string[];
+  checkedText?: string;
+  optionList?: OptionList[] | undefined
 
   ngOnDestroy(): void {
     if (this.upload$)
@@ -275,7 +279,7 @@ export class UploadComponent implements IceComponent, OnDestroy {
               if (errorFileIndex != -1) {
                 let errorFile = this.files[errorFileIndex]
                 message = `Ошибка загрузки файла ${errorFile.name}. Смотри доп. информацию.(Кликни на иконку информации.)`
-                this.files.splice(errorFileIndex,1)
+                this.files.splice(errorFileIndex, 1)
               }
               this.show$ = this.messageService.show(message ? message : FILES_LOAD_ERROR, err.error.message, ERROR)
               this.reCalculateSumSize()

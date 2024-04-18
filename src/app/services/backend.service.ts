@@ -1,4 +1,4 @@
-import {Observable} from 'rxjs';
+import {Observable, tap} from 'rxjs';
 import {Injectable} from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from "../../environments/environment";
@@ -136,6 +136,16 @@ export class BackendService {
     return this.http.post(environment.bffURI + '/operation', operation);
   }
 
+  /**Обновить только данные документа*/
+  updateOnlyDate(document: IceDocument):Observable<any>{
+    document = this.transferValueToAttrib(document)
+    const operation = new Operation();
+    operation.url = environment.resourceServerURL + "/core/documents/update/" + document.id + "/values"
+    operation.httpMethod = HttpMethod.PUT
+    operation.body = document.docAttrib.componentValueList
+    return this.http.post(environment.bffURI + '/operation', operation);
+  }
+
   transferValueToAttrib(maket: IceDocument):IceDocument{
     if(!maket.docAttrib)
       return maket
@@ -147,17 +157,25 @@ export class BackendService {
         value.value,
         value.componentType,
         value.notification ? value.notification : value.placeHolder,
-        value.enabled ? value.enabled : false))
+        value.enabled ? value.enabled : false,
+        value.dataObject))
+
       maket.docAttrib.componentValueList = componentValueList
     return maket
   }
 
-  getDocumentNameList(page?: number,size?: number, sort?: string, order?: string, docName?: string, createDate?: Date, status?: string): Observable<any> {
+  getDocumentNameList(page?: number,size?: number, sort?: string, order?: string, docName?: string, createDate?: Date, status?: string, inn?: string, orgName?: string,statusDate?: Date): Observable<any> {
     const operation = new Operation();
+    if(sort === "inn") sort = "customAttrib_" + sort
+    if(sort === "name") sort = "customAttrib_" + sort
+
     operation.url = environment.resourceServerURL + `/core/documents?page=${page}&size=${size}&sort=${sort},${order}`
     operation.url +=  docName != undefined ? `&name=${docName}` : ''
     operation.url +=  createDate != undefined ? `&createDate=${createDate}` : ''
+    //operation.url +=  statusDate != undefined ? `&statusDate=${statusDate}` : ''
     operation.url +=  status != undefined ? `&status=${status}` : ''
+    operation.url +=  inn != undefined ? `&customAttrib_inn=${inn}` : ''
+    operation.url +=  orgName != undefined ? `&customAttrib_name=${orgName}` : ''
     operation.httpMethod = HttpMethod.GET;
     return this.http.post(environment.bffURI + '/operation', operation);
   }
@@ -233,6 +251,4 @@ export class BackendService {
     operation.httpMethod = HttpMethod.DELETE
     return this.http.post<any>(environment.bffURI + '/operation', operation,{observe: 'events',reportProgress: true,});
   }
-
-
 }

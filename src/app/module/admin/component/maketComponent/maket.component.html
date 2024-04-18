@@ -23,26 +23,30 @@
      (mouseenter)="isHover = true"
      (mouseleave)="!isDragged ? isHover = false : isHover = true">
 
-  <div class="handle opacity-50" cdkDragHandle>
-    <svg width="24px" fill="currentColor" viewBox="0 0 24 24">
-      <path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"></path>
-      <path d="M0 0h24v24H0z" fill="none"></path>
-    </svg>
+  <div *ngIf="componentType != 'select' && componentType != 'upload'" class="w-full h-full pl-7"
+       [innerHTML]="sanitizer.bypassSecurityTrustHtml(value ? value : placeHolder + (inputType ? ' ' + inputType : ''))">
   </div>
-
-    <div *ngIf="componentType != 'select' && componentType != 'upload'" class="w-full h-full pl-7"
-         [innerHTML]="sanitizer.bypassSecurityTrustHtml(value ? value : placeHolder + (inputType ? ' ' + inputType : ''))">
-    </div>
-    <div *ngIf="componentType === 'select'" class="w-full h-full pl-7"
-         [innerHTML]="sanitizer.bypassSecurityTrustHtml(placeHolder)">
-    </div>
-    <mat-icon *ngIf="componentType === 'upload'" class="ml-4 mt-2 text-blue-500 scale-[2.0]">
+  <div *ngIf="componentType === 'select'" class="w-full h-full pl-7"
+       [innerHTML]="sanitizer.bypassSecurityTrustHtml(placeHolder)">
+  </div>
+  <div class="absolute top-0 left-0 h-full w-full flex justify-center items-center">
+    <mat-icon *ngIf="componentType === 'upload'" class="text-blue-500 scale-[2.0]">
       cloud_upload
     </mat-icon>
+  </div>
   <mat-icon *ngIf="isResizable"
             (mousedown)="mouseDown($event)"
             class="text-error-base scale-50 absolute right-0 bottom-0 translate-x-2 translate-y-2 cursor-nw-resize z-10">
     network_cell
   </mat-icon>
+
+  <div class="handle opacity-50" cdkDragHandle>
+    <svg width="24px" fill="currentColor" viewBox="0 0 24 24">
+      <path
+        d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z"></path>
+      <path d="M0 0h24v24H0z" fill="none"></path>
+    </svg>
+  </div>
+
 
 </div>

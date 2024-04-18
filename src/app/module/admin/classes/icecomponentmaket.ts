@@ -3,11 +3,11 @@ import {
   ComponentBound, ComponentInputType,
   ComponentMaket,
   ComponentRuleForPDF, IceEvent,
-  MasterControl, TableProperties,
+  MasterControl, OptionList, TableProperties,
   TextPosition
 } from "../../../interfaces/interfaces";
 import {BehaviorSubject} from "rxjs";
-import {IceDataSourceWorker} from "../../../workers/IceDataSourceWorker";
+import {IceDataSource} from "../../../workers/IceDataSource";
 
 export class IceMaketComponent {
 
@@ -33,15 +33,34 @@ export class IceMaketComponent {
   private _maxVal: number | undefined
   private _notification: string | undefined
   private _checkText: string | undefined;
-  private _optionList: string[] | undefined
+  private _optionList: OptionList[] | undefined
   private _enabled: boolean | undefined
   private _visible: boolean | undefined
 
   private _printRule: ComponentRuleForPDF;
   private _tableProp?: TableProperties
-  private _dataSource?: IceDataSourceWorker[]
+  private _dataSource?: IceDataSource[]
   private _componentEvent?: IceEvent[]
 
+  private _customAttribName?: string
+  private _customAttribColumnName?: string
+
+
+  get customAttribName(): string {
+    return this._customAttribName;
+  }
+
+  set customAttribName(value: string) {
+    this._customAttribName = value;
+  }
+
+  get customAttribColumnName(): string {
+    return this._customAttribColumnName;
+  }
+
+  set customAttribColumnName(value: string) {
+    this._customAttribColumnName = value;
+  }
 
   get enabled(): boolean | undefined {
     return this._enabled;
@@ -67,11 +86,11 @@ export class IceMaketComponent {
     this._componentEvent = value;
   }
 
-  get dataSource(): IceDataSourceWorker[] {
+  get dataSource(): IceDataSource[] {
     return this._dataSource;
   }
 
-  set dataSource(value: IceDataSourceWorker[]) {
+  set dataSource(value: IceDataSource[]) {
     this._dataSource = value;
   }
 
@@ -101,11 +120,11 @@ export class IceMaketComponent {
     this._printRule = value;
   }
 
-  get optionList(): string[] | undefined {
+  get optionList(): OptionList[] {
     return this._optionList;
   }
 
-  set optionList(value: string[] | undefined) {
+  set optionList(value: OptionList[]) {
     this._optionList = value;
   }
 
@@ -319,7 +338,7 @@ export class IceMaketComponent {
       backgroundColor: this.backgroundColor,
       inputType: this.inputType,
       required: this.required,
-      textPosition: this._textPosition,
+      textPosition: this.textPosition,
       tableType: this.tableType,
       frameColor: this.frameColor,
       minLength: this.minLength,
@@ -332,10 +351,11 @@ export class IceMaketComponent {
       checkedText: this.checkText,
       optionList: this.optionList,
       tableProp: this.tableProp,
-      dataSource: this.dataSource,
       componentEvent: this.componentEvent,
       enabled: this.enabled,
-      visible: this.visible
+      visible: this.visible,
+      customAttribName: this.customAttribName,
+      customAttribColumnName: this.customAttribColumnName
   }
   }
 }

@@ -1,9 +1,10 @@
-import { Injectable } from '@angular/core';
-import {IceDataSourceWorker } from "../workers/IceDataSourceWorker";
+import {Injectable} from '@angular/core';
 import {DataSourceService} from "./data-source.service";
-import {IceDocument} from "../interfaces/interfaces";
-import {IDataSource, IWorker} from "../workers/workerModel";
-import {FieldChangerWorker} from "../workers/FiedChangerWorker";
+import {IceDocument, IceEvent} from "../interfaces/interfaces";
+import {IceWorker, IWorker} from "../workers/workerModel";
+import {FieldWorker} from "../workers/FiedChangerWorker";
+import {EventService} from "./event.service";
+import {BehaviorSubject, Subject} from "rxjs";
 
 
 @Injectable({
@@ -11,36 +12,53 @@ import {FieldChangerWorker} from "../workers/FiedChangerWorker";
 })
 export class WorkerService {
 
-  workerList: IWorker[] = []
+  workerList: IceWorker[] = []
+  startedWorkerList: IceWorker[] = []
+  workerListStartedIndex = 0
 
-  constructor(private dataSourceService: DataSourceService) { }
+  isWorkerStarted$ = new BehaviorSubject<boolean>(false)
 
-  createWorker(currentDocument: IceDocument){
-    let workerDataList: IWorker[] = currentDocument.docAttrib.workerList
+  static instance: WorkerService
+
+
+  constructor() {
+    if(!WorkerService.instance)
+      WorkerService.instance = this
+  }
+
+  createWorker(currentDocument: IceDocument) {
+    let workerMetaDataList: IWorker[] = currentDocument.docAttrib.workerList
     this.workerList.splice(0, this.workerList.length)
-    workerDataList.forEach((worker : IDataSource) => {
-      let newWorker: IWorker =
-      worker.type === "NETDATASOURCE"  ?
-        new IceDataSourceWorker(
-        worker.id,
-        worker.name,
-        worker.type,
-        worker.url,
-        worker.method,
-        worker.pathVariables,
-        worker.bodyVariables,
-        worker.relation,
-        worker.event,
-        worker.isNativeSource,
-        this.dataSourceService) :
-      new FieldChangerWorker(worker.id,worker.name, worker.type)
-
-      this.workerList.push(newWorker)
+    workerMetaDataList.forEach((worker: IWorker) => {
+      this.workerList.push(
+        new FieldWorker(
+          worker.id,
+          worker.name,
+          worker.type,
+          worker.dataSourceId,
+          worker.order,
+          worker.actionGroupList)
+      )
     })
   }
 
-  startWorkers(workerIdList: number[], componentValue?: any, currentDocument?: IceDocument){
-    this.workerList.filter(value => workerIdList.includes(value.id)).forEach(value => value.runWorker(componentValue,currentDocument))
+  startWorkers(workerIdList: {id: number, order: number}[], componentValue?: any, currentDocument?: IceDocument) {
+  //startWorkers(workerIdList: {id: number, order: number}[], componentValue?: any, currentDocument?: IceDocument) {
+    this.startedWorkerList.splice(0,this.startedWorkerList.length)
+    this.startedWorkerList.push(...this.workerList.filter(value => workerIdList.map(item => item.id).includes(value.id))
+      .sort((a,b) => a.order - b.order) )
+
+    this.workerListStartedIndex = 0
+
+    this.isWorkerStarted$.subscribe(value => {
+
+      if(!value && this.workerListStartedIndex < this.startedWorkerList.length){
+        this.startedWorkerList[this.workerListStartedIndex ++].runWorker(componentValue, currentDocument)
+        EventService.instance.isWorkerResize = true
+        console.log("event resize")
+      }
+    })
+
   }
 
 }

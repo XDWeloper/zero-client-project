@@ -54,6 +54,7 @@ import {MatDialog} from "@angular/material/dialog";
 import {StatusReasonComponent} from "../../../../component/status-reason/status-reason.component";
 import {PDFDocObject, PrintService} from "../../../../services/print.service";
 import {AnketaScriptRule} from "../../../../data/anketaScriptRule";
+import {TableComponent} from "../../../../component/dinamicComponent/tables/table/table.component";
 
 @Component({
   selector: 'app-document-editor',
@@ -301,11 +302,14 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   showComponentOnCurrentStep(stepNum: number) {
     this.firstComponentRef = undefined;
+    if(!this.steps[stepNum - 1]) return
+
     let stepComponentList = this.steps[stepNum - 1].componentMaket
-    //let stepComponentList = this.currentDocument.docStep.find(p => p.stepNum === stepNum).componentMaket
     stepComponentList.forEach(comp => {
-      if (comp.componentType === IceComponentType.SELECT)
+      if (comp.componentType === IceComponentType.SELECT) {
         this.componentRef = this.itemsField.createComponent(SelectComponent);
+        comp.optionList = comp.optionList ? comp.optionList : []
+      }
       if (comp.componentType === IceComponentType.PLACE)
         this.componentRef = this.itemsField.createComponent(AddressComponent);
       if (comp.componentType === IceComponentType.TEXT)
@@ -319,6 +323,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       if (comp.componentType === IceComponentType.AREA)
         this.componentRef = this.itemsField.createComponent(AreaComponent);
       if (comp.componentType === IceComponentType.TABLE) {
+        console.log("comp.tableType ",comp.tableType)
         switch (comp.tableType) {
           case 1:
             this.componentRef = this.itemsField.createComponent(InformationMainCounterpartiesTableComponent);
@@ -326,6 +331,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
           case 2:
             this.componentRef = this.itemsField.createComponent(InformationCompanyParticipantsTableComponent);
             break;
+          default:
+            this.componentRef = this.itemsField.createComponent(TableComponent);
         }
       }
 
@@ -351,14 +358,15 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       compInstance.regExp = comp.regExp
       compInstance.notification = comp.notification
       compInstance.value = comp.value
+      compInstance.enabled = comp.enabled === undefined ? true : comp.enabled
+      compInstance.visible = comp.visible === undefined ? true : comp.visible
       compInstance.masterControlList = comp.masterControlList
       compInstance.checkedText = comp.checkedText
       compInstance.optionList = comp.optionList
       compInstance.tableProp = comp.tableProp
+      compInstance.componentEvent = comp.componentEvent
 
-      if (this.openType === "EDIT")
-        compInstance.enabled = true
-      else
+      if (this.openType !== "EDIT")
         compInstance.enabled = false
 
       if (comp.componentType === IceComponentType.INPUT || comp.componentType === IceComponentType.AREA)
@@ -407,7 +415,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   updateDoc(docStatus: DocStat) {
     if (!this.currentDocument || (this.currentDocument && this.currentDocument.status != 'CONTROL')) return
     //this.currentDocument.status = docStatus
-    this.updateDocument$ = this.backService.updateDocument(this.currentDocument).subscribe({
+    this.updateDocument$ = this.backService.updateOnlyDate(this.currentDocument).subscribe({
       next: (res => {
         if (docStatus === 'AGREE') {
           this.changeStatus(docStatus, "Отправлено клиенту на согласование")

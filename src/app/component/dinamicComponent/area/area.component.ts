@@ -7,7 +7,7 @@ import {
   ControlPropType,
   IceComponent,
   IceEvent,
-  MasterControl,
+  MasterControl, OptionList,
   TableProperties,
   TextPosition
 } from "../../../interfaces/interfaces";
@@ -31,7 +31,7 @@ export class AreaComponent implements IceComponent, OnDestroy {
 
   tableType: number;
 
-  optionList?: string[];
+  optionList?: OptionList[] | undefined
   printRule: ComponentRuleForPDF;
   masterControlList: MasterControl[];
 

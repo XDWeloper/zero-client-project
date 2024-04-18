@@ -1,6 +1,7 @@
 import {ChangeDetectionStrategy, Component, ElementRef, Input, OnInit, ViewChild} from '@angular/core';
 import {CellService} from "../../../../services/cell.service";
 import {cellHeight, CellType} from "../../../../constants";
+import {ComponentService} from "../../../../services/component.service";
 
 @Component({
   selector: 'app-cell',
@@ -28,7 +29,7 @@ export class CellComponent implements OnInit{
       this.cellService.addClientCell(this)
   }
 
-  constructor(private cellService: CellService) {
+  constructor(private cellService: CellService,private componentService: ComponentService,) {
   }
 
 
@@ -39,6 +40,8 @@ export class CellComponent implements OnInit{
     if(event.x >= bound.left && event.x < bound.right &&  event.y >= bound.top && event.y < bound.bottom){
       this.cellService.cellSubject$.next({bound:bound, number: this.index, refresh: false})
     }
+//    this.componentService.selectedComponent$.next(undefined)
+
   }
 
   public getBounds(): DOMRect {

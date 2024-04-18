@@ -10,7 +10,9 @@ export class MessageService {
   private message = new Subject<MessageDialog>()
   private onClose = new Subject<DialogButtonType>()
 
+  static instance: MessageService;
   constructor() {
+    MessageService.instance = this;
   }
 
   show(message: string, hideMessage: string, type: DialogType, buttonList?: DialogButtonType[]): Subject<DialogButtonType> {

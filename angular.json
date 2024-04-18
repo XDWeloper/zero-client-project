@@ -80,7 +80,7 @@
               "ssl": true,
               "sslKey": "src/assets/ssl/icebitsy.online.pkcs8",
               "sslCert": "src/assets/ssl/icebitsy.online.cer",
-              "host": "icedev.ru"
+              "host": "icebitsy.online"
             }
           },
           "defaultConfiguration": "development"

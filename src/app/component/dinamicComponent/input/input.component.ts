@@ -1,30 +1,33 @@
-import {Component} from '@angular/core';
+import {Component, OnDestroy} from '@angular/core';
 import {CellService} from "../../../services/cell.service";
 import {
-  ComponentBound, ComponentInputType, ComponentRuleForPDF,
+  ComponentBound,
+  ComponentInputType,
+  ComponentRuleForPDF,
   ControlPropType,
   IceComponent,
-  MasterControl,
+  MasterControl, OptionList,
   TextPosition
 } from "../../../interfaces/interfaces";
 import {AlertColor, IceComponentType} from "../../../constants";
 import {ComponentService} from "../../../services/component.service";
 import {Subscription} from "rxjs";
-import {list} from "postcss";
+import {computeStartOfLinePositions} from "@angular/compiler-cli/src/ngtsc/sourcemaps/src/source_file";
+
 
 @Component({
   selector: 'app-input',
   templateUrl: './input.component.html',
 })
-export class InputComponent implements IceComponent {
+export class InputComponent implements IceComponent, OnDestroy {
 
   constructor(private cellService: CellService, private componentSelectedService: ComponentService, private componentService: ComponentService) {
   }
 
   tableType: number;
 
-  optionList?: string[];
-    printRule: ComponentRuleForPDF;
+  optionList?: OptionList[] | undefined
+  printRule: ComponentRuleForPDF;
 
   masterControlList: MasterControl[];
 
@@ -59,11 +62,13 @@ export class InputComponent implements IceComponent {
   localBorderColor: string
 
   private changeValue$: Subscription
-  enabled = true
-  visible = true
+  enabled : boolean
+  visible : boolean
+
 
 
   ngOnInit(): void {
+
     if(this.inputType === 'button')
       this.value = this.placeHolder
 
@@ -93,20 +98,21 @@ export class InputComponent implements IceComponent {
         let control: ControlPropType = undefined
         if(list.length > 0)
           control = list.find(c => c.componentValue === value) ? list.find(c => c.componentValue === value).controlProp : undefined
-        if(control)
-        switch (control.toString()) {
-          case "DISABLED":
-            this.enabled = false;
-            break;
-          case "ENABLED":
-            this.enabled = true;
-            break;
-          case "INVISIBLE":
-            this.visible = false;
-            break;
-          case "VISIBLE":
-            this.visible = true;
-            break;
+        if(control) {
+          switch (control.toString()) {
+            case "DISABLED":
+              this.enabled = false;
+              break;
+            case "ENABLED":
+              this.enabled = true;
+              break;
+            case "INVISIBLE":
+              this.visible = false;
+              break;
+            case "VISIBLE":
+              this.visible = true;
+              break;
+          }
         }
       }
     })
@@ -126,7 +132,7 @@ export class InputComponent implements IceComponent {
     }
       this._value = value;
     //this.checkValid()
-    if(this.componentID) {
+    if(this.componentID && this.visible) {
       this.componentService.setComponentValue({componentId: this.componentID, value: value})
     }
   }
@@ -139,23 +145,21 @@ export class InputComponent implements IceComponent {
     }
   }
 
-  checkValid() {
-    if(this.value){
-      if(this.inputType === 'number'){
-        if (this.maxVal < this.value || this.minVal > this.value)
-          this.localBorderColor = AlertColor
-        else
-          this.localBorderColor = this.frameColor
-      }
-      if(this.inputType === 'text') {
-        if (this.maxLength < this.value.length || this.minLength > this.value.length)
-          this.localBorderColor = AlertColor
-        else
-          this.localBorderColor = this.frameColor
-      }
-    }
+  ngOnDestroy(): void {
+    if(this.changeValue$)
+      this.changeValue$.unsubscribe()
   }
 
-  update(): void {
-  }
+  // checkValid(): boolean {
+  //   if(this.value){
+  //     if(this.inputType === 'number'){
+  //       return !(this.maxVal < this.value || this.minVal > this.value)
+  //     }
+  //     if(this.inputType === 'text') {
+  //       return !(this.maxLength < this.value.length || this.minLength > this.value.length)
+  //     }
+  //   }
+  //   return true
+  // }
+
 }
