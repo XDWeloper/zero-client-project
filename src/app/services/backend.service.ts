@@ -142,7 +142,7 @@ export class BackendService {
     const operation = new Operation();
     operation.url = environment.resourceServerURL + "/core/documents/update/" + document.id + "/values"
     operation.httpMethod = HttpMethod.PUT
-    operation.body = document.docAttrib.componentValueList
+    operation.body = document.docAttrib.componentValueList.filter(item => item.componentValue != undefined)
     return this.http.post(environment.bffURI + '/operation', operation);
   }
 

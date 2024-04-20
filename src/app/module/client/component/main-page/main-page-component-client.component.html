@@ -28,7 +28,7 @@
 <!--              <mat-icon >assignment</mat-icon>-->
 <!--              <span class="ml-2">Документы пользователя</span>-->
 <!--            </ng-template>-->
-            <app-document-table (openDocId)="openDoc($event)" [isOpenedTab] = !tabDone></app-document-table>
+            <app-document-table (openDocId)="openDoc($event)" [isOpenedTab] = !tabDone [isMaketExist]="maketId != undefined"></app-document-table>
           </mat-tab>
 
       <mat-tab>

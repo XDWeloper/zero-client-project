@@ -6,9 +6,9 @@
 
     <mat-accordion>
       <mat-expansion-panel hideToggle>
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            <div class="text-center mt-4">{{ message.message }}</div>
+        <mat-expansion-panel-header [style]="'height:auto'" class="p-1">
+          <mat-panel-title class="">
+            <div class="text-center mt-4 w-full" [innerHTML]="message.message"></div>
           </mat-panel-title>
            <mat-icon class="text-primary-dark mt-2">info</mat-icon>
         </mat-expansion-panel-header>

@@ -445,7 +445,16 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
       if (comp.componentType === IceComponentType.INPUT || comp.componentType === IceComponentType.AREA)
         this.setFirstComponent();
+
+      /**Создаем событие установка значения копонента*/
+        if(!this.eventService.isWorkerResize && comp.value) {
+          this.eventService.launchEvent(EventObject.ON_COMPONENT_SET_VALUE, this.currentDocument, comp.componentEvent, comp.value)
+        }
+        else
+          this.eventService.isWorkerResize = false
     })
+
+
 
     this.setFocusToFirstElement()
     this.changeDetection.detectChanges()

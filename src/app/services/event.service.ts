@@ -22,7 +22,8 @@ export class EventService {
   }
 
   launchEvent(eventType: EventObject,currentDocument: IceDocument,workerEventList:IceEvent[],value?: any){
-    //console.log("before launchEvent",this.isWorkerResize)
+    // console.log("------------------------------------")
+    // console.log("before launchEvent",this.isWorkerResize)
     if(this.isWorkerResize) return;
 
     if(workerEventList === undefined
@@ -32,12 +33,11 @@ export class EventService {
       .filter(value => this.getEventObjectFromName(value.eventName) === eventType)
       .map(value => value.workerIdList).flat()
 
-    // if(eventType === EventObject.ON_STEP_OPEN){
+    // if(eventType === EventObject.ON_COMPONENT_SET_VALUE){
     //   console.log("eventType",eventType)
     //   console.log("&&&&", workerEventList.filter(value => workerEventList.filter(value => this.getEventObjectFromName(value.eventName) === eventType)))
-    //
-    //   console.log("workerEventList",workerEventList)
-    //   console.log("workerListId",workerListId)
+    //    console.log("workerEventList",workerEventList)
+    //    console.log("workerListId",workerListId)
     // }
 
     this.workerService.startWorkers(workerListId, value,currentDocument)
@@ -82,6 +82,7 @@ export class EventService {
       case "ON_COMPONENT_INIT": return EventObject.ON_COMPONENT_INIT;
       case "ON_COMPONENT_CLICK": return EventObject.ON_COMPONENT_CLICK;
       case "ON_COMPONENT_CHANGE_VALUE": return EventObject.ON_COMPONENT_CHANGE_VALUE;
+      case "ON_COMPONENT_SET_VALUE": return EventObject.ON_COMPONENT_SET_VALUE;
       case "ON_COMPONENT_DESTROY": return EventObject.ON_COMPONENT_DESTROY;
     }
     return undefined

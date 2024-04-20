@@ -272,7 +272,7 @@
   <div *ngIf="selectedObjectType === 'PAGE'" class="p-2">
     <div class="p-1 hover:bg-primary-light hover:text-white duration-300 cursor-pointer"
          (click)="selectedPage =  page"
-         (dblclick)="selectedPage =  page;ChangeActionObjectDialogSaveAndClose()"
+         (dblclick)="selectedPage =  page;ChangeActionObjectDialogSaveAndClose();searchText=''"
          *ngFor="let page of currentTemplate.docStep; let i = index">
       <div class="flex justify-between items-center">
         <span>{{ page.stepNum }} {{ page.stepName }}</span>
@@ -288,7 +288,7 @@
   <div *ngIf="selectedObjectType === 'COMPONENT'" class="p-2 ">
     <div class="p-1 hover:bg-primary-light hover:text-white cursor-pointer"
          (click)="selectedComponent =  component"
-         (dblclick)="selectedComponent =  component;ChangeActionObjectDialogSaveAndClose()"
+         (dblclick)="selectedComponent =  component;ChangeActionObjectDialogSaveAndClose();searchText=''"
          *ngFor="let component of getAllComponent() | componentFilter: searchText; let i = index">
       <div class="flex justify-between items-center">
         <div class="flex-1 flex">
@@ -365,7 +365,7 @@
       <div class="h-full flex-1 flex">
         <div class="w-1/3 border  overflow-auto h-full p-2">
           <div class="flex hover:bg-primary-light hover:text-white cursor-pointer"
-               (dblclick)="setFieldSetPropFromObject(row)"
+               (dblclick)="setFieldSetPropFromObject(row); setAutoFillFromSourceDialogOpen = false"
                *ngFor="let row of selectedRowObjectDataSourceDataMap">
             <div class="w-full"
                  [ngClass]=" row.key.startsWith('[]') ? (row.key.endsWith('{}') ? 'ml-6 text-warning-base': 'ml-10')
@@ -399,7 +399,7 @@
         </div>
       </div>
       <div class=" border border-t p-1 flex justify-end">
-        <button class="footer-button-style" (click)="setRezultObjectField(); setRezultObjectDialogOpen = false">
+        <button class="footer-button-style" (click)="setRezultObjectField(); setRezultObjectDialogOpen = false; setAutoFillFromSourceDialogOpen = false">
           Сохранить
         </button>
       </div>

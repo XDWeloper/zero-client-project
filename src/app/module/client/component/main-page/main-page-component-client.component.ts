@@ -61,6 +61,8 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy, OnInit
       let respTree = (res.content as ResponseTree[]).filter(value => value.isActive)
        if(respTree.length === 1)
         this.maketId = respTree[0].id
+      else
+         this.maketId = undefined
     })
   }
 

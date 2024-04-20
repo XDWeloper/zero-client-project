@@ -1,4 +1,4 @@
-<div class="absolute z-10 rounded-lg border-solid"
+<div class="absolute z-10 rounded-lg border-solid -2"
      [ngStyle]="{'height.px':height,'width.px':width}"
      [style.top.px]="top" [style.left.px]="left" [style.border-color]="localBorderColor"
      [ngClass]="{'border':frameColor}">
@@ -39,7 +39,7 @@
     </div>
   </div>
 
-  <div class="absolute bottom-0 left-2 w-[98%] border-t border-t-primary-base h-[8%] text-gray-900">
+  <div class="absolute bottom-0 left-2 w-[98%] border-t border-t-primary-base text-gray-900">
     <p class="m-0">Общий размер файлов: {{ sumSize }} мб.</p>
     <p class="m-0 text-error-base">{{ maxFilesizeString }}</p>
   </div>

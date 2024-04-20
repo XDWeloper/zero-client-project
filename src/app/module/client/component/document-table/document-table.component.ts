@@ -1,8 +1,10 @@
 import {
   AfterViewInit,
-  ChangeDetectionStrategy, ChangeDetectorRef,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
-  EventEmitter, Input,
+  EventEmitter,
+  Input,
   OnInit,
   Output,
   ViewChild
@@ -16,20 +18,20 @@ import {
   dialogOpenAnimationDuration,
   DOCUMENT_NAME_LOAD_ERROR,
   DOCUMENT_REMOVE_ERROR,
-  ERROR,
-  TAB_DOCUMENT_LIST, TAB_DOCUMENT_SHOW
+  ERROR, MESSAGE_NO_DOCUMENT,
+  TAB_DOCUMENT_LIST,
+  TAB_DOCUMENT_SHOW
 } from "../../../../constants";
 import {MessageService} from "../../../../services/message.service";
 import {TabService} from "../../../../services/tab.service";
-import {merge, of as observableOf} from 'rxjs';
-import {catchError, map, startWith, switchMap} from 'rxjs/operators';
+import {merge } from 'rxjs';
+import {map, startWith, switchMap} from 'rxjs/operators';
 import {animate, style, transition, trigger} from "@angular/animations";
 import {BankDocumentListComponent} from "../bank-document-list/bank-document-list.component";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {HistoryDialogComponent} from "../../../../component/history-dialog/history-dialog.component";
 import {ComponentType} from "@angular/cdk/overlay";
 import {DocumentService} from "../../../../services/document.service";
-import {DocumentEditorComponent} from "../document-editor/document-editor.component";
 
 @Component({
   selector: 'app-document-table',
@@ -67,13 +69,19 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
   docStatus: string
   statusList:{status: string , name: string}[] = []
   private _isOpenedTab: boolean = false
+  private _isMaketExist: boolean = true
 
   @Input() set isOpenedTab(value: boolean) {
     // if(value === true)
     //   this.refreshData()
-
     this._isOpenedTab = value
+  }
+  @Input() set isMaketExist(value: boolean){
+    this._isMaketExist = value
+  }
 
+  get isMaketExist(): boolean {
+    return this._isMaketExist;
   }
 
   get isOpenedTab(): boolean {
@@ -137,6 +145,9 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
       ).subscribe({
       next: data => {
         this.data = data
+        if(data.length < 1)
+          this.messageService.show(MESSAGE_NO_DOCUMENT, "", "INFO")
+
         this.changeDetection.detectChanges()
       },
       error: err => this.messageService.show(DOCUMENT_NAME_LOAD_ERROR, err.error.message, ERROR)

@@ -307,9 +307,9 @@ export class FieldWorker extends IceWorker {
 
       if((typeof arg2) === 'string')
         arg1 = arg1 ? arg1.toString() : ""
-      if(!isNaN(Number(arg1)))
+      if(arg1 && !isNaN(Number(arg1)))
         arg1 = Number(arg1)
-      if(!isNaN(Number(arg2)))
+      if(arg2 && !isNaN(Number(arg2)))
         arg2 = Number(arg2)
 
 

@@ -133,7 +133,6 @@ export class UploadComponent implements IceComponent, OnDestroy {
   }
 
   set value(value: any) {
-    this.localBorderColor = value === undefined && this.required ? AlertColor : this.frameColor
     this._value = value;
 
     if (value) {
@@ -148,6 +147,10 @@ export class UploadComponent implements IceComponent, OnDestroy {
       let size = this.files.map(f => f.size).reduce((x, y) => x + y) / fileSize1mb
       this.sumSize = Number(size.toFixed(2))
     }
+
+    console.log("files",this.files)
+
+    this.localBorderColor = this.files.length === 0 && this.required ? AlertColor : this.frameColor
     this.changeDetection.detectChanges()
   }
 

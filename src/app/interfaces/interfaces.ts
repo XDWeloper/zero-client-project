@@ -402,6 +402,7 @@ export enum EventObject {
   ON_COMPONENT_INIT = "Создание компонента",
   ON_COMPONENT_CLICK = "Клик на компоненте",
   ON_COMPONENT_CHANGE_VALUE = "Изменение данных компонента",
+  ON_COMPONENT_SET_VALUE = "Установка данных компонента",
   ON_COMPONENT_DESTROY = "Удаление компонента",
 }
 
