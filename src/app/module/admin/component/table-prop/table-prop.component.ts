@@ -12,7 +12,6 @@ import {MatCheckboxModule} from "@angular/material/checkbox";
 import {DomSanitizer} from "@angular/platform-browser";
 import {from, max} from "rxjs";
 import {map} from "rxjs/operators";
-import {computeStartOfLinePositions} from "@angular/compiler-cli/src/ngtsc/sourcemaps/src/source_file";
 
 
 @Component({
@@ -97,8 +96,8 @@ export class TablePropComponent implements OnInit, AfterViewInit {
   }
 
   addColumn() {
-    if (this.tableProp.header.length > 5) {
-      this.errorMessage = "Таблица не может содержать более 6 колонок."
+    if (this.tableProp.header.length > 9) {
+      this.errorMessage = "Таблица не может содержать более 10 колонок."
       return
     }
     let newTitleObject: Header = {

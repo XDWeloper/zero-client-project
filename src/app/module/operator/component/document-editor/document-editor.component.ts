@@ -5,7 +5,7 @@ import {
   Component,
   ComponentRef,
   ElementRef,
-  HostListener, Inject,
+  HostListener,
   Input,
   OnDestroy,
   OnInit,
@@ -41,7 +41,7 @@ import {
 import {
   InformationCompanyParticipantsTableComponent
 } from "../../../../component/dinamicComponent/tables/information-company-participants-table/information-company-participants-table.component";
-import {debounceTime, filter, Observable, pipe, Subscription, takeLast} from "rxjs";
+import {debounceTime, filter, Subscription} from "rxjs";
 import {ComponentService} from "../../../../services/component.service";
 import {BackendService} from "../../../../services/backend.service";
 import {MessageService} from "../../../../services/message.service";
@@ -78,7 +78,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     this.validationText.splice(0, this.validationText.length)
 
     if (value != undefined) {
-      this.steps = value.docStep
+      this.steps = value.docStep.filter(item => item.visible === true)
       this.currentStepIndex = 0
     } else {
       if (this.itemsField)
@@ -127,6 +127,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   checkedText: string | undefined
   disabledStep: boolean = false
+  requiredText: string;
 
   constructor(private componentService: ComponentService,
               private backService: BackendService,
@@ -219,14 +220,24 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   checkAllStepsToRule() {
     if (this.currentDocument) {
-      let compList = this.currentDocument.docStep.map(i => i.componentMaket).flat(2)
+      //let compList = this.currentDocument.docStep.filter(item => item.visible).map(i => i.componentMaket).flat(2)
       this.isDocumentRequiredFieldNotEmpty = true
-      for (let i in compList) {
-        if (this.checkValidValue(compList[i]).length > 0) {
-          this.isDocumentRequiredFieldNotEmpty = false
-          break
+
+      this.currentDocument.docStep.filter(item => item.visible).forEach(step => {
+        for (let i in step.componentMaket) {
+          if (this.checkValidValue(step.componentMaket[i]).length > 0) {
+            this.isDocumentRequiredFieldNotEmpty = false
+            this.requiredText = "См. страницу '" + step.stepName + "'"
+            break
+          }
         }
-      }
+      })
+      // for (let i in compList) {
+      //   if (this.checkValidValue(compList[i]).length > 0) {
+      //     this.isDocumentRequiredFieldNotEmpty = false
+      //     break
+      //   }
+      // }
     }
   }
 
@@ -338,9 +349,12 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
       let compInstance = this.componentRef.instance
 
+      compInstance.enabled = comp.enabled === undefined ? true : comp.enabled
+      compInstance.visible = comp.visible === undefined ? true : comp.visible
       compInstance.componentType = comp.componentType
       compInstance.inputType = comp.inputType
       compInstance.componentID = comp.componentID
+      compInstance.optionList = comp.optionList
       compInstance.componentBound = comp.bound
       compInstance.cellNumber = comp.cellNumber
       compInstance.componentName = comp.componentName
@@ -358,13 +372,12 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       compInstance.regExp = comp.regExp
       compInstance.notification = comp.notification
       compInstance.value = comp.value
-      compInstance.enabled = comp.enabled === undefined ? true : comp.enabled
-      compInstance.visible = comp.visible === undefined ? true : comp.visible
       compInstance.masterControlList = comp.masterControlList
       compInstance.checkedText = comp.checkedText
-      compInstance.optionList = comp.optionList
       compInstance.tableProp = comp.tableProp
       compInstance.componentEvent = comp.componentEvent
+      compInstance.customAttribName = comp.customAttribName
+      compInstance.customAttribColumnName = comp.customAttribColumnName
 
       if (this.openType !== "EDIT")
         compInstance.enabled = false

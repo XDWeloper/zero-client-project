@@ -139,7 +139,6 @@ export class FieldWorker extends IceWorker {
                         isAutoFill: boolean,isDisabledAfterFill: boolean
                       },
                       object: ComponentMaket | IceDocument | IceStepMaket, objectType: ActionObjectType) {
-
     /**Получить данные для вставки*/
     let value: any
     if (fieldAction.isAutoFill) {
@@ -150,6 +149,7 @@ export class FieldWorker extends IceWorker {
     }
     else
       value = fieldAction.fieldSet
+
 
     /**Нужно трансформировать значение в соответствии с типом объекта*/
 
@@ -256,10 +256,12 @@ export class FieldWorker extends IceWorker {
         item = item.value
         rowArray = []
         fieldAction.fieldSet.string.forEach((key: string) => {
-          let field = key.substring(1,key.length)
-          let index = Object.keys(item).findIndex(f => f === field)
-          let val = index != -1 ? Object.values(item)[index] : "-"
-
+          let val: any = ""
+          if(key != null && key != undefined){
+            let field = key.substring(1,key.length)
+            let index = Object.keys(item).findIndex(f => f === field)
+            val = index != -1 ? Object.values(item)[index] : "-"
+          }
           rowArray.push(val)
         })
         resultArray.push(...[rowArray])
@@ -313,12 +315,11 @@ export class FieldWorker extends IceWorker {
         arg2 = Number(arg2)
 
 
-      // console.log((typeof arg1))
-      // console.log((typeof arg2))
-      //
-      //  console.log("arg1:", arg1)
-      //  console.log("arg2:", arg2)
-      //  console.log("cond.relation:", cond.relation)
+       // console.log((typeof arg1))
+       // console.log((typeof arg2))
+       // console.log("arg1:", arg1)
+       // console.log("arg2:", arg2)
+       // console.log("cond.relation:", cond.relation)
 
 
       switch (cond.relation) {

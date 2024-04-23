@@ -3,7 +3,7 @@ import {
   ComponentMaket, DocStatus,
   DocumentTreeTempl,
   IceDocumentMaket,
-  IceStepMaket,
+  IceStepMaket, StepControl,
   StepTreeTempl
 } from "../interfaces/interfaces";
 import {IceMaketComponent} from "../module/admin/classes/icecomponentmaket";
@@ -57,6 +57,12 @@ export class DocumentService {
     let nextId = 0
     this.getTemplateByDocId(docId).docStep.map(s => s.componentMaket).flat().forEach(c => nextId = c.componentID > nextId ? c.componentID : nextId)
     this.lastComponentIndex = nextId
+  }
+
+  getStepComponentList(docId: number,selfId: number): StepControl[]{
+    let cml = this.templateList.find(p => p.docId === docId).docStep.find(item => item.componentMaket.find(comp => comp.componentID === selfId))
+    return [{stepName: cml.stepName, component: cml.componentMaket.sort((a, b) => a.componentID - b.componentID)}]
+
   }
 
   getMaketComponentList(docId: number,selfId: number){

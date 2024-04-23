@@ -66,7 +66,7 @@
       <p *ngIf="commentText" class="text-gray-600 dark:text-gray-300 overflow-auto border-b border-color" >{{ commentText }}</p>
       <p *ngIf="checkedText" class="text-error-base dark:text-gray-300 overflow-auto border-b border-color" >{{ checkedText }}</p>
       <p *ngIf="!isDocumentRequiredFieldNotEmpty" class="text-error-base dark:text-gray-300 overflow-auto border-b border-color" >
-        Документ не может быть отправлен на рассмотрение в банк. Не заполнены обязательные поля документа.
+        Документ не может быть отправлен на рассмотрение в банк. Не заполнены обязательные поля документа. {{ requiredText }}
       </p>
 
       <div class="text-red-500 text-xs dark:text-rerror-base overflow-auto" *ngFor="let item of validationText">

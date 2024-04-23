@@ -135,6 +135,8 @@ export class UploadComponent implements IceComponent, OnDestroy {
   set value(value: any) {
     this._value = value;
 
+    this.setFrameColor()
+
     if (value) {
       let docArray = value as Array<UploadFile>
       docArray.filter(f => f.id).forEach(doc => this.files.push(doc))
@@ -148,10 +150,12 @@ export class UploadComponent implements IceComponent, OnDestroy {
       this.sumSize = Number(size.toFixed(2))
     }
 
-    console.log("files",this.files)
-
-    this.localBorderColor = this.files.length === 0 && this.required ? AlertColor : this.frameColor
+    this.setFrameColor()
     this.changeDetection.detectChanges()
+  }
+
+  private setFrameColor(){
+    this.localBorderColor = this.files.length === 0 && this.required ? AlertColor : this.frameColor
   }
 
   ngOnInit(): void {

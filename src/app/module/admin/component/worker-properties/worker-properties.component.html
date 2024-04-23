@@ -365,7 +365,7 @@
       <div class="h-full flex-1 flex">
         <div class="w-1/3 border  overflow-auto h-full p-2">
           <div class="flex hover:bg-primary-light hover:text-white cursor-pointer"
-               (dblclick)="setFieldSetPropFromObject(row); setAutoFillFromSourceDialogOpen = false"
+               (dblclick)="setFieldSetPropFromObject(row)"
                *ngFor="let row of selectedRowObjectDataSourceDataMap">
             <div class="w-full"
                  [ngClass]=" row.key.startsWith('[]') ? (row.key.endsWith('{}') ? 'ml-6 text-warning-base': 'ml-10')

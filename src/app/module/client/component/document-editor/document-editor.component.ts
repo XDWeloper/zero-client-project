@@ -171,6 +171,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   disabledStep: boolean = false
   isReasonAsk: boolean = false
   $reason: Observable<string> = new Observable<string>()
+  requiredText: string;
 
   constructor(private componentService: ComponentService,
               private backService: BackendService,
@@ -281,14 +282,24 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   checkAllStepsToRule() {
     if (this.currentDocument) {
-      let compList = this.currentDocument.docStep.filter(i => i.visible).map(i => i.componentMaket).flat(2)
+      //let compList = this.currentDocument.docStep.filter(item => item.visible).map(i => i.componentMaket).flat(2)
       this.isDocumentRequiredFieldNotEmpty = true
-      for (let i in compList) {
-        if (this.checkValidValue(compList[i]).length > 0) {
-          this.isDocumentRequiredFieldNotEmpty = false
-          break
+
+      this.currentDocument.docStep.filter(item => item.visible).forEach(step => {
+        for (let i in step.componentMaket) {
+          if (this.checkValidValue(step.componentMaket[i]).length > 0) {
+            this.isDocumentRequiredFieldNotEmpty = false
+            this.requiredText = "См. страницу '" + step.stepName + "'"
+            break
+          }
         }
-      }
+      })
+      // for (let i in compList) {
+      //   if (this.checkValidValue(compList[i]).length > 0) {
+      //     this.isDocumentRequiredFieldNotEmpty = false
+      //     break
+      //   }
+      // }
     }
   }
 
@@ -532,15 +543,24 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         error: (err => this.messageService.show(DRAFT_SAVE_ERROR, err.error.message, ERROR))
       })
     } else {
-      this.updateDocument$ = this.backService.updateOnlyDate(this.currentDocument).subscribe({
-        next: (res => {
-          if (reg === 1)
-            this.docSaved(docStatus === "DRAFT" ? DOCUMENT_DRAFT_SAVED : DOCUMENT_SEND, "")
-        }),
-        error: (err => {
-          this.messageService.show(DOCUMENT_SAVE_ERROR, err.error.message, ERROR)
+      if(reg === 0){
+        this.updateDocument$ = this.backService.updateOnlyDate(this.currentDocument).subscribe({
+          next: (res => {
+          }),
+          error: (err => {
+            this.messageService.show(DOCUMENT_SAVE_ERROR, err.error.message, ERROR)
+          })
         })
-      })
+      } else{
+        this.updateDocument$ = this.backService.updateDocument(this.currentDocument).subscribe({
+          next: (res => {
+              this.docSaved(docStatus === "DRAFT" ? DOCUMENT_DRAFT_SAVED : DOCUMENT_SEND, "")
+          }),
+          error: (err => {
+            this.messageService.show(DOCUMENT_SAVE_ERROR, err.error.message, ERROR)
+          })
+        })
+      }
     }
     this.changeDetection.detectChanges()
   }
