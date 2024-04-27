@@ -11,7 +11,7 @@ import {ComponentMaket, IceDocumentMaket, IceStepMaket} from "../../../../interf
 import {
   Action,
   ActionGroup,
-  ActionObjectType,
+  ActionObjectType, ConditionType,
   IAction,
   IActionGroup,
   IDataSource,
@@ -29,7 +29,13 @@ import {NgxJsonViewerModule} from "ngx-json-viewer";
 import {MatExpansionModule} from "@angular/material/expansion";
 import {MatTooltipModule} from "@angular/material/tooltip";
 import {ComponentFilterPipe} from "../../../../pipe/component-filter.pipe";
-import {IceComponentType, ObjectEditedFields, ObjectField, REQUEST_TEST_ERROR} from "../../../../constants";
+import {
+  functionNameAndDescription,
+  IceComponentType,
+  ObjectEditedFields,
+  ObjectField,
+  REQUEST_TEST_ERROR
+} from "../../../../constants";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
 import {IceDataSource} from "../../../../workers/IceDataSource";
 import {DataSourceFilterPipe} from "../../../../pipe/dataSource-filter.pipe";
@@ -98,11 +104,16 @@ export class WorkerPropertiesComponent implements OnInit, AfterViewInit{
   protected readonly IceComponentType = IceComponentType;
   selectedSubHeader: number;
   tableComponentAutoFillValue: string[] = []
+  currentCondition:ConditionType
 
   @ViewChild('accordionContainer')
   accordionContainer : ElementRef;
   isDynamicVarDialog: boolean;
   isSelectComponentForCondition = false
+  isSetFunctionForCondition= false
+  functionNameAndDescription = functionNameAndDescription
+  currentDescription: string;
+  selectedFunction: string = ""
 
   constructor(public dialogRef: MatDialogRef<WorkerPropertiesComponent>,
               private dataSourceService: DataSourceService,
@@ -117,7 +128,7 @@ export class WorkerPropertiesComponent implements OnInit, AfterViewInit{
     this.localWorker = {...this.currentWorker}
     this.currentActionGroup = !this.localWorker.actionGroupList ? undefined : this.localWorker.actionGroupList[0] ?? undefined
     if(this.currentActionGroup && !this.currentActionGroup.conditions){
-      this.currentActionGroup.conditions = [{argument1: "",relation: "=", argument2:""}]
+      this.currentActionGroup.conditions = [{preRelation: undefined,argument1: "",relation: "=", argument2:""}]
     }
   }
 
@@ -130,7 +141,7 @@ export class WorkerPropertiesComponent implements OnInit, AfterViewInit{
     if(!this.localWorker.actionGroupList)
       this.localWorker.actionGroupList = []
     let newActionGroup = new ActionGroup("Набор " + this.localWorker.actionGroupList.length)
-    newActionGroup.conditions = [{argument1: "",relation: "=", argument2:""}]
+    newActionGroup.conditions = [{preRelation: undefined,argument1: "",relation: "=", argument2:""}]
     this.localWorker.actionGroupList.push(newActionGroup)
   }
 
@@ -409,34 +420,34 @@ export class WorkerPropertiesComponent implements OnInit, AfterViewInit{
     this.setRezultObjectDialogOpen = true
   }
 
-  selectComponentForCondition(argumentNumber: number) {
+  selectComponentForCondition(cond: ConditionType, argumentNumber: number) {
+    this.currentCondition = cond
     this.currentSelectedConditionArgument = argumentNumber
     this.componentPropForCond.splice(0,this.componentPropForCond.length)
     this.componentPropForCond.push(...this.getAllComponentForCondition().map(item => {return {comp: item, compProp: "value"}}))
-
     this.isSelectComponentForCondition = true
   }
 
   setComponentForCondition() {
-    console.log("selectedComponentForCondition : ",this.selectedComponentForCondition)
-    console.log("currentActionGroup : ",this.currentActionGroup)
-    console.log("currentSelectedConditionArgument : ",this.currentSelectedConditionArgument)
+    // console.log("selectedComponentForCondition : ",this.selectedComponentForCondition)
+    // console.log("currentActionGroup : ",this.currentActionGroup)
+    // console.log("currentSelectedConditionArgument : ",this.currentSelectedConditionArgument)
 
     let argValue = "[" + this.selectedComponentForCondition.comp.componentName + "." + this.selectedComponentForCondition.compProp + "]"
 
-    console.log("argValue : ",argValue)
+//    console.log("argValue : ",argValue)
 
     if(this.currentSelectedConditionArgument === 1)
-      this.currentActionGroup.conditions[0].argument1 = argValue
+      this.currentCondition.argument1 = argValue
     else
-      this.currentActionGroup.conditions[0].argument2 = argValue
+      this.currentCondition.argument2 = argValue
 
     this.selectedComponentForCondition = undefined
     this.isSelectComponentForCondition = false
   }
 
-  clearCondition() {
-    this.currentActionGroup.conditions = [{argument1: "",relation: "=", argument2:""}]
+  clearCondition(i: number) {
+    this.currentActionGroup.conditions.splice(i,1)
   }
 
   setCurrentObject(){
@@ -468,6 +479,38 @@ export class WorkerPropertiesComponent implements OnInit, AfterViewInit{
 
   getComponentById(id: number): ComponentMaket{
     return this.currentTemplate.docStep.map(item => item.componentMaket).flat().find(item => item.componentID === id)
+  }
+
+  addCondition() {
+    let preRel: "&&" | "||" = "&&"
+    if(this.currentActionGroup.conditions && this.currentActionGroup.conditions.length === 0)
+      preRel = undefined
+    this.currentActionGroup.conditions.push({preRelation: preRel,argument1: "",relation: "=", argument2:""})
+  }
+
+  setFunctionForCondition() {
+    if(this.currentSelectedConditionArgument === 1)
+      this.currentCondition.argument1 = this.setFunc(this.currentCondition.argument1)
+    else
+      this.currentCondition.argument2 = this.setFunc(this.currentCondition.argument2)
+
+    this.currentDescription = ""
+    this.selectedFunction = ""
+
+  }
+
+  setFunc(arg: string): string{
+    switch (this.selectedFunction){
+      case "substring": return arg + ".substring(0,1)"
+      case "length": return arg + ".length()"
+    }
+    return arg
+  }
+
+  selectFunctionForCondition(condition: ConditionType, arg: number) {
+    this.currentCondition = condition
+    this.currentSelectedConditionArgument = arg
+    this.isSetFunctionForCondition = true
   }
 }
 

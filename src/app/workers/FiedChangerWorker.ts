@@ -9,7 +9,7 @@ import {
 import {Action, ActionObjectType, IActionGroup, IceWorker, WorkerType} from "./workerModel";
 import {DataSourceMap, DataSourceService} from "../services/data-source.service";
 import {MessageService} from "../services/message.service";
-import {IceComponentType, REQUEST_TEST_ERROR} from "../constants";
+import {functionNameAndDescription, IceComponentType, REQUEST_TEST_ERROR} from "../constants";
 import {DocumentEditorComponent} from "../module/client/component/document-editor/document-editor.component";
 import {EventService} from "../services/event.service";
 import {WorkerService} from "../services/worker.service";
@@ -20,6 +20,7 @@ export class FieldWorker extends IceWorker {
   localDataSourceMap: DataSourceMap[] = []
   localCurrentDocument: IceDocument | undefined = undefined
   localValue: any | undefined = undefined
+  isRunning = false
 
   tmpFieldDisabled: boolean| undefined = undefined
 
@@ -80,14 +81,20 @@ export class FieldWorker extends IceWorker {
   startWorker() {
 
     console.log("startWorker()")
+    this.isRunning = false
     this.actionGroupList.forEach(actionGroup => {
       this.runActionGroup(actionGroup)
     })
     //console.log("dispatchEvent")
     //window.dispatchEvent(new Event('resize'))
 
-    DocumentEditorComponent.instance.currentDocument = {...this.localCurrentDocument}
-    window.dispatchEvent(new Event('resize'))
+    /**Вот это нужно делать только если воркер сработал*/
+    if(this.isRunning){
+      console.log("update window")
+      DocumentEditorComponent.instance.currentDocument = {...this.localCurrentDocument}
+      window.dispatchEvent(new Event('resize'))
+    }
+
     console.log("worker  " + this.name + "  is finished  "  +  this.id)
     //console.log("localCurrentDocument", {...this.localCurrentDocument})
     WorkerService.instance.isWorkerStarted$.next(false)
@@ -95,9 +102,9 @@ export class FieldWorker extends IceWorker {
   }
 
   private runActionGroup(actionGroup: IActionGroup) {
-
     if (!this.checkCondition(actionGroup))
       return
+    this.isRunning = true
     console.log("-------- runAction!!!!!!!!!!!!!!")
     if(actionGroup.action)
     actionGroup.action.forEach(action => {
@@ -142,8 +149,10 @@ export class FieldWorker extends IceWorker {
     /**Получить данные для вставки*/
     let value: any
     if (fieldAction.isAutoFill) {
-      value = this.getFromDataMap(fieldAction.fieldSet)
-      if(fieldAction.isDisabledAfterFill && value){
+      value  = this.getFromDataMap(fieldAction.fieldSet) as DataSourceMap[]
+      /**Это временно тут нужно еще подумать*/
+      if(fieldAction.isDisabledAfterFill && value && value.length > 0
+        && (value as DataSourceMap[]).filter(item => item.value != undefined && item.value != '').length > 0){
         this.tmpFieldDisabled = true
       }
     }
@@ -261,6 +270,9 @@ export class FieldWorker extends IceWorker {
             let field = key.substring(1,key.length)
             let index = Object.keys(item).findIndex(f => f === field)
             val = index != -1 ? Object.values(item)[index] : "-"
+            if(Array.isArray(val)){
+              val = val.toString()
+            }
           }
           rowArray.push(val)
         })
@@ -302,7 +314,8 @@ export class FieldWorker extends IceWorker {
 
   /**проверить условие выполнения группы*/
   private checkCondition(actionGroup: IActionGroup) {
-    let result: boolean[] = []
+    let result: boolean = false
+    let tmpRes: boolean = false
     actionGroup.conditions.forEach(cond =>{
       let arg1 = this.getArgValue(cond.argument1)
       let arg2 = this.getArgValue(cond.argument2)
@@ -320,34 +333,53 @@ export class FieldWorker extends IceWorker {
        // console.log("arg1:", arg1)
        // console.log("arg2:", arg2)
        // console.log("cond.relation:", cond.relation)
-
+       // console.log("preRelation",cond.preRelation)
 
       switch (cond.relation) {
         case "=":
-          result.push(arg1 === arg2)
+          tmpRes = arg1 === arg2
           break;
         case "!=":
-          result.push(arg1 !== arg2)
+          tmpRes = arg1 !== arg2
           break;
         case ">":
-          result.push(Number(arg1) > Number(arg2))
+          tmpRes = Number(arg1) > Number(arg2)
           break;
         case "<":
-          result.push(arg1 < arg2)
+          tmpRes = Number(arg1) < Number(arg2)
       }
+
+
+      if(cond.preRelation === undefined)
+        result = tmpRes
+      else {
+        if(cond.preRelation === "&&")
+          result = result && tmpRes
+        if(cond.preRelation === "||")
+          result = result || tmpRes
+      }
+
+      // console.log("")
+      // console.log("tmpRes",tmpRes)
+      // console.log("res",result)
+
     })
 
-     //console.log("cond result: ",result.find(item => item === false) === undefined)
-    return result.find(item => item === false) === undefined;//Если хоть одно условие не выполняется
+    return result
   }
 
-  getArgValue(arg: string){
-    if(!this.isDynamicValue(arg))
-      return arg
-    return this.getValueFromComponent(arg)
-  }
-  isDynamicValue(arg: string){
-    return arg.startsWith("[") && arg.endsWith("]") && arg.includes(".")
+  getArgValue(arg: string): any{
+    let retString: any = arg
+    retString = this.checkArg(arg)
+    if( retString === "ERROR ARGUMENT")
+      return  arg
+
+    retString = this.changeDinamicValue(arg)
+    retString = this.changeFunction(retString)
+
+    // console.log("arg",arg)
+    // console.log("retString",retString)
+    return retString
   }
 
   private getValueFromComponent(arg: string): any {
@@ -365,6 +397,99 @@ export class FieldWorker extends IceWorker {
     }
     return undefined;
   }
+
+  private changeFunction(arg: string): any {
+    if(arg === undefined || (arg.length < 1)) return arg
+    if(functionNameAndDescription.map(item => arg.includes(item.name)).length < 1) return arg
+    let result: any = arg
+
+    functionNameAndDescription.forEach(func => {
+      if(arg.includes(func.name)){
+
+        let startFuncIndex = arg.indexOf(func.name,0)
+        let startArgFuncIndex = arg.indexOf("(", startFuncIndex) +1
+        let endArgFuncIndex = arg.indexOf(")", startArgFuncIndex)
+        let clearFuncArgs = arg.substring(startArgFuncIndex, endArgFuncIndex)
+
+        let source: any = ""
+        let argArray: any[] = []
+
+        if(clearFuncArgs != ""){
+          argArray = clearFuncArgs.split(",")
+        }
+
+
+        let firstIndex = 0
+        if(arg.charAt(startFuncIndex - 1) === "."){
+          for(let i = startFuncIndex ; i > 0; i--){
+            if(arg.charAt(i) === " ") {
+              firstIndex = i
+              break
+            }
+          }
+          source = arg.substring(firstIndex, startFuncIndex - 1)
+        }
+        result =  arg.replaceAll(arg.substring(firstIndex,endArgFuncIndex + 1),this.realiseFunc(func.name, source,argArray))
+      }
+    })
+    return result;
+  }
+
+  private changeDinamicValue(arg: string):any {
+    if(arg === undefined || (arg.length < 1)) return arg
+    //console.log("----------- changeDinamicValue", arg)
+    let dinValPosition: {argName: string}[] = []
+    let tmpArgName = ""
+    let isReadArg= false
+
+    for(let i = 0; i < arg.length; i++){
+      let currentChar = arg.charAt(i)
+      if(currentChar === "["){
+        isReadArg = true
+      }
+      if(currentChar === "]"){
+        isReadArg = false
+        dinValPosition.push({argName:tmpArgName + currentChar})
+        tmpArgName = ""
+      }
+      if(isReadArg){
+        tmpArgName += currentChar
+      }
+    }
+//    console.log("dinValPosition",dinValPosition)
+    dinValPosition.forEach(dArg =>{
+      let val: any = this.getValueFromComponent(dArg.argName)
+      val = val === undefined ? "" : val
+      arg = arg.replaceAll(dArg.argName, val)
+    })
+    // console.log(arg)
+    return arg
+  }
+
+  private checkArg(arg: string) {
+    let result = false
+    let openCount = (arg.match(/[[]/gm) || []).length
+    let closeCount = (arg.match(/]/gm) || []).length
+    result = openCount === closeCount
+    openCount = (arg.match(/[(]/gm) || []).length
+    closeCount = (arg.match(/[)]/gm) || []).length
+    result = result && (openCount === closeCount)
+    return result ? arg : "ERROR ARGUMENT";
+  }
+
+  private realiseFunc(funcName: string, source: any, args: any[]): any{
+    let result: any = ""
+    if(funcName === "substring" && source){
+      let startIndex = args[0] ? args[0] : 0
+      let endIndex = args[1] ? args[1] : source.length
+      result = source.substring(startIndex ,endIndex)
+    }
+    if(funcName === "length" && source){
+        result = source.length
+    }
+    return result
+  }
+
 }
 
 

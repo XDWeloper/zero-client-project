@@ -135,12 +135,19 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy, OnInit
   }
 
   exit() {
+    /**Нужно сохранить документ если были изменения*/
+    if(DocumentEditorComponent.instance.currentDocument.changed)
+      DocumentEditorComponent.instance.saveDoc(undefined,0)
+
     this.keycloakService.logoutAction().subscribe({
       complete:(() => this.router.navigate(["/"]))
     })
   }
 
   openDocList() {
+    /**Нужно сохранить документ если были изменения*/
+    if(DocumentEditorComponent.instance.currentDocument.changed)
+      DocumentEditorComponent.instance.saveDoc(undefined,0)
     this.tabService.openTab(TAB_DOCUMENT_LIST)
   }
 

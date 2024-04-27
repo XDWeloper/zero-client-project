@@ -69,45 +69,70 @@
                       </mat-panel-title>
                       <mat-icon class="text-primary-dark mt-2">help_outline</mat-icon>
                     </mat-expansion-panel-header>
-                    <p>Установите условия для запуска набора действий</p>
-                    <div class="flex">
-
-                      <div class="flex-1 flex">
-                        <button class="bg-white border border-primary-base rounded-md px-2 h-full"
-                                (click)="selectComponentForCondition(1)">...
-                        </button>
-                        <div class="w-1"></div>
-                        <input type="text" class="flex-1 border border-primary-base"
-                               [(ngModel)]="actionGroup.conditions[0].argument1"/>
-                      </div>
-
-                      <div class="w-1"></div>
-
-                      <select class="w-8 bg-white font-bold text-xl text-center cursor-pointer rounded-md"
-                              [(ngModel)]="actionGroup.conditions[0].relation">
-                        <option ngValue="="> =</option>
-                        <option ngValue="!="> !=</option>
-                        <option ngValue=">"> ></option>
-                        <option ngValue="<"> <</option>
-                      </select>
-
-                      <div class="w-1"></div>
-
-                      <div class="flex-1 flex">
-                        <input type="text" class="flex-1 border border-primary-base"
-                               [(ngModel)]="actionGroup.conditions[0].argument2"/>
-                        <div class="w-1"></div>
-                        <button class="bg-white border border-primary-base rounded-md px-2 h-full"
-                                (click)="selectComponentForCondition(2)">...
-                        </button>
-                      </div>
-
-                      <div class="w-1"></div>
-
-                      <mat-icon class="text-error-base cursor-pointer hover:font-bold duration-300 ml-4"
-                                [matTooltip]="'Очистить условия'" (click)="clearCondition()">clear
+                    <div class="flex gap-2">
+                      <mat-icon class="text-info-base cursor-pointer hover:font-bold duration-300"
+                                (click)="addCondition()"
+                                [matTooltip]="'Добавить условие'">add_circle_outline
                       </mat-icon>
+                      <p>Добавить условие</p>
                     </div>
+                    <!--                    Условие-->
+                    <div class="py-1" *ngFor="let condition of actionGroup.conditions; let i = index;">
+                      <div *ngIf="condition.preRelation != undefined" class="pb-2">
+                        <select class="bg-white cursor-pointer w-12 z-10" [(ngModel)]="condition.preRelation">
+                          <option ngValue="&&">и</option>
+                          <option ngValue="||=">или</option>
+                        </select>
+                      </div>
+                      <div class="flex">
+                        <div class="flex-1 flex">
+                          <mat-icon class="text-primary-base cursor-pointer hover:font-bold duration-300"
+                                    [matTooltip]="'Функция'"
+                                    (click)="selectFunctionForCondition(condition,1)">functions
+                          </mat-icon>
+                          <button class="bg-white border border-primary-base rounded-md px-2 h-full"
+                                  [matTooltip]="'Выбрать компонент'"
+                                  (click)="selectComponentForCondition(condition,1)">...
+                          </button>
+                          <div class="w-1"></div>
+                          <input type="text" class="flex-1 border border-primary-base"
+                                 [(ngModel)]="condition.argument1"/>
+                        </div>
+
+                        <div class="w-1"></div>
+
+                        <select class="w-8 bg-white font-bold text-xl text-center cursor-pointer rounded-md"
+                                [(ngModel)]="condition.relation">
+                          <option ngValue="="> =</option>
+                          <option ngValue="!="> !=</option>
+                          <option ngValue=">"> ></option>
+                          <option ngValue="<"> <</option>
+                        </select>
+
+                        <div class="w-1"></div>
+
+                        <div class="flex-1 flex">
+                          <input type="text" class="flex-1 border border-primary-base"
+                                 [(ngModel)]="condition.argument2"/>
+                          <div class="w-1"></div>
+                          <button class="bg-white border border-primary-base rounded-md px-2 h-full"
+                                  [matTooltip]="'Выбрать компонент'"
+                                  (click)="selectComponentForCondition(condition,2)">...
+                          </button>
+                          <mat-icon class="text-primary-base cursor-pointer hover:font-bold duration-300"
+                                    [matTooltip]="'Функция'"
+                                    (click)="selectFunctionForCondition(condition,1)">functions
+                          </mat-icon>
+                        </div>
+
+                        <div class="w-1"></div>
+
+                        <mat-icon class="text-error-base cursor-pointer hover:font-bold duration-300 ml-4"
+                                  [matTooltip]="'Удалить условие'" (click)="clearCondition(i)">clear
+                        </mat-icon>
+                      </div>
+                    </div>
+
                   </mat-expansion-panel>
                 </mat-accordion>
 
@@ -203,6 +228,7 @@
   <ng-container [ngTemplateOutlet]="errorDialog"></ng-container>
   <ng-container [ngTemplateOutlet]="dynamicVar"></ng-container>
   <ng-container [ngTemplateOutlet]="SelectComponentForCondition"></ng-container>
+  <ng-container [ngTemplateOutlet]="SetFunctionForCondition"></ng-container>
 
 </div>
 
@@ -378,16 +404,20 @@
         <div class="w-1 "></div>
         <div class="w-2/3 border border-primary-base">
           <!--          Если выбран компонент таблица-->
-          <div *ngIf="currentObject && currentAction.objectType === 'COMPONENT' && getCurrentComponent().componentType === IceComponentType.TABLE"
+          <div
+            *ngIf="currentObject && currentAction.objectType === 'COMPONENT' && getCurrentComponent().componentType === IceComponentType.TABLE"
             class="w-full h-full flex overflow-auto">
             <div *ngFor="let header of getCurrentComponent().tableProp.header" class="flex-1 border">
               <div class="border-b text-center"> {{ header.title }}</div>
               <div class="flex h-full">
                 <div class="flex-1" *ngFor="let subHeader of header.subHeader">
-                  <div class="border-b  text-center cursor-pointer hover:border-b-2 hover:border-error-base duration-300"
-                       [ngClass]="{'border-b-2 border-error-base': selectedSubHeader === subHeader.order}"
-                       (click)="selectedSubHeader = subHeader.order">{{ subHeader.title }}</div>
-                  <textarea class="mt-0.5 border" [readOnly]="true" [(ngModel)]="this.tableComponentAutoFillValue[subHeader.order]"></textarea>
+                  <div
+                    class="border-b  text-center cursor-pointer hover:border-b-2 hover:border-error-base duration-300"
+                    [ngClass]="{'border-b-2 border-error-base': selectedSubHeader === subHeader.order}"
+                    (click)="selectedSubHeader = subHeader.order">{{ subHeader.title }}
+                  </div>
+                  <textarea class="mt-0.5 border" [readOnly]="true"
+                            [(ngModel)]="this.tableComponentAutoFillValue[subHeader.order]"></textarea>
                 </div>
               </div>
             </div>
@@ -399,7 +429,8 @@
         </div>
       </div>
       <div class=" border border-t p-1 flex justify-end">
-        <button class="footer-button-style" (click)="setRezultObjectField(); setRezultObjectDialogOpen = false; setAutoFillFromSourceDialogOpen = false">
+        <button class="footer-button-style"
+                (click)="setRezultObjectField(); setRezultObjectDialogOpen = false; setAutoFillFromSourceDialogOpen = false">
           Сохранить
         </button>
       </div>
@@ -489,6 +520,44 @@
         <button class="button-style right-0 bottom-0 relative"
                 [disabled]="selectedComponentForCondition === undefined"
                 (click)="setComponentForCondition();searchText=''">
+          Выбрать
+        </button>
+      </div>
+    </div>
+  </div>
+
+</ng-template>
+
+<ng-template #SetFunctionForCondition>
+  <div *ngIf="isSetFunctionForCondition"
+       class="absolute h-full w-full bg-gray-200 z-50 bg-opacity-50 flex justify-center items-center">
+    <div class="h-[50%] w-[50%] border border-primary-base bg-white flex flex-col z-10000 p-1 relative">
+
+      <mat-icon class="close-button" (click)="isSetFunctionForCondition = false">close</mat-icon>
+      <p class="text-center text-lg flex-none border-b">Компонент условия обработки</p>
+
+      <div class="flex-1 flex">
+        <div class="flex-1 overflow-auto border">
+          <div *ngFor="let func of functionNameAndDescription"
+               (mouseleave)="currentDescription = ''"
+               (mouseenter)="currentDescription = func.description"
+               (dblclick)="setFunctionForCondition();isSetFunctionForCondition = false"
+               (click)="selectedFunction = func.name"
+               class="cursor-pointer hover:text-white hover:bg-primary-light"
+          >
+            <mat-checkbox *ngIf="selectedFunction === func.name" [checked]="true" ></mat-checkbox>
+            {{ func.name }}
+          </div>
+        </div>
+        <div class="flex-1 overflow-auto border">
+          <div>{{ currentDescription }}</div>
+        </div>
+      </div>
+
+      <div class="flex-none  border-t border-t-primary-dark flex justify-end items-center pt-0.5 gap-1">
+        <button class="button-style right-0 bottom-0 relative"
+                [disabled]="selectedFunction === ''"
+                (click)="setFunctionForCondition();isSetFunctionForCondition = false">
           Выбрать
         </button>
       </div>

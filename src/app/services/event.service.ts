@@ -33,14 +33,8 @@ export class EventService {
       .filter(value => this.getEventObjectFromName(value.eventName) === eventType)
       .map(value => value.workerIdList).flat()
 
-    // if(eventType === EventObject.ON_COMPONENT_SET_VALUE){
-    //   console.log("eventType",eventType)
-    //   console.log("&&&&", workerEventList.filter(value => workerEventList.filter(value => this.getEventObjectFromName(value.eventName) === eventType)))
-    //    console.log("workerEventList",workerEventList)
-    //    console.log("workerListId",workerListId)
-    // }
-
-    this.workerService.startWorkers(workerListId, value,currentDocument)
+    if(workerListId.length > 0)
+     this.workerService.startWorkers(workerListId, value,currentDocument)
   }
 
 

@@ -129,6 +129,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   disabledStep: boolean = false
   requiredText: string;
 
+  static instance: DocumentEditorComponent
+
   constructor(private componentService: ComponentService,
               private backService: BackendService,
               private messageService: MessageService,
@@ -137,6 +139,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
               public dialog: MatDialog,
               private stepService: StepService,
               private printService: PrintService) {
+    DocumentEditorComponent.instance = this
   }
 
   ngOnDestroy(): void {

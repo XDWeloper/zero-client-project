@@ -43,19 +43,17 @@ export class WorkerService {
   }
 
   startWorkers(workerIdList: {id: number, order: number}[], componentValue?: any, currentDocument?: IceDocument) {
-  //startWorkers(workerIdList: {id: number, order: number}[], componentValue?: any, currentDocument?: IceDocument) {
     this.startedWorkerList.splice(0,this.startedWorkerList.length)
+
     this.startedWorkerList.push(...this.workerList.filter(value => workerIdList.map(item => item.id).includes(value.id))
       .sort((a,b) => a.order - b.order) )
 
     this.workerListStartedIndex = 0
 
     this.isWorkerStarted$.subscribe(value => {
-
       if(!value && this.workerListStartedIndex < this.startedWorkerList.length){
         this.startedWorkerList[this.workerListStartedIndex ++].runWorker(componentValue, currentDocument)
         EventService.instance.isWorkerResize = true
-        console.log("event resize")
       }
     })
 

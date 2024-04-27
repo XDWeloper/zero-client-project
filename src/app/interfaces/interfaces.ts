@@ -93,6 +93,7 @@ export interface IceDocument{
   docStep: IceStepMaket[]
   docAttrib: IceDocAttrib
   customAttrib?: any
+  changed?: boolean
 }
 
 export type Role = "ROLE_user" | "ROLE_admin" | "ROLE_operator"

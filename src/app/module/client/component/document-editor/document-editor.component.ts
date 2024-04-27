@@ -105,9 +105,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   @Input() set currentDocument(value: IceDocument | undefined) {
-
     //console.log("set currentDocument: ", value)
-
     this._currentDocument = value;
     this.commentText = ""
     this.currentComponent = undefined
@@ -235,9 +233,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     this.checkedText = ""
     this.validatonTextClear()
 
-    if (this._currentStepIndex != value && this.openType === "EDIT" /*&& value != 0*/) {
-      this.saveDoc(this.currentDocument.status, 0)
-    }
+    // if (this._currentStepIndex != value && this.openType === "EDIT" /*&& value != 0*/) {
+    //   this.saveDoc(this.currentDocument.status, 0)
+    // }
 
 
     if (this.itemsField)
@@ -342,7 +340,15 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     ).subscribe(item => {
       let currentComponent = this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === item.componentId)
       if(!currentComponent) return
-      currentComponent.value = item.value
+
+
+      if(currentComponent.value != item.value) {
+        currentComponent.value = item.value
+        console.log("changeValue$",currentComponent.value)
+        this.currentDocument.changed = true
+      }
+
+
       if (currentComponent.componentType === "upload") {//Если идет изменение загруженных файлов нужно сразу сохранять
         this.saveDoc(this.currentDocument.status, 0)
       }
@@ -526,8 +532,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     })
   }
 
-  saveDoc(docStatus: DocStat, reg: number) {
+  saveDoc(docStatus: DocStat | undefined, reg: number) {
     if (!this.currentDocument || docStatus === "INCORRECT") return
+    if(docStatus != undefined)
     this.currentDocument.status = docStatus
 
     /**нужно залить доп атрибуты*/

@@ -40,6 +40,7 @@ export class Action implements IAction{
 }
 
 export interface ConditionType{
+  preRelation: "&&" | "||" | undefined
   argument1: string
   relation: "=" | "!=" | ">" | "<"
   argument2: string

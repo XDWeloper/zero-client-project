@@ -173,4 +173,9 @@ export const editorConfig: AngularEditorConfig = {
   // ]
 };
 
+/**Описание функций для условий воркеров*/
 
+export const functionNameAndDescription: {name: string, description: string}[] = [
+  {name:"substring", description:"Пример использования функции: Получение первого символа в строке - str.substring(0, 1)"},
+  {name:"length", description:"Пример использования функции: Получение количества символов в строке - str.length()"}
+]
