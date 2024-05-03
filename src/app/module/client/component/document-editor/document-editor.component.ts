@@ -117,7 +117,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       }
 
       this.steps = value.docStep.filter(i => i.visible)
-      this.currentStepIndex = 0
+      //this.currentStepIndex = 0
     } else {
       if (this.itemsField)
         this.itemsField.clear()
@@ -199,6 +199,12 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       this.updateDocument$.unsubscribe()
     if (this.tabChange$)
       this.tabChange$.unsubscribe()
+  }
+
+  updateCurrentPage(){
+    let cs = this._currentStepIndex
+    if(cs)
+      this.currentStepIndex = cs
   }
 
   get currentDocument(): IceDocument | undefined {
@@ -344,7 +350,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
       if(currentComponent.value != item.value) {
         currentComponent.value = item.value
-        console.log("changeValue$",currentComponent.value)
         this.currentDocument.changed = true
       }
 
@@ -543,7 +548,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     if (this.currentDocument.id === undefined) {
       this.createDocument$ = this.backService.createDocument(this.currentDocument).subscribe({
         next: (res => {
-          if (res) {
+          if (res && this.currentDocument) {
             this.currentDocument.id = res.id
           }
         }),
@@ -551,7 +556,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       })
     } else {
       if(reg === 0){
-        this.updateDocument$ = this.backService.updateOnlyDate(this.currentDocument).subscribe({
+        this.updateDocument$ = this.backService.updateDocument(this.currentDocument).subscribe({
+        //this.updateDocument$ = this.backService.updateOnlyDate(this.currentDocument).subscribe({
           next: (res => {
           }),
           error: (err => {

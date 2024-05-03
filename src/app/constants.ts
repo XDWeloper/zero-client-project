@@ -83,16 +83,16 @@ export const  ObjectEditedFields:ObjectField[] =[
   {fieldName: "visible", fieldString: "Видимость страницы",fieldType:"boolean",objectType: "PAGE",componentType:[]},
   {fieldName: "isToolBar", fieldString: "Видимость панели инструментов",fieldType:"boolean",objectType: "PAGE",componentType:[]},
 
-  {fieldName: "value", fieldString: "Значение компонента",fieldType:"any",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE]},
+  {fieldName: "value", fieldString: "Значение компонента",fieldType:"any",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE,IceComponentType.TEXT]},
   {fieldName: "optionList", fieldString: "Набор значений",fieldType:"any",objectType: "COMPONENT",componentType:[IceComponentType.SELECT]},
   // {fieldName: "dataObject", fieldString: "Объект данных",fieldType:"any",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA]},
   {fieldName: "placeHolder", fieldString: "Подсказка",fieldType:"string",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE]},
   {fieldName: "required", fieldString: "Обязательно для заполнения",fieldType:"boolean",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE]},
   {fieldName: "enabled", fieldString: "Активность",fieldType:"boolean",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE]},
-  {fieldName: "visible", fieldString: "Видимость",fieldType:"boolean",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE]},
-  {fieldName: "textColor", fieldString: "Цвет текста",fieldType:"color",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE]},
-  {fieldName: "backgroundColor", fieldString: "Цвет фона",fieldType:"color",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE]},
-  {fieldName: "frameColor", fieldString: "Цвет рамки",fieldType:"color",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE]},
+  {fieldName: "visible", fieldString: "Видимость",fieldType:"boolean",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE,IceComponentType.TEXT]},
+  {fieldName: "textColor", fieldString: "Цвет текста",fieldType:"color",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE,IceComponentType.TEXT]},
+  {fieldName: "backgroundColor", fieldString: "Цвет фона",fieldType:"color",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE,IceComponentType.TEXT]},
+  {fieldName: "frameColor", fieldString: "Цвет рамки",fieldType:"color",objectType: "COMPONENT",componentType:[IceComponentType.INPUT,IceComponentType.AREA,IceComponentType.SELECT,IceComponentType.PLACE,IceComponentType.TABLE,IceComponentType.TEXT]},
 ]
 
 export type DocNameEdit = {

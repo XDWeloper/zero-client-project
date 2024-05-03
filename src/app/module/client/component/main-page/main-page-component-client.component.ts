@@ -136,7 +136,7 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy, OnInit
 
   exit() {
     /**Нужно сохранить документ если были изменения*/
-    if(DocumentEditorComponent.instance.currentDocument.changed)
+    if(DocumentEditorComponent.instance.currentDocument && DocumentEditorComponent.instance.currentDocument.changed)
       DocumentEditorComponent.instance.saveDoc(undefined,0)
 
     this.keycloakService.logoutAction().subscribe({

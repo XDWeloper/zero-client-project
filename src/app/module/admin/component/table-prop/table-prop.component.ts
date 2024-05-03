@@ -120,7 +120,8 @@ export class TablePropComponent implements OnInit, AfterViewInit {
       }]
     }
 
-    let columnNum = this.tableProp.header.map(value => value.subHeader.length).reduce((previousValue, currentValue, currentIndex, []) => previousValue + currentValue, 0)
+    let columnNum = this.tableProp.header.map(value => value.subHeader.length)
+      .reduce((previousValue, currentValue, currentIndex, []) => previousValue + currentValue, 0)
     newTitleObject.subHeader[0].title = this.tableProp.header.length === 0 ? "0" : "" + columnNum
     newTitleObject.subHeader[0].order = columnNum
 

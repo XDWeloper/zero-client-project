@@ -431,7 +431,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   updateDoc(docStatus: DocStat) {
     if (!this.currentDocument || (this.currentDocument && this.currentDocument.status != 'CONTROL')) return
     //this.currentDocument.status = docStatus
-    this.updateDocument$ = this.backService.updateOnlyDate(this.currentDocument).subscribe({
+    this.updateDocument$ = this.backService.updateDocument(this.currentDocument).subscribe({
+    //this.updateDocument$ = this.backService.updateOnlyDate(this.currentDocument).subscribe({
       next: (res => {
         if (docStatus === 'AGREE') {
           this.changeStatus(docStatus, "Отправлено клиенту на согласование")

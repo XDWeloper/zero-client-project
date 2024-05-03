@@ -1,19 +1,10 @@
-import {
-  ComponentMaket,
-  DialogType,
-  EventObject,
-  IceDocument,
-  IceStepMaket,
-  PlaceObject
-} from "../interfaces/interfaces";
+import {ComponentMaket, DialogType, IceDocument, IceStepMaket} from "../interfaces/interfaces";
 import {Action, ActionObjectType, IActionGroup, IceWorker, WorkerType} from "./workerModel";
 import {DataSourceMap, DataSourceService} from "../services/data-source.service";
 import {MessageService} from "../services/message.service";
-import {functionNameAndDescription, IceComponentType, REQUEST_TEST_ERROR} from "../constants";
+import {functionNameAndDescription, IceComponentType} from "../constants";
 import {DocumentEditorComponent} from "../module/client/component/document-editor/document-editor.component";
-import {EventService} from "../services/event.service";
 import {WorkerService} from "../services/worker.service";
-import {computeStartOfLinePositions} from "@angular/compiler-cli/src/ngtsc/sourcemaps/src/source_file";
 
 export class FieldWorker extends IceWorker {
 
@@ -91,6 +82,7 @@ export class FieldWorker extends IceWorker {
     /**Вот это нужно делать только если воркер сработал*/
     if(this.isRunning){
       console.log("update window")
+      //DocumentEditorComponent.instance.updateCurrentPage()
       DocumentEditorComponent.instance.currentDocument = {...this.localCurrentDocument}
       window.dispatchEvent(new Event('resize'))
     }
@@ -150,7 +142,7 @@ export class FieldWorker extends IceWorker {
     let value: any
     if (fieldAction.isAutoFill) {
       value  = this.getFromDataMap(fieldAction.fieldSet) as DataSourceMap[]
-      /**Это временно тут нужно еще подумать*/
+      /**Если данные не получены и идет закрытие компонента, то этого делать не надо*/
       if(fieldAction.isDisabledAfterFill && value && value.length > 0
         && (value as DataSourceMap[]).filter(item => item.value != undefined && item.value != '').length > 0){
         this.tmpFieldDisabled = true
@@ -359,9 +351,9 @@ export class FieldWorker extends IceWorker {
           result = result || tmpRes
       }
 
-      // console.log("")
       // console.log("tmpRes",tmpRes)
       // console.log("res",result)
+      // console.log("------------------")
 
     })
 
@@ -371,11 +363,22 @@ export class FieldWorker extends IceWorker {
   getArgValue(arg: string): any{
     let retString: any = arg
     retString = this.checkArg(arg)
+    //console.log("checkArg: " + arg)
+    //console.log("retString: " + retString)
+
     if( retString === "ERROR ARGUMENT")
       return  arg
 
     retString = this.changeDinamicValue(arg)
+
+    // console.log("changeDinamicValue: " + arg)
+    // console.log("retString: " + retString)
+
     retString = this.changeFunction(retString)
+
+    //console.log("changeFunction: " + arg)
+    //console.log("retString: " + retString)
+    // console.log("--------------------------- ")
 
     // console.log("arg",arg)
     // console.log("retString",retString)
@@ -390,7 +393,7 @@ export class FieldWorker extends IceWorker {
       let keyIndex = Object.keys(component).findIndex(item => item === fieldName )
       if (keyIndex != -1){
         let val = Object.values(component)[keyIndex]
-        if(val && !isNaN(Number(val)))
+        if(val && (typeof val) != 'boolean' &&!isNaN(Number(val)))
           val = Number(val)
         return  val
       }
@@ -456,7 +459,7 @@ export class FieldWorker extends IceWorker {
         tmpArgName += currentChar
       }
     }
-//    console.log("dinValPosition",dinValPosition)
+    //console.log("dinValPosition",dinValPosition)
     dinValPosition.forEach(dArg =>{
       let val: any = this.getValueFromComponent(dArg.argName)
       val = val === undefined ? "" : val
