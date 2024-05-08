@@ -21,12 +21,9 @@ export class AnketaScriptRule {
       .forEach(comp => {
         this.currentCrfPdf = comp.printRule ? comp.printRule : {isPrint: comp.componentType != IceComponentType.TEXT}
         if (comp && this.currentCrfPdf.isPrint) {
-          if (comp.componentType === IceComponentType.AREA ||
-            comp.componentType === IceComponentType.SELECT ||
-            comp.componentType === IceComponentType.PLACE ||
-            (comp.componentType === IceComponentType.INPUT
-              && comp.inputType != "checkbox"
-              && comp.inputType != "radio")) {
+          if (comp.componentType === IceComponentType.AREA || comp.componentType === IceComponentType.SELECT ||
+            comp.componentType === IceComponentType.PLACE || (comp.componentType === IceComponentType.INPUT
+              && comp.inputType != "checkbox" && comp.inputType != "radio")) {
             resRul.push(...this.setPdfRuleForAreaInputComponent(comp))
           }
           if (comp.componentType === IceComponentType.INPUT && comp.inputType === "checkbox")
@@ -95,7 +92,7 @@ export class AnketaScriptRule {
         tableCol: this.currentCrfPdf.tableCol,
         newLine: label.length > 0 ? false : this.currentCrfPdf.newLine,
         align: this.currentCrfPdf.align,
-        tabCount: this.currentCrfPdf.tabCount
+        //tabCount: this.currentCrfPdf.tabCount
       })
 
     return [
@@ -111,7 +108,9 @@ export class AnketaScriptRule {
       valueString = (comp.value && comp.value.placeString) ? comp.value.placeString : valueString
     else
       valueString = comp.value ? comp.value : valueString
-    return this.setPdfRule((comp.placeHolder ? comp.placeHolder + ": " : ""), valueString)
+
+    let isOnlyValue = (comp.printRule && comp.printRule.onlyValue && comp.printRule.onlyValue === true) ? true : false
+    return this.setPdfRule((comp.placeHolder && isOnlyValue === false ? comp.placeHolder + ": " : ""), valueString)
   }
 
   getComponentFromDoc(id: number): ComponentMaket {

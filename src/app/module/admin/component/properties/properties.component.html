@@ -78,6 +78,11 @@
           <span class="col-span-8 text-left">Количество отступов:</span>
           <input class="col-span-4  border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.tabCount" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
 
+          <span class="col-span-8 text-left">Только значение:</span>
+          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.onlyValue"
+                 [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload' || currentComponent.componentType === 'text'">
+
+
           <hr class="col-span-12">
             <span class="col-span-8 text-left">Таблица кол-во колонок:</span>
             <input class="col-span-4 border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.tableCol"  [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">

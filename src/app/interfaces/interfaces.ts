@@ -15,6 +15,7 @@ export interface ComponentRuleForPDF {
   fontStyle?: "normal" | "bold" | "italic" | "semiBold" | undefined
   order?: number
   align?: "left" | "right" | "center"
+  onlyValue?: boolean
 }
 
 export interface BankFile {

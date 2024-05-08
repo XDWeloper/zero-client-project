@@ -131,6 +131,8 @@ export class PrintService {
       this.resetCurrentHeight()
     }
 
+    console.log(docData)
+
     docData.forEach(docObject => {
       let objectType = docObject.type ? docObject.type : "text"
       switch (objectType) {
@@ -187,15 +189,14 @@ export class PrintService {
     let newLine = docObject.newLine != undefined ? docObject.newLine : true
     let charArr: string[] = [...(docObject.value as string)]
     let isTable = docObject.tableCol != undefined && docObject.colNum != undefined
-    let stringWith = isTable ? this.docWorkWidth / docObject.tableCol : this.docWorkWidth
+    let stringWith = isTable === true ? this.docWorkWidth / docObject.tableCol : this.docWorkWidth
     let resultArray = this.getNormalizeString(newLine, charArr, stringWith);
-
 
     let firstLine = docObject.redLine
 
-    if (isTable) {
+    if (isTable === true) {
       x = (this.docWorkWidth / docObject.tableCol) * (docObject.colNum - 1) + pdfConfig.leftBorder
-      if (!newLine)
+      if (newLine === false)
         this.currentHeight = this.tableRowCurrentHeight
       else
         this.tableRowCurrentHeight = this.currentHeight
@@ -208,28 +209,33 @@ export class PrintService {
     if (docObject.align ) {
       switch (docObject.align) {
         case "center":
-          x = isTable ? xPositionForRect + stringWith / 2 : this.docWidth / 2
+          x = isTable === true ? xPositionForRect + stringWith / 2 : this.docWidth / 2
           break
         case "right":
-          x = isTable ? xPositionForRect + stringWith :this.docWidth - pdfConfig.rightBorder
+          x = isTable === true ? xPositionForRect + stringWith :this.docWidth - pdfConfig.rightBorder
           break
       }
     }
 
     resultArray.forEach(line => {
-      if (line.length < 1) return
-      if (newLine || isTable) {
+      if (line.length < 1) {
+        newLine = true
+        return
+      }
+      if (newLine === true || isTable === true) {
         this.addSpace(docObject)
         this.checkNewPage()
       }
       let xPosition = firstLine ? pdfConfig.redLineBorder : x
       let yPosition = this.currentHeight
 
-      if (!newLine && !isTable) {
+//      if (newLine === false && isTable === true) {
+      if (newLine === false) {
         xPosition = this.lastXPosition
         yPosition = this.lastYPosition
+        this.currentHeight = this.lastYPosition
         newLine = true
-        isTable = false
+        //isTable = false
       }
 
       xPosition += docObject.tabCount ? docObject.tabCount * pdfConfig.tabSize : 0
@@ -249,11 +255,13 @@ export class PrintService {
   }
 
   private getNormalizeString(newLine: boolean, charArr: string[], stringWith: number): string[] {
-    let tempStr = ""
+
+     let tempStr = ""
     let deltaStr = ""
     let lastBlankString = ""
     let deltaLastString = newLine ? 0 : this.lastStringXPositionEnd
     let resultArray: string[] = []
+    let tmpStringWidth = stringWith - deltaLastString
 
     charArr.forEach(c => {
       tempStr += c
@@ -269,11 +277,12 @@ export class PrintService {
         deltaStr = ""
       }
 
-      if ((pdfDoc.getTextWidth(tempStr)) > stringWith) {
+      if ((pdfDoc.getTextWidth(tempStr)) > tmpStringWidth) {
         resultArray.push(lastBlankString)
         tempStr = deltaStr
         deltaStr = ""
         deltaLastString = 0
+        tmpStringWidth = stringWith
       }
     })
 
