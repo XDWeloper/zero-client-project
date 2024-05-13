@@ -43,7 +43,8 @@ export class AnketaScriptRule {
 
   private setPdfRuleForTextComponent(comp: ComponentMaket): PDFDocObject[] {
     let string = stripHtml(comp.value ? comp.value : "", {skipHtmlDecoding: true}).result
-    string = string.replaceAll("&nbsp;", "\n")
+    //string = string.replaceAll("&nbsp;", "\n")
+    string = string.replaceAll("&nbsp;", "")
     return this.setPdfRule(string, "")
   }
 
@@ -58,11 +59,16 @@ export class AnketaScriptRule {
       colNum: this.currentCrfPdf.colNum,
       tableCol: this.currentCrfPdf.tableCol,
       newLine: this.currentCrfPdf.newLine,
-      tabCount: this.currentCrfPdf.tabCount
+      tabCount: this.currentCrfPdf.tabCount,
+      repeatLine: this.currentCrfPdf.repeatLine
     } as PDFDocObject]
   }
 
-  setPdfRule(label: string, value: string): PDFDocObject[] {
+  setPdfRule(label: string, value: any): PDFDocObject[] {
+
+    if((typeof value) === 'number')
+      value = value.toString()
+
     if (this.currentCrfPdf.addDash) {
       label = "- " + label
     }
@@ -79,7 +85,8 @@ export class AnketaScriptRule {
         tableCol: this.currentCrfPdf.tableCol,
         newLine: this.currentCrfPdf.newLine,
         align: this.currentCrfPdf.align,
-        tabCount: this.currentCrfPdf.tabCount
+        tabCount: this.currentCrfPdf.tabCount,
+        repeatLine: this.currentCrfPdf.repeatLine
       })
     if (value.length > 0)
       result.push({
@@ -92,7 +99,8 @@ export class AnketaScriptRule {
         tableCol: this.currentCrfPdf.tableCol,
         newLine: label.length > 0 ? false : this.currentCrfPdf.newLine,
         align: this.currentCrfPdf.align,
-        //tabCount: this.currentCrfPdf.tabCount
+        tabCount: this.currentCrfPdf.onlyValue && this.currentCrfPdf.onlyValue === true ? this.currentCrfPdf.tabCount : 0,
+        repeatLine: this.currentCrfPdf.onlyValue && this.currentCrfPdf.onlyValue === true ? this.currentCrfPdf.repeatLine: undefined
       })
 
     return [
@@ -104,13 +112,22 @@ export class AnketaScriptRule {
 
   setPdfRuleForAreaInputComponent(comp: ComponentMaket): PDFDocObject[] {
     let valueString = "Не указано."
-    if (comp.componentType === IceComponentType.PLACE)
-      valueString = (comp.value && comp.value.placeString) ? comp.value.placeString : valueString
-    else
-      valueString = comp.value ? comp.value : valueString
+    switch (comp.componentType) {
+      case IceComponentType.SELECT:
+        valueString = (comp.value && comp.value.value) ? comp.value.value : valueString
+        break;
+      case IceComponentType.PLACE:
+        valueString = (comp.value && comp.value.placeString) ? comp.value.placeString : valueString
+        break;
+      default:
+          valueString = comp.value ? comp.value : valueString
+    }
+    let isOnlyValue = comp.printRule && comp.printRule.onlyValue && comp.printRule.onlyValue === true
+    console.log("isOnlyValue",isOnlyValue)
+    console.log("comp.placeHolder",comp.placeHolder)
+    console.log("valueString",valueString)
 
-    let isOnlyValue = (comp.printRule && comp.printRule.onlyValue && comp.printRule.onlyValue === true) ? true : false
-    return this.setPdfRule((comp.placeHolder && isOnlyValue === false ? comp.placeHolder + ": " : ""), valueString)
+    return this.setPdfRule((comp.placeHolder && (isOnlyValue === false || isOnlyValue === undefined) ? comp.placeHolder + ": " : ""), valueString)
   }
 
   getComponentFromDoc(id: number): ComponentMaket {
@@ -119,67 +136,39 @@ export class AnketaScriptRule {
   }
 
   private setPdfRuleForTableComponent(comp: ComponentMaket): PDFDocObject[] {
-    if (!comp.value)
-      return [];
+    /**Если не нужно показывать пустую таблицу это расскоментарить!*/
+    // if (!comp.value)
+    //   return [];
 
     let header: string[]
     let subHeader: string[][] = []
     let body: string[][][] = []
-    let tableTitle = comp.tableType === 1 ? "Сведения об основных контрагентах, планируемых плательщиках и получателях денежных средств" : "Сведения об участниках общества, размерах их долей в уставном капитале и их оплате"
-
-    if (comp.tableType && comp.tableType === 1) {
-      header = ["Плательщики", "Получатели"]
-      subHeader = [["Наименование", "Местонахождение (страна, город)"], ["Наименование", "Местонахождение (страна, город)"]]
-    }
-
-    if (comp.tableType && comp.tableType === 2) {
-      header = [
-        "Сведения об участнике общества (Ф.И.О, дата и место рождения (организационно-правовая форма и наименование юридического лица)",
-        "Вид, номер, серия, дата и место выдачи документа, удостоверяющего личность, орган, выдавший документ (номер гос. регистрации, наименование органа, осуществившего регистрацию, дата регистрации)",
-        "Адрес места регистрации (место нахождения)",
-        "Размер доли в уставном капитале общества",
-        "Сведения об оплате доли"
-      ]
-      subHeader = [["1"], ["2"], ["3"], ["4"], ["5"]]
-    }
+    let tableTitle
 
     if (comp.tableType === undefined) {
       header = comp.tableProp.header.map(value => value.title)
       subHeader = comp.tableProp.header.map(value => value.subHeader.map(value1 => value1.title))
 
-      subHeader.map(val => val.length).forEach(arrLenght => {
-        let resArr: [][] = [];
+      if(comp.value)
+      subHeader.flat().forEach((value, index) => {
+        let resArr:any[] = []
         comp.value.forEach((val: any[]) => {
-          let resultArr: [] | undefined = val.filter((value, index) => this.predIndex <= index && index < (arrLenght + this.predIndex)) as []
-          if (resultArr)
-            resArr.push(resultArr)
+          let indexValue = val[index]
+          resArr.push(indexValue)
         })
-        this.predIndex = arrLenght
-        body.push(resArr)
-      })
-
-    } else {
-      subHeader.map(val => val.length).forEach(arrLenght => {
-        let resArr: [][] = [];
-        (comp.value as [{}]).map(row => Object.values(row) as []).forEach(val => {
-          let resultArr: [] | undefined = val.filter((value, index) => this.predIndex <= index && index < (arrLenght + this.predIndex)) as []
-          if (resultArr)
-            resArr.push(resultArr)
-        })
-        this.predIndex = arrLenght
-        body.push(resArr)
+        body.push([resArr])
       })
     }
 
     return [
-      {
-        value: tableTitle,
-        redLine: true,
-        fontSize: 10,
-        fontStyle: "italic"
-      }, {
-        type: "space"
-      },
+      // {
+      //   value: tableTitle,
+      //   redLine: true,
+      //   fontSize: 10,
+      //   fontStyle: "italic"
+      // }, {
+      //   type: "space"
+      // },
       {
         type: "table",
         head: header,

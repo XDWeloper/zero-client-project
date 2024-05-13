@@ -10,6 +10,7 @@ export interface ComponentRuleForPDF {
   colNum?: number
   tableCol?: number
   redLine?: boolean
+  repeatLine?: number
   frame?: boolean
   fontSize?: number
   fontStyle?: "normal" | "bold" | "italic" | "semiBold" | undefined

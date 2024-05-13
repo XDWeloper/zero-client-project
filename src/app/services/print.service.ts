@@ -131,7 +131,7 @@ export class PrintService {
       this.resetCurrentHeight()
     }
 
-    console.log(docData)
+    //console.log(docData)
 
     docData.forEach(docObject => {
       let objectType = docObject.type ? docObject.type : "text"
@@ -192,9 +192,11 @@ export class PrintService {
     let stringWith = isTable === true ? this.docWorkWidth / docObject.tableCol : this.docWorkWidth
     let resultArray = this.getNormalizeString(newLine, charArr, stringWith);
 
+
     let firstLine = docObject.redLine
 
     if (isTable === true) {
+      this.lastStringXPositionEnd = 0
       x = (this.docWorkWidth / docObject.tableCol) * (docObject.colNum - 1) + pdfConfig.leftBorder
       if (newLine === false)
         this.currentHeight = this.tableRowCurrentHeight
@@ -229,13 +231,12 @@ export class PrintService {
       let xPosition = firstLine ? pdfConfig.redLineBorder : x
       let yPosition = this.currentHeight
 
-//      if (newLine === false && isTable === true) {
-      if (newLine === false) {
+      if (newLine === false && isTable === false) {
         xPosition = this.lastXPosition
         yPosition = this.lastYPosition
         this.currentHeight = this.lastYPosition
         newLine = true
-        //isTable = false
+        isTable = true
       }
 
       xPosition += docObject.tabCount ? docObject.tabCount * pdfConfig.tabSize : 0
@@ -256,7 +257,7 @@ export class PrintService {
 
   private getNormalizeString(newLine: boolean, charArr: string[], stringWith: number): string[] {
 
-     let tempStr = ""
+    let tempStr = ""
     let deltaStr = ""
     let lastBlankString = ""
     let deltaLastString = newLine ? 0 : this.lastStringXPositionEnd
@@ -290,7 +291,6 @@ export class PrintService {
       resultArray.push(tempStr)
       this.lastStringXPositionEnd = pdfDoc.getTextWidth(tempStr)
     }
-
     return resultArray;
   }
 
@@ -388,10 +388,13 @@ export class PrintService {
   }
 
   private createNestedTable(docObject: PDFTableObject) {
-    this.tableLineMaxHeight = new Array(docObject.body[0].length + 1).fill(0)
+
+    this.tableLineMaxHeight = new Array(docObject.subHead.flat().length + 1).fill(0)
+    //this.tableLineMaxHeight = new Array(docObject.body[0].length + 1).fill(0)
     this.createdTable(docObject, prePdfDoc, false)
     prePdfDoc.deletePage(0)
     this.createdTable(docObject, pdfDoc, true)
+
   }
 
   private createdTable(docObject: PDFTableObject, doc: jsPDF, isVisible: boolean) {

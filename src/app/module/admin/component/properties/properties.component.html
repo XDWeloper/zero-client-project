@@ -77,10 +77,12 @@
           <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.frame" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
           <span class="col-span-8 text-left">Количество отступов:</span>
           <input class="col-span-4  border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.tabCount" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
+          <span class="col-span-8 text-left">Количество строк :</span>
+          <input class="col-span-4  border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.repeatLine" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
 
-          <span class="col-span-8 text-left">Только значение:</span>
+          <span *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'" class="col-span-8 text-left">Только значение:</span>
           <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.onlyValue"
-                 [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload' || currentComponent.componentType === 'text'">
+                 *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'">
 
 
           <hr class="col-span-12">

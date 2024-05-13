@@ -714,7 +714,10 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   private getDataForPdf(): PDFDocObject[] {
 
     let resultList: PDFDocObject[]
-    let asr = new AnketaScriptRule(this.currentDocument.docStep.flatMap(value => value.componentMaket).filter(p => p.printRule.isPrint)
+    let asr = new AnketaScriptRule(this.currentDocument.docStep
+      .filter(item => item.visible === true)
+      .flatMap(value => value.componentMaket)
+      .filter(p => p.printRule.isPrint)
       .sort((a, b) => a.printRule.order < b.printRule.order ? -1 : 1))
     resultList = asr.getPrintRules()
     return resultList
