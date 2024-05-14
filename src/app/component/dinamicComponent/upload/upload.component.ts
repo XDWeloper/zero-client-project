@@ -16,7 +16,7 @@ import {
 } from "../../../interfaces/interfaces";
 import {
   AlertColor,
-  BANK_FILE_LOAD_ERROR,
+  BANK_FILE_LOAD_ERROR, DOCUMENT_NAME_LOAD_ERROR_NOT_ID,
   ERROR,
   FILE_SIZE_ERROR,
   FILES_DELETE_ERROR,
@@ -32,6 +32,7 @@ import {environment} from "../../../../environments/environment";
 import {SpinnerService} from "../../../services/spinner.service";
 import {HttpEventType} from "@angular/common/http";
 import {StepService} from "../../../services/step.service";
+import {DocumentEditorComponent} from "../../../module/client/component/document-editor/document-editor.component";
 
 const fileSize1mb = 1048576
 
@@ -112,6 +113,8 @@ export class UploadComponent implements IceComponent, OnDestroy {
   tableType: number;
   checkedText?: string;
   optionList?: OptionList[] | undefined
+  tooltipEnabled = "Перетащите необходимые документы в данную область или воспользуйтесь кнопкой 'Выбрать'"
+  tooltipDisabled = "Для загрузки документов необходимо предварительно сохранить документ нажмите кнопку 'Сохранить'"
 
   ngOnDestroy(): void {
     if (this.upload$)
@@ -244,6 +247,11 @@ export class UploadComponent implements IceComponent, OnDestroy {
   }
 
   private upLoadFiles(files: Array<File>) {
+    if(!this.currentDocument.id){
+      this.messageService.show(DOCUMENT_NAME_LOAD_ERROR_NOT_ID,"", ERROR)
+      return
+    }
+
     this.isUpload = true
     let fileCont = 0
     const formData: FormData = new FormData();
