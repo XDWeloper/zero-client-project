@@ -2,6 +2,14 @@ import {DocStat, IceComponentType} from "../constants";
 import {IceDataSource} from "../workers/IceDataSource";
 import {IDataSource, IWorker} from "../workers/workerModel";
 
+export interface ReportData {
+  uuid:string,
+  status:string,
+  message:string,
+  data:string,
+  reportFile:string
+}
+
 export interface ComponentRuleForPDF {
   isPrint: boolean
   tabCount?: number

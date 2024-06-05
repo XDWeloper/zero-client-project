@@ -29,7 +29,7 @@ import {
   ERROR,
   IceComponentType,
   INFO,
-  MAKET_LOAD_ERROR,
+  MAKET_LOAD_ERROR, MESSAGE_REPORT_IN_PROCESS, MESSAGE_REPORT_IS_DONE,
   TAB_DOCUMENT_LIST
 } from "../../../../constants";
 import {TextComponent} from "../../../../component/dinamicComponent/text/text.component";
@@ -41,7 +41,7 @@ import {
 import {
   InformationCompanyParticipantsTableComponent
 } from "../../../../component/dinamicComponent/tables/information-company-participants-table/information-company-participants-table.component";
-import {debounceTime, filter, Subscription} from "rxjs";
+import {debounceTime, filter, interval, Subscription} from "rxjs";
 import {ComponentService} from "../../../../services/component.service";
 import {BackendService} from "../../../../services/backend.service";
 import {MessageService} from "../../../../services/message.service";
@@ -55,6 +55,7 @@ import {StatusReasonComponent} from "../../../../component/status-reason/status-
 import {PDFDocObject, PrintService} from "../../../../services/print.service";
 import {AnketaScriptRule} from "../../../../data/anketaScriptRule";
 import {TableComponent} from "../../../../component/dinamicComponent/tables/table/table.component";
+import {TimeService} from "../../../../services/time.service";
 
 @Component({
   selector: 'app-document-editor',
@@ -70,6 +71,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   private updateDocument$: Subscription;
   private tabLabelNode: HTMLElement
   private _openType: OpenDocType = "EDIT"
+  reportProcessUID: string | undefined = undefined
+  reportInterval$: Subscription
 
   @Input() set currentDocument(value: IceDocument | undefined) {
     this._currentDocument = value;
@@ -138,7 +141,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
               private changeDetection: ChangeDetectorRef,
               public dialog: MatDialog,
               private stepService: StepService,
-              private printService: PrintService) {
+              private printService: PrintService,
+              private timeService: TimeService
+  ) {
     DocumentEditorComponent.instance = this
   }
 
@@ -155,6 +160,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       this.updateDocument$.unsubscribe()
     if (this.tabChange$)
       this.tabChange$.unsubscribe()
+    if (this.reportInterval$)
+      this.reportInterval$.unsubscribe()
+
   }
 
   get currentDocument(): IceDocument | undefined {
@@ -564,10 +572,35 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   print() {
-    let docData = this.getDataForPdf()
-    if (docData && docData.length > 0) {
-      this.printService.createPDF(docData)
-    }
+    this.backService.createReport(1, "PDF", [this.currentDocument.id]).subscribe({
+        next: value => {
+          if (value.status === "ERROR") {
+            this.messageService.show(value.message, value.message, ERROR)
+          }
+          if (value.status === "DONE" && value.reportFile.length > 0) {
+            window.open("assets/report/" + value.reportFile, "_blank");
+          }
+          if (value.status === "PROCESS" && value.uuid.length > 0) {
+            this.reportProcessUID = value.uuid
+            this.messageService.show(MESSAGE_REPORT_IN_PROCESS, "", INFO).subscribe({
+              next: value1 => {
+                this.startReportTimer()
+              }
+            })
+            console.log(value)
+          }
+
+        },
+        error: err => {
+          this.messageService.show(err, err, ERROR)
+        }
+      }
+    )
+
+    // let docData = this.getDataForPdf()
+    // if (docData && docData.length > 0) {
+    //   this.printService.createPDF(docData)
+    // }
   }
 
   private getDataForPdf(): PDFDocObject[] {
@@ -581,4 +614,44 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     resultList = asr.getPrintRules()
     return resultList
   }
+
+  startReportTimer() {
+    this.reportInterval$ = interval(5000).subscribe(() => {
+      if (this.reportProcessUID) {
+        this.timeService.isBlocked = true
+        this.backService.getReportStatus(this.reportProcessUID).subscribe({
+          next: value => {
+            if (value.status === "ERROR") {
+              this.reportProcessUID = undefined
+              this.reportInterval$.unsubscribe()
+              this.messageService.show(value.message, value.message, ERROR)
+            }
+            if (value.status === "DONE" && value.reportFile.length > 0) {
+              this.reportProcessUID = undefined
+              this.reportInterval$.unsubscribe()
+              this.messageService.show(MESSAGE_REPORT_IS_DONE, "", INFO,["YES","NO"]).subscribe({
+                next: button => {
+                  if (button === "YES") {
+                    window.open("assets/report/" + value.reportFile, "_blank");
+                  }
+                }
+              })
+
+            }
+            if (value.status === "PROCESS" && value.uuid.length > 0) {
+              console.log(value)
+            }
+          },
+          error: err => {
+            this.messageService.show(err, err, ERROR)
+          },
+          complete: () => {
+            this.timeService.isBlocked = false
+          }
+        })
+      }
+    })
+
+  }
+
 }

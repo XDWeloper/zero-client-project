@@ -44,6 +44,9 @@ export const MAKET_CLOSE_NOT_SAVE = "Не сохраненные данные б
 export const MAKET_CLOSE_NOT_SAVE_FULL_MESSAGE = "Если хотите сохранить изменения нажмите кнопку ДА."
 export const MESSAGE_NO_DOCUMENT = "Здравствуйте уважаемый клиент! <br> У вас еще не создано ни одного документа.<br> Для продолжения работы нажмите на кнопку 'Создать документ'"
 
+export const MESSAGE_REPORT_IN_PROCESS = "Продолжается формирование отчета. По окончании вы получите уведомление."
+export const MESSAGE_REPORT_IS_DONE = "Отчет сформирован. Открыть?"
+
 
 export const ERROR = "ERROR"
 export const INFO = "INFO"

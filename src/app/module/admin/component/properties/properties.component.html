@@ -51,67 +51,67 @@
     </mat-accordion>
 
     <!--    параметры печати-->
-    <mat-accordion
-      *ngIf="currentComponent.inputType !== 'button'"
-      class="mt-2 col-span-12 w-[95%] text-center rounded-md dark:bg-slate-700 bg-gray-200 border border-primary-light relative">
-      <mat-expansion-panel hideToggle [expanded]="false">
-        <mat-expansion-panel-header>
-          <mat-panel-title>
-            <p>Параметры печати компонента</p>
-          </mat-panel-title>
-          <mat-icon [ngClass]="(currentComponent.printRule && currentComponent.printRule.isPrint === true) ? 'text-primary-dark':'text-error-base'">print</mat-icon>
-        </mat-expansion-panel-header>
-        <div class="w-full border-t border-t-primary-light grid grid-cols-12 gap-y-0.5">
-          <div class="col-span-12 h-2"></div>
-          <span class="col-span-8 text-left">Печатаемый:</span>
-          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.isPrint">
-          <span class="col-span-8 text-left">Порядковый номер:</span>
-          <input class="col-span-4  border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.order">
-          <span class="col-span-8 text-left">С новой строки:</span>
-          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.newLine" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
-          <span class="col-span-8 text-left">Красная строка:</span>
-          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.redLine" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
-          <span class="col-span-8 text-left">Дефис:</span>
-          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.addDash" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
-          <span class="col-span-8 text-left">Рамка:</span>
-          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.frame" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
-          <span class="col-span-8 text-left">Количество отступов:</span>
-          <input class="col-span-4  border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.tabCount" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
-          <span class="col-span-8 text-left">Количество строк :</span>
-          <input class="col-span-4  border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.repeatLine" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
+<!--    <mat-accordion-->
+<!--      *ngIf="currentComponent.inputType !== 'button'"-->
+<!--      class="mt-2 col-span-12 w-[95%] text-center rounded-md dark:bg-slate-700 bg-gray-200 border border-primary-light relative">-->
+<!--      <mat-expansion-panel hideToggle [expanded]="false">-->
+<!--        <mat-expansion-panel-header>-->
+<!--          <mat-panel-title>-->
+<!--            <p>Параметры печати компонента</p>-->
+<!--          </mat-panel-title>-->
+<!--          <mat-icon [ngClass]="(currentComponent.printRule && currentComponent.printRule.isPrint === true) ? 'text-primary-dark':'text-error-base'">print</mat-icon>-->
+<!--        </mat-expansion-panel-header>-->
+<!--        <div class="w-full border-t border-t-primary-light grid grid-cols-12 gap-y-0.5">-->
+<!--          <div class="col-span-12 h-2"></div>-->
+<!--          <span class="col-span-8 text-left">Печатаемый:</span>-->
+<!--          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.isPrint">-->
+<!--          <span class="col-span-8 text-left">Порядковый номер:</span>-->
+<!--          <input class="col-span-4  border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.order">-->
+<!--          <span class="col-span-8 text-left">С новой строки:</span>-->
+<!--          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.newLine" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">-->
+<!--          <span class="col-span-8 text-left">Красная строка:</span>-->
+<!--          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.redLine" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">-->
+<!--          <span class="col-span-8 text-left">Дефис:</span>-->
+<!--          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.addDash" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">-->
+<!--          <span class="col-span-8 text-left">Рамка:</span>-->
+<!--          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.frame" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">-->
+<!--          <span class="col-span-8 text-left">Количество отступов:</span>-->
+<!--          <input class="col-span-4  border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.tabCount" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">-->
+<!--          <span class="col-span-8 text-left">Количество строк :</span>-->
+<!--          <input class="col-span-4  border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.repeatLine" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">-->
 
-          <span *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'" class="col-span-8 text-left">Только значение:</span>
-          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.onlyValue"
-                 *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'">
+<!--          <span *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'" class="col-span-8 text-left">Только значение:</span>-->
+<!--          <input class="col-span-4  h-4 w-4" type="checkbox" [(ngModel)]="currentComponent.printRule.onlyValue"-->
+<!--                 *ngIf="currentComponent.componentType === 'input' || currentComponent.componentType === 'area'">-->
 
 
-          <hr class="col-span-12">
-            <span class="col-span-8 text-left">Таблица кол-во колонок:</span>
-            <input class="col-span-4 border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.tableCol"  [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
-            <span class="col-span-8 text-left">Номер колонки:</span>
-            <input class="col-span-4 border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.colNum" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
-          <hr class="col-span-12">
+<!--          <hr class="col-span-12">-->
+<!--            <span class="col-span-8 text-left">Таблица кол-во колонок:</span>-->
+<!--            <input class="col-span-4 border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.tableCol"  [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">-->
+<!--            <span class="col-span-8 text-left">Номер колонки:</span>-->
+<!--            <input class="col-span-4 border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.colNum" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">-->
+<!--          <hr class="col-span-12">-->
 
-          <span class="col-span-8 text-left">Размер шрифта:</span>
-          <input class="col-span-4 border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.fontSize" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
-          <span class="col-span-8 text-left">Стиль шрифта:</span>
-          <select class="col-span-4 border border-primary-light" [(ngModel)]="currentComponent.printRule.fontStyle" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
-            <option value="undefined" selected></option>
-            <option value="normal">normal</option>
-            <option class="font-bold" value="bold">bold</option>
-            <option class="italic" value="italic">italic</option>
-            <option class="font-semibold" value="semiBold">semiBold</option>
-          </select>
-          <span class="col-span-8 text-left">Табуляция:</span>
-          <select class="col-span-4 border border-primary-light" [(ngModel)]="currentComponent.printRule.align" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">
-            <option value="left" selected></option>
-            <option value="center">центер</option>
-            <option value="left">лево</option>
-            <option value="right">право</option>
-          </select>
-        </div>
-      </mat-expansion-panel>
-    </mat-accordion>
+<!--          <span class="col-span-8 text-left">Размер шрифта:</span>-->
+<!--          <input class="col-span-4 border border-primary-light" type="number" [(ngModel)]="currentComponent.printRule.fontSize" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">-->
+<!--          <span class="col-span-8 text-left">Стиль шрифта:</span>-->
+<!--          <select class="col-span-4 border border-primary-light" [(ngModel)]="currentComponent.printRule.fontStyle" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">-->
+<!--            <option value="undefined" selected></option>-->
+<!--            <option value="normal">normal</option>-->
+<!--            <option class="font-bold" value="bold">bold</option>-->
+<!--            <option class="italic" value="italic">italic</option>-->
+<!--            <option class="font-semibold" value="semiBold">semiBold</option>-->
+<!--          </select>-->
+<!--          <span class="col-span-8 text-left">Табуляция:</span>-->
+<!--          <select class="col-span-4 border border-primary-light" [(ngModel)]="currentComponent.printRule.align" [disabled]="currentComponent.componentType === 'table' || currentComponent.componentType === 'upload'">-->
+<!--            <option value="left" selected></option>-->
+<!--            <option value="center">центер</option>-->
+<!--            <option value="left">лево</option>-->
+<!--            <option value="right">право</option>-->
+<!--          </select>-->
+<!--        </div>-->
+<!--      </mat-expansion-panel>-->
+<!--    </mat-accordion>-->
 
 
     <p *ngIf="currentComponent.componentType === 'text'" class="col-span-2 mt-2">Ссылка:</p>

@@ -10,7 +10,7 @@ import {
   IceDocumentMaket,
   IIceComponentValue,
   LoginPasswordProperties,
-  OtpType
+  OtpType, ReportData
 } from "../interfaces/interfaces";
 import {DocNameEdit, DocStat, IceComponentType} from "../constants";
 import {map} from "rxjs/operators";
@@ -250,5 +250,33 @@ export class BackendService {
     operation.url = environment.resourceServerURL + "/core/files?id=" + fileId + "&documentRef=" + documentRef
     operation.httpMethod = HttpMethod.DELETE
     return this.http.post<any>(environment.bffURI + '/operation', operation,{observe: 'events',reportProgress: true,});
+  }
+
+  createReport(reportId: number, reportType: string,params?: any[]): Observable<ReportData> {
+    const operation = new Operation();
+    operation.url = environment.resourceServerURL + "/report/run"
+    operation.httpMethod = HttpMethod.POST
+    operation.body = {
+      reportId: reportId,
+      fileType: reportType,
+      p1: params[0] ? params[0] : null,
+      p2: params[1] ? params[1] : null,
+      p3: params[2] ? params[2] : null,
+      p4: params[3] ? params[3] : null,
+      p5: params[4] ? params[4] : null,
+      p6: params[5] ? params[5] : null,
+      p7: params[6] ? params[6] : null,
+      p8: params[7] ? params[7] : null,
+      p9: params[8] ? params[8] : null,
+      p10: params[9] ? params[9] : null,
+    }
+    return this.http.post<ReportData>(environment.bffURI + '/operation', operation,);
+  }
+
+  getReportStatus(reportUID: string): Observable<ReportData> {
+    const operation = new Operation();
+    operation.url = environment.resourceServerURL + "/report/" + reportUID
+    operation.httpMethod = HttpMethod.GET
+    return this.http.post<ReportData>(environment.bffURI + '/operation', operation,);
   }
 }

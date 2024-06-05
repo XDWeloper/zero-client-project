@@ -38,7 +38,7 @@ import {
   ERROR,
   IceComponentType,
   INFO,
-  MAKET_LOAD_ERROR,
+  MAKET_LOAD_ERROR, MESSAGE_REPORT_IN_PROCESS, MESSAGE_REPORT_IS_DONE,
   TAB_DOCUMENT_LIST, TAB_DOCUMENT_SHOW
 } from "../../../../constants";
 import {TextComponent} from "../../../../component/dinamicComponent/text/text.component";
@@ -50,7 +50,7 @@ import {
 import {
   InformationCompanyParticipantsTableComponent
 } from "../../../../component/dinamicComponent/tables/information-company-participants-table/information-company-participants-table.component";
-import {debounceTime, filter, Observable, Subscription} from "rxjs";
+import {debounceTime, filter, interval, Observable, Subscription} from "rxjs";
 import {ComponentService} from "../../../../services/component.service";
 import {BackendService} from "../../../../services/backend.service";
 import {MessageService} from "../../../../services/message.service";
@@ -67,6 +67,7 @@ import {TableComponent} from "../../../../component/dinamicComponent/tables/tabl
 import {EventService} from "../../../../services/event.service";
 import {WorkerService} from "../../../../services/worker.service";
 import {DataSourceService} from "../../../../services/data-source.service";
+import {TimeService} from "../../../../services/time.service";
 
 @Component({
   selector: 'app-document-editor',
@@ -83,16 +84,18 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   private tabLabelNode: HTMLElement
   private _openType: OpenDocType = "EDIT"
   private _isOpenedTab: boolean = false
+  reportProcessUID: string | undefined = undefined
+  reportInterval$: Subscription
 
   @Input() maketId: number | undefined
 
   @Input() set isOpenedTab(value: boolean) {
-    if(value === false)
+    if (value === false)
       this.currentDocument = undefined
 
     this._isOpenedTab = value
 
-    if(value === true && this.maketId && !this.currentDocument){
+    if (value === true && this.maketId && !this.currentDocument) {
       this._isOpenedTab = false
       this.loadDocMaket(this.maketId)
     }
@@ -181,8 +184,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
               private printService: PrintService,
               private eventService: EventService,
               private workerService: WorkerService,
-              private dataSourceService: DataSourceService
-              ) {
+              private dataSourceService: DataSourceService,
+              private timeService: TimeService
+  ) {
     DocumentEditorComponent.instance = this
   }
 
@@ -199,11 +203,13 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       this.updateDocument$.unsubscribe()
     if (this.tabChange$)
       this.tabChange$.unsubscribe()
+    if (this.reportInterval$)
+      this.reportInterval$.unsubscribe()
   }
 
-  updateCurrentPage(){
+  updateCurrentPage() {
     let cs = this._currentStepIndex
-    if(cs)
+    if (cs)
       this.currentStepIndex = cs
   }
 
@@ -222,7 +228,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   setMainBounds() {
-    if(!this.mainContainer) return
+    if (!this.mainContainer) return
     this.dialogCorrectX = this.mainContainer.nativeElement.getBoundingClientRect().x - 20
     this.dialogCorrectY = this.mainContainer.nativeElement.getBoundingClientRect().y
   }
@@ -329,8 +335,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     this.componentSelected$ = this.componentService.selectedDocumentComponent$.subscribe(component => {
 
       /**Создаем событие клик компонента*/
-      if(!this.eventService.isWorkerResize)
-        this.eventService.launchEvent(EventObject.ON_COMPONENT_CLICK ,this.currentDocument, component.componentEvent, null)
+      if (!this.eventService.isWorkerResize)
+        this.eventService.launchEvent(EventObject.ON_COMPONENT_CLICK, this.currentDocument, component.componentEvent, null)
       else
         this.eventService.isWorkerResize = false
 
@@ -345,10 +351,10 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       debounceTime(500),
     ).subscribe(item => {
       let currentComponent = this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === item.componentId)
-      if(!currentComponent) return
+      if (!currentComponent) return
 
 
-      if(currentComponent.value != item.value) {
+      if (currentComponent.value != item.value) {
         currentComponent.value = item.value
         this.currentDocument.changed = true
       }
@@ -371,7 +377,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       this.changeDetection.detectChanges()
 
       /**Создаем событие значение копонента*/
-      if(!this.eventService.isWorkerResize)
+      if (!this.eventService.isWorkerResize)
         this.eventService.launchEvent(EventObject.ON_COMPONENT_CHANGE_VALUE, this.currentDocument, currentComponent.componentEvent, item.value)
       else
         this.eventService.isWorkerResize = false
@@ -397,7 +403,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   showComponentOnCurrentStep(stepNum: number) {
     this.firstComponentRef = undefined;
-    if(!this.steps[stepNum - 1]) return
+    if (!this.steps[stepNum - 1]) return
 
     let stepComponentList = this.steps[stepNum - 1].componentMaket
     stepComponentList.forEach(comp => {
@@ -469,13 +475,11 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         this.setFirstComponent();
 
       /**Создаем событие установка значения копонента*/
-        if(!this.eventService.isWorkerResize && comp.value) {
-          this.eventService.launchEvent(EventObject.ON_COMPONENT_SET_VALUE, this.currentDocument, comp.componentEvent, comp.value)
-        }
-        else
-          this.eventService.isWorkerResize = false
+      if (!this.eventService.isWorkerResize && comp.value) {
+        this.eventService.launchEvent(EventObject.ON_COMPONENT_SET_VALUE, this.currentDocument, comp.componentEvent, comp.value)
+      } else
+        this.eventService.isWorkerResize = false
     })
-
 
 
     this.setFocusToFirstElement()
@@ -516,13 +520,13 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         this.dataSourceService.createDataSourceList(this.currentDocument)
 
         /**Создаем воркеры*/
-        if(this.currentDocument.docAttrib && this.currentDocument.docAttrib.workerList)
+        if (this.currentDocument.docAttrib && this.currentDocument.docAttrib.workerList)
           this.workerService.createWorker(this.currentDocument)
 
 
         /**Создаем событие создание документа*/
-        if(!this.eventService.isWorkerResize)
-          this.eventService.launchEvent(EventObject.ON_DOCUMENT_CREATE, this.currentDocument,this.currentDocument.docAttrib.documentEventList)
+        if (!this.eventService.isWorkerResize)
+          this.eventService.launchEvent(EventObject.ON_DOCUMENT_CREATE, this.currentDocument, this.currentDocument.docAttrib.documentEventList)
         else
           this.eventService.isWorkerResize = false
 
@@ -539,8 +543,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   saveDoc(docStatus: DocStat | undefined, reg: number) {
     if (!this.currentDocument || docStatus === "INCORRECT") return
-    if(docStatus != undefined)
-    this.currentDocument.status = docStatus
+    if (docStatus != undefined)
+      this.currentDocument.status = docStatus
 
     /**нужно залить доп атрибуты*/
     this.setCurrentAttrib()
@@ -555,19 +559,19 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         error: (err => this.messageService.show(DRAFT_SAVE_ERROR, err.error.message, ERROR))
       })
     } else {
-      if(reg === 0){
+      if (reg === 0) {
         this.updateDocument$ = this.backService.updateDocument(this.currentDocument).subscribe({
-        //this.updateDocument$ = this.backService.updateOnlyDate(this.currentDocument).subscribe({
+          //this.updateDocument$ = this.backService.updateOnlyDate(this.currentDocument).subscribe({
           next: (res => {
           }),
           error: (err => {
             this.messageService.show(DOCUMENT_SAVE_ERROR, err.error.message, ERROR)
           })
         })
-      } else{
+      } else {
         this.updateDocument$ = this.backService.updateDocument(this.currentDocument).subscribe({
           next: (res => {
-              this.docSaved(docStatus === "DRAFT" ? DOCUMENT_DRAFT_SAVED : DOCUMENT_SEND, "")
+            this.docSaved(docStatus === "DRAFT" ? DOCUMENT_DRAFT_SAVED : DOCUMENT_SEND, "")
           }),
           error: (err => {
             this.messageService.show(DOCUMENT_SAVE_ERROR, err.error.message, ERROR)
@@ -580,13 +584,23 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   private setCurrentAttrib() {
     let rezObj: Object = {}
-      this.currentDocument.docStep
+    this.currentDocument.docStep
       .map(item => item.componentMaket)
       .flat()
       .filter(item => item.customAttribName)
-      .map(item =>{
-        Object.defineProperty(rezObj, item.customAttribName, {value: item.value, writable: true, enumerable: true, configurable: true})
-        Object.defineProperty(rezObj, item.customAttribName + "_column_name", {value: item.customAttribColumnName, writable: true, enumerable: true, configurable: true})
+      .map(item => {
+        Object.defineProperty(rezObj, item.customAttribName, {
+          value: item.value,
+          writable: true,
+          enumerable: true,
+          configurable: true
+        })
+        Object.defineProperty(rezObj, item.customAttribName + "_column_name", {
+          value: item.customAttribColumnName,
+          writable: true,
+          enumerable: true,
+          configurable: true
+        })
       })
     this.currentDocument.customAttrib = rezObj
   }
@@ -705,10 +719,34 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   print() {
-    let docData = this.getDataForPdf()
-    if (docData && docData.length > 0) {
-      this.printService.createPDF(docData)
-    }
+    this.backService.createReport(1, "PDF", [this.currentDocument.id]).subscribe({
+        next: value => {
+          if (value.status === "ERROR") {
+            this.messageService.show(value.message, value.message, ERROR)
+          }
+          if (value.status === "DONE" && value.reportFile.length > 0) {
+            window.open("assets/report/" + value.reportFile, "_blank");
+          }
+          if (value.status === "PROCESS" && value.uuid.length > 0) {
+            this.reportProcessUID = value.uuid
+            this.messageService.show(MESSAGE_REPORT_IN_PROCESS, "", INFO).subscribe({
+              next: value1 => {
+                this.startReportTimer()
+              }
+            })
+            console.log(value)
+          }
+
+        },
+        error: err => {
+          this.messageService.show(err, err, ERROR)
+        }
+      }
+    )
+    // let docData = this.getDataForPdf()
+    // if (docData && docData.length > 0) {
+    //   this.printService.createPDF(docData)
+    // }
   }
 
   private getDataForPdf(): PDFDocObject[] {
@@ -724,11 +762,50 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   isToolBarShow() {
-    if(this.currentDocument && this.currentDocument.docStep.filter(item => item.visible === true)[this.currentStepIndex])
+    if (this.currentDocument && this.currentDocument.docStep.filter(item => item.visible === true)[this.currentStepIndex])
       return this.currentDocument.docStep.filter(item => item.visible === true)[this.currentStepIndex].isToolBar
     return false
   }
 
+
+  startReportTimer() {
+    this.reportInterval$ = interval(5000).subscribe(() => {
+      if (this.reportProcessUID) {
+        this.timeService.isBlocked = true
+        this.backService.getReportStatus(this.reportProcessUID).subscribe({
+          next: value => {
+            if (value.status === "ERROR") {
+              this.reportProcessUID = undefined
+              this.reportInterval$.unsubscribe()
+              this.messageService.show(value.message, value.message, ERROR)
+            }
+            if (value.status === "DONE" && value.reportFile.length > 0) {
+              this.reportProcessUID = undefined
+              this.reportInterval$.unsubscribe()
+              this.messageService.show(MESSAGE_REPORT_IS_DONE, "", INFO,["YES","NO"]).subscribe({
+                next: button => {
+                  if (button === "YES") {
+                    window.open("assets/report/" + value.reportFile, "_blank");
+                  }
+                }
+              })
+
+            }
+            if (value.status === "PROCESS" && value.uuid.length > 0) {
+              console.log(value)
+            }
+          },
+          error: err => {
+            this.messageService.show(err, err, ERROR)
+          },
+          complete: () => {
+            this.timeService.isBlocked = false
+          }
+        })
+      }
+    })
+
+  }
 
 }
 
