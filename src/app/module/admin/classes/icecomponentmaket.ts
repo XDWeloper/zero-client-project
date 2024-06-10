@@ -1,5 +1,6 @@
 import {IceComponentType} from "../../../constants";
 import {
+  CheckRadioGroup,
   ComponentBound, ComponentInputType,
   ComponentMaket,
   ComponentRuleForPDF, IceEvent,
@@ -44,7 +45,16 @@ export class IceMaketComponent {
 
   private _customAttribName?: string
   private _customAttribColumnName?: string
+  private _radioGroupID?: number
 
+
+  get radioGroupID(): number {
+    return this._radioGroupID;
+  }
+
+  set radioGroupID(value: number) {
+    this._radioGroupID = value;
+  }
 
   get customAttribName(): string {
     return this._customAttribName;
@@ -355,7 +365,8 @@ export class IceMaketComponent {
       enabled: this.enabled,
       visible: this.visible,
       customAttribName: this.customAttribName,
-      customAttribColumnName: this.customAttribColumnName
+      customAttribColumnName: this.customAttribColumnName,
+      radioGroupID: this.radioGroupID
   }
   }
 }

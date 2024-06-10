@@ -16,6 +16,9 @@ import {EventService} from "../../../../services/event.service";
 import {EventControlPropComponent} from "../event-control-prop/event-control-prop.component";
 import {DocumentService} from "../../../../services/document.service";
 import {MessageService} from "../../../../services/message.service";
+import {CheckRadioGroup} from "../../../../interfaces/interfaces";
+import {RadioGroupPropComponent} from "../radio-group-prop/radio-group-prop.component";
+import {isTemplateDiagnostic} from "@angular/compiler-cli/src/ngtsc/typecheck/diagnostics";
 
 @Component({
   selector: 'app-properties',
@@ -89,10 +92,13 @@ export class PropertiesComponent implements OnInit, OnDestroy {
     this.openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration, OptionListComponent)
   }
 
-  openDialog<T>(enterAnimationDuration: string, exitAnimationDuration: string, component: ComponentType<T>): void {
+  openDialog<T>(enterAnimationDuration: string, exitAnimationDuration: string, component: ComponentType<T>, rect?:{xSize: number, ySize: number} ): void {
+    let xSize = rect ? rect.xSize / 100 : 0.8
+    let ySize = rect ? rect.ySize / 100 : 0.8
+
     let componentRef = this.dialog.open(component, {
-      width: '' + (window.innerWidth * 0.8) + 'px',
-      height: '' + (window.innerHeight * 0.8) + 'px',
+      width: '' + (window.innerWidth * xSize) + 'px',
+      height: '' + (window.innerHeight * ySize) + 'px',
       enterAnimationDuration,
       exitAnimationDuration,
     })
@@ -128,5 +134,41 @@ export class PropertiesComponent implements OnInit, OnDestroy {
       this.currentComponent.componentName = undefined)
   }
 
+  getRadioGroupList(): CheckRadioGroup[]{
+    if(this.documentService.getTemplateByDocId(this.currentDocId).docAttrib.checkGroupList){
+      return this.documentService.getTemplateByDocId(this.currentDocId).docAttrib.checkGroupList
+    }
+    return null
+  }
+
+  openRadioGroupDialog() {
+    this.openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration, RadioGroupPropComponent, {xSize: 50,ySize: 50})
+  }
+
+
+
   protected readonly IceComponentType = IceComponentType;
+
+  setRadioGroupID($event: number) {
+    this.currentComponent.radioGroupID = $event
+
+    let checkGroupList = this.documentService.getTemplateByDocId(this.currentDocId).docAttrib.checkGroupList
+
+    if($event){
+      let checkedGroup = checkGroupList.find(item => item.id === Number($event))
+      if(!checkedGroup.checkList)
+      checkedGroup.checkList = []
+
+      if(checkedGroup.checkList.map(item => item.id).includes(this.currentComponent.componentID) === false){
+        checkedGroup.checkList.push({id:this.currentComponent.componentID,name:this.currentComponent.componentName})
+      }
+    } else{
+      checkGroupList.forEach(value => {
+        let index = value.checkList.findIndex(item => item.id === this.currentComponent.componentID)
+        if(index != -1){
+          value.checkList.splice(index,1)
+        }
+      })
+    }
+  }
 }

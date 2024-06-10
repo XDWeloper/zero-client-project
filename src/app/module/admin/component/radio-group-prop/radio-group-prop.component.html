@@ -1,0 +1,42 @@
+<div class="relative w-full h-full p-1 rounded-md flex flex-col">
+  <header class="flex-none text-center p-1">
+    <mat-icon class="close-button" (click)="close()">close</mat-icon>
+    Управление группами кнопок
+  </header>
+  <body class="flex-1 border flex">
+  <mat-icon class="text-green-500 cursor-pointer" matTooltip="Добавить группу" (click)="addGroup()">add</mat-icon>
+  <div class="w-2/3 h-full border">
+      <div *ngFor="let group of privateGroupList" (click)="currentGroup = group"
+           (dblclick)="editGroupName(group)"
+           class="p-1 flex hover:bg-primary-base hover:text-white cursor-pointer"
+          [ngClass]="currentGroup === group ? 'bg-primary-base text-white' : ''">
+        <div class="w-[10%]">{{group.id}}</div>
+        <div class="w-[85%]">{{group.name}}</div>
+        <mat-icon class="w-[5%] text-error-base hover:text-warning-base" (click)="removeGroup(group)">close</mat-icon>
+      </div>
+    </div>
+
+    <div class="w-1/3 h-full border">
+      <div class="h-full w-full" *ngIf="currentGroup && currentGroup.checkList">
+        <div *ngFor="let checkedButton of currentGroup.checkList"  class="p-1 flex">
+          <div class="w-[20%]">{{checkedButton.id}}</div>
+          <div class="w-[80%]">{{checkedButton.name}}</div>
+        </div>
+      </div>
+    </div>
+  </body>
+
+  <footer class="flex-none border-t border-t-primary-base p-1 flex justify-end items-center">
+    <div class="w-1"></div>
+    <button class="footer-button-style " (click)="saveAndClose()">Сохранить</button>
+  </footer>
+
+  <div *ngIf="setNewGroupName" class="absolute top-0 left-0 w-full h-full bg-gray-300 opacity-50 flex justify-center items-center">
+    <div class=" p-3 rounded-md border border-primary-base bg-white" cdkTrapFocus cdkTrapFocusAutoCapture>
+      <app-ice-input class="flex-1 opacity-100"  [(ngModel)]="newGroupName" [label]="'Наименование группы'" [inputType]="'text'" (keydown)="listenKey($event)"></app-ice-input>
+    </div>
+  </div>
+
+
+</div>
+

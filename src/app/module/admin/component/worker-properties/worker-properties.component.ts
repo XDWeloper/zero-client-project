@@ -433,7 +433,7 @@ export class WorkerPropertiesComponent implements OnInit, AfterViewInit{
     // console.log("currentActionGroup : ",this.currentActionGroup)
     // console.log("currentSelectedConditionArgument : ",this.currentSelectedConditionArgument)
 
-    let argValue = "[" + this.selectedComponentForCondition.comp.componentName + "." + this.selectedComponentForCondition.compProp + "]"
+    let argValue = "[" + this.selectedComponentForCondition.comp.componentID + "." + this.selectedComponentForCondition.compProp + "]"
 
 //    console.log("argValue : ",argValue)
 

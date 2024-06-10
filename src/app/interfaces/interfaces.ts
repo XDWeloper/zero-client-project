@@ -204,6 +204,7 @@ export interface ComponentMaket {
   changeProp?: string
   customAttribName?: string
   customAttribColumnName?: string
+  radioGroupID?: number
 }
 
 export type FontWeight = "normal" | "bold" | "semiBold"
@@ -241,20 +242,20 @@ export class TableColumn {
   defaultValue?: string
 }
 
-export interface ColumnProperties {
-  title: string
-  subHeader?: string[]
-  columnType: "area" | "input"[]
-  columnMask: string[]
-  headerBgColor?: string
-  headerTextColor?: string
-  subHeaderColor?: string
-  subHeaderTextColor?: string
-  headerFontSize?: number
-  subHeaderFontSize?: number
-  headerFontStyle?: "normal" | "bold" | "italic" | "semiBold" | undefined
-  subHeaderFontStyle?: "normal" | "bold" | "italic" | "semiBold" | undefined
-}
+// export interface ColumnProperties {
+//   title: string
+//   subHeader?: string[]
+//   columnType: "area" | "input"[]
+//   columnMask: string[]
+//   headerBgColor?: string
+//   headerTextColor?: string
+//   subHeaderColor?: string
+//   subHeaderTextColor?: string
+//   headerFontSize?: number
+//   subHeaderFontSize?: number
+//   headerFontStyle?: "normal" | "bold" | "italic" | "semiBold" | undefined
+//   subHeaderFontStyle?: "normal" | "bold" | "italic" | "semiBold" | undefined
+// }
 
 export interface IceStepMaket {
   stepNum: number
@@ -279,10 +280,22 @@ export interface IceDocumentMaket{
 
 
 export interface IceDocAttrib {
+  checkGroupList?: CheckRadioGroup[]          /** Список групп радио кнопок*/
   dataSourceList?: IDataSource[]              /** Дата сеты тут*/
   workerList?: IWorker[]                      /** Воркеры документа*/
   documentEventList?: IceEvent[]              /** События на уровне документа */
   componentValueList?: IIceComponentValue[]   /** Храним отдельно данные компонентов в виде: ключ/значение */
+}
+
+export interface CheckRadioGroup {
+  id: number,
+  name: string,
+  checkList: CheckedButton[]
+}
+
+export interface CheckedButton {
+  id: number,
+  name: string
 }
 
 export interface IIceComponentValue{
@@ -354,6 +367,7 @@ export interface IceComponent {
   dataObject?: any
   customAttribName?: string
   customAttribColumnName?: string
+  radioGroupID?: number
 }
 
 export class MasterControl{

@@ -5,6 +5,7 @@ import {MessageService} from "../services/message.service";
 import {functionNameAndDescription, IceComponentType} from "../constants";
 import {DocumentEditorComponent} from "../module/client/component/document-editor/document-editor.component";
 import {WorkerService} from "../services/worker.service";
+import {computeStartOfLinePositions} from "@angular/compiler-cli/src/ngtsc/sourcemaps/src/source_file";
 
 export class FieldWorker extends IceWorker {
 
@@ -81,7 +82,7 @@ export class FieldWorker extends IceWorker {
 
     /**Вот это нужно делать только если воркер сработал*/
     if(this.isRunning){
-      console.log("update window")
+      //console.log("update window")
       //DocumentEditorComponent.instance.updateCurrentPage()
       DocumentEditorComponent.instance.currentDocument = {...this.localCurrentDocument}
       window.dispatchEvent(new Event('resize'))
@@ -194,8 +195,6 @@ export class FieldWorker extends IceWorker {
     if (objectType === 'COMPONENT' && fieldAction.fieldName === "enabled" && this.tmpFieldDisabled){
       value = false
     }
-
-    //console.log(fieldAction.fieldName, object, value)
     this.enabledAndSetFieldValue(fieldAction.fieldName, object, value)
   }
 
@@ -274,7 +273,7 @@ export class FieldWorker extends IceWorker {
     }
   }
 
-  setValueToOptionListOfSelect(value: any, fieldAction: {fieldName: string;fieldSet: { object: string, string: string } | any,isAutoFill: boolean,isDisabledAfterFill: boolean},
+  private setValueToOptionListOfSelect(value: any, fieldAction: {fieldName: string;fieldSet: { object: string, string: string } | any,isAutoFill: boolean,isDisabledAfterFill: boolean},
                                object: ComponentMaket | IceDocument | IceStepMaket) {
     if ((typeof value) === "object") {
       let keyName = fieldAction.fieldSet.string.substring(2, fieldAction.fieldSet.string.length - 1)
@@ -294,7 +293,7 @@ export class FieldWorker extends IceWorker {
     }
   }
 
-  enabledAndSetFieldValue(fieldName: string,
+  private enabledAndSetFieldValue(fieldName: string,
                           object: ComponentMaket | IceDocument | IceStepMaket, value: any) {
     Object.defineProperty(object, fieldName, {value: value, writable: true, enumerable: true, configurable: true})
   }
@@ -302,7 +301,6 @@ export class FieldWorker extends IceWorker {
   private getFromDataMap(fieldSet: { object: string, string: string } | any): DataSourceMap[] {
     return this.localDataSourceMap.filter(item => item.key === fieldSet.object)
   }
-
 
   /**проверить условие выполнения группы*/
   private checkCondition(actionGroup: IActionGroup) {
@@ -320,11 +318,11 @@ export class FieldWorker extends IceWorker {
         arg2 = Number(arg2)
 
 
-       // console.log((typeof arg1))
-       // console.log((typeof arg2))
-       // console.log("arg1:", arg1)
-       // console.log("arg2:", arg2)
-       // console.log("cond.relation:", cond.relation)
+        // console.log((typeof arg1))
+        // console.log((typeof arg2))
+        // console.log("arg1:", arg1)
+        // console.log("arg2:", arg2)
+        // console.log("cond.relation:", cond.relation)
        // console.log("preRelation",cond.preRelation)
 
       switch (cond.relation) {
@@ -351,16 +349,15 @@ export class FieldWorker extends IceWorker {
           result = result || tmpRes
       }
 
-      // console.log("tmpRes",tmpRes)
-      // console.log("res",result)
-      // console.log("------------------")
+       // console.log("tmpRes",tmpRes)
+       // console.log("res",result)
+       // console.log("------------------")
 
     })
-
     return result
   }
 
-  getArgValue(arg: string): any{
+  private getArgValue(arg: string): any{
     let retString: any = arg
     retString = this.checkArg(arg)
     //console.log("checkArg: " + arg)
@@ -371,8 +368,8 @@ export class FieldWorker extends IceWorker {
 
     retString = this.changeDinamicValue(arg)
 
-    // console.log("changeDinamicValue: " + arg)
-    // console.log("retString: " + retString)
+     // console.log("changeDinamicValue: " + arg)
+     // console.log("retString: " + retString)
 
     retString = this.changeFunction(retString)
 
@@ -386,9 +383,11 @@ export class FieldWorker extends IceWorker {
   }
 
   private getValueFromComponent(arg: string): any {
-    let componentName = arg.substring(1,arg.length - 1).substring(0,arg.indexOf(".") - 1)
+//    console.log("arg:",arg)
+    let componentID = arg.substring(1,arg.length - 1).substring(0,arg.indexOf(".") - 1)
     let fieldName = arg.substring(1,arg.length - 1).substring(arg.indexOf(".") ,arg.length)
-    let component = this.localCurrentDocument.docStep.map(item => item.componentMaket).flat().find(item => item.componentName === componentName)
+    let component = this.localCurrentDocument.docStep.map(item => item.componentMaket).flat()
+      .find(item => item.componentID === Number(componentID))
     if(component){
       let keyIndex = Object.keys(component).findIndex(item => item === fieldName )
       if (keyIndex != -1){
@@ -465,7 +464,7 @@ export class FieldWorker extends IceWorker {
       val = val === undefined ? "" : val
       arg = arg.replaceAll(dArg.argName, val)
     })
-    // console.log(arg)
+    //console.log(arg)
     return arg
   }
 

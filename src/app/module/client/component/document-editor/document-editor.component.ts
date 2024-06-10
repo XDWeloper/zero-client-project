@@ -38,8 +38,10 @@ import {
   ERROR,
   IceComponentType,
   INFO,
-  MAKET_LOAD_ERROR, MESSAGE_REPORT_IN_PROCESS, MESSAGE_REPORT_IS_DONE,
-  TAB_DOCUMENT_LIST, TAB_DOCUMENT_SHOW
+  MAKET_LOAD_ERROR,
+  MESSAGE_REPORT_IN_PROCESS,
+  MESSAGE_REPORT_IS_DONE,
+  TAB_DOCUMENT_LIST
 } from "../../../../constants";
 import {TextComponent} from "../../../../component/dinamicComponent/text/text.component";
 import {InputComponent} from "../../../../component/dinamicComponent/input/input.component";
@@ -61,8 +63,8 @@ import {SelectComponent} from "../../../../component/dinamicComponent/select/sel
 import {StepService} from "../../../../services/step.service";
 import {StatusReasonComponent} from "../../../../component/status-reason/status-reason.component";
 import {MatDialog} from "@angular/material/dialog";
-import {PDFDocObject, PrintService} from "../../../../services/print.service";
-import {AnketaScriptRule} from "../../../../data/anketaScriptRule";
+//import {PDFDocObject, PrintService} from "../../../../services/print.service";
+//import {AnketaScriptRule} from "../../../../data/anketaScriptRule";
 import {TableComponent} from "../../../../component/dinamicComponent/tables/table/table.component";
 import {EventService} from "../../../../services/event.service";
 import {WorkerService} from "../../../../services/worker.service";
@@ -181,7 +183,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
               private changeDetection: ChangeDetectorRef,
               public dialog: MatDialog,
               private stepService: StepService,
-              private printService: PrintService,
               private eventService: EventService,
               private workerService: WorkerService,
               private dataSourceService: DataSourceService,
@@ -232,7 +233,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     this.dialogCorrectX = this.mainContainer.nativeElement.getBoundingClientRect().x - 20
     this.dialogCorrectY = this.mainContainer.nativeElement.getBoundingClientRect().y
   }
-
 
   get currentStepIndex(): number {
     return this._currentStepIndex;
@@ -348,11 +348,10 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     this.changeValue$ = this.componentService.changeValue$.pipe(
       filter(item => !!item.componentId),
       filter(item => item.value != "NaN"),
-      debounceTime(500),
+      debounceTime(500)
     ).subscribe(item => {
       let currentComponent = this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === item.componentId)
       if (!currentComponent) return
-
 
       if (currentComponent.value != item.value) {
         currentComponent.value = item.value
@@ -376,11 +375,28 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       })
       this.changeDetection.detectChanges()
 
-      /**Создаем событие значение копонента*/
+      /**Создаем событие значение компонента*/
       if (!this.eventService.isWorkerResize)
         this.eventService.launchEvent(EventObject.ON_COMPONENT_CHANGE_VALUE, this.currentDocument, currentComponent.componentEvent, item.value)
       else
         this.eventService.isWorkerResize = false
+
+
+      if(currentComponent.componentType === IceComponentType.INPUT && currentComponent.inputType === "checkbox" && currentComponent.radioGroupID && item.value === true){
+        /**Это групповой чекбокс нужно остальные погасить*/
+        let checkList = this.currentDocument.docAttrib.checkGroupList.find(crg => crg.id === Number(currentComponent.radioGroupID)).checkList
+        if(checkList){
+          checkList
+            .filter(value => value.id != currentComponent.componentID)
+            .forEach(checkButton => {
+              //this.componentService.setComponentValue({componentId: checkButton.id,value: false})
+              this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === checkButton.id).value = false
+            })
+          this.resizeWindow()
+        }
+      }
+
+
     })
 
     this.cellColl = cellColl
@@ -467,6 +483,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       compInstance.componentEvent = comp.componentEvent
       compInstance.customAttribName = comp.customAttribName
       compInstance.customAttribColumnName = comp.customAttribColumnName
+      compInstance.radioGroupID = comp.radioGroupID
 
       if (this.openType !== "EDIT")
         compInstance.enabled = false
@@ -749,17 +766,17 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     // }
   }
 
-  private getDataForPdf(): PDFDocObject[] {
-
-    let resultList: PDFDocObject[]
-    let asr = new AnketaScriptRule(this.currentDocument.docStep
-      .filter(item => item.visible === true)
-      .flatMap(value => value.componentMaket)
-      .filter(p => p.printRule.isPrint)
-      .sort((a, b) => a.printRule.order < b.printRule.order ? -1 : 1))
-    resultList = asr.getPrintRules()
-    return resultList
-  }
+  // private getDataForPdf(): PDFDocObject[] {
+  //
+  //   let resultList: PDFDocObject[]
+  //   let asr = new AnketaScriptRule(this.currentDocument.docStep
+  //     .filter(item => item.visible === true)
+  //     .flatMap(value => value.componentMaket)
+  //     .filter(p => p.printRule.isPrint)
+  //     .sort((a, b) => a.printRule.order < b.printRule.order ? -1 : 1))
+  //   resultList = asr.getPrintRules()
+  //   return resultList
+  // }
 
   isToolBarShow() {
     if (this.currentDocument && this.currentDocument.docStep.filter(item => item.visible === true)[this.currentStepIndex])

@@ -12,7 +12,6 @@ import {
 import {AlertColor, IceComponentType} from "../../../constants";
 import {ComponentService} from "../../../services/component.service";
 import {Subscription} from "rxjs";
-import {computeStartOfLinePositions} from "@angular/compiler-cli/src/ngtsc/sourcemaps/src/source_file";
 
 
 @Component({
@@ -53,6 +52,7 @@ export class InputComponent implements IceComponent, OnDestroy {
   notification: string | undefined;
   checked: boolean = false
   checkedText: string | undefined = undefined
+  radioGroupID?: number
 
   private _value: any;
   height: any;
@@ -131,7 +131,6 @@ export class InputComponent implements IceComponent, OnDestroy {
       this.checked = value
     }
       this._value = value;
-    //this.checkValid()
     if(this.componentID && this.visible) {
       this.componentService.setComponentValue({componentId: this.componentID, value: value})
     }

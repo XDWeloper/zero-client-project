@@ -232,6 +232,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
       this.componentRef.instance.enabled = compMaket.enabled
       this.componentRef.instance.customAttribName = compMaket.customAttribName
       this.componentRef.instance.customAttribColumnName = compMaket.customAttribColumnName
+      this.componentRef.instance.radioGroupID = compMaket.radioGroupID
     } else {
       this._modify = true
     }

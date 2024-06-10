@@ -17,8 +17,8 @@ import {
 import {UploadComponent} from "../../../../component/dinamicComponent/upload/upload.component";
 import {AddressComponent} from "../../../../component/dinamicComponent/adress/address.component";
 import {SelectComponent} from "../../../../component/dinamicComponent/select/select.component";
-import {PDFDocObject, PrintService} from "../../../../services/print.service";
-import {AnketaScriptRule} from "../../../../data/anketaScriptRule";
+//import {PDFDocObject, PrintService} from "../../../../services/print.service";
+//import {AnketaScriptRule} from "../../../../data/anketaScriptRule";
 import {TableComponent} from "../../../../component/dinamicComponent/tables/table/table.component";
 
 @Component({
@@ -59,8 +59,7 @@ export class WatchTemplateComponent implements OnInit,AfterViewInit {
 
   constructor(public dialogRef: MatDialogRef<WatchTemplateComponent>,
               private documentService: DocumentService,
-              private cellService: CellService,
-              private printService: PrintService) {
+              private cellService: CellService) {
   }
 
   ngAfterViewInit() {
@@ -148,18 +147,18 @@ export class WatchTemplateComponent implements OnInit,AfterViewInit {
     this.showComponentOnCurrentStep(index)
   }
 
-  print() {
-    let docData = this.getDataForPdf()
-    if (docData && docData.length > 0) {
-      this.printService.createPDF(docData)
-    }
-  }
+  // print() {
+  //   let docData = this.getDataForPdf()
+  //   if (docData && docData.length > 0) {
+  //     this.printService.createPDF(docData)
+  //   }
+  // }
 
-  private getDataForPdf(): PDFDocObject[] {
-    let resultList: PDFDocObject[]
-    let asr = new AnketaScriptRule( this.componentRefStepList.map(c => c.instance as unknown as ComponentMaket).filter(p => p.printRule.isPrint)
-      .sort((a, b) => a.printRule.order < b.printRule.order ? -1 : 1))
-    resultList = asr.getPrintRules()
-    return resultList
-  }
+  // private getDataForPdf(): PDFDocObject[] {
+  //   let resultList: PDFDocObject[]
+  //   let asr = new AnketaScriptRule( this.componentRefStepList.map(c => c.instance as unknown as ComponentMaket).filter(p => p.printRule.isPrint)
+  //     .sort((a, b) => a.printRule.order < b.printRule.order ? -1 : 1))
+  //   resultList = asr.getPrintRules()
+  //   return resultList
+  // }
 }
