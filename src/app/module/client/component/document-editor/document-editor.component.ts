@@ -86,6 +86,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   private tabLabelNode: HTMLElement
   private _openType: OpenDocType = "EDIT"
   private _isOpenedTab: boolean = false
+  private defaultDebounce = 500
+  private currentDebounce = 500
+  private isResize = false
   reportProcessUID: string | undefined = undefined
   reportInterval$: Subscription
 
@@ -344,20 +347,41 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       this.currentComponent = component
       this.commentText = component.notification
       this.setValidationText(component)
+
+      //console.log("this.currentComponent",this.currentComponent)
+      /**Работа с группами чекбоксов*/
+      if(this.currentComponent.componentType === IceComponentType.INPUT && this.currentComponent.inputType === "checkbox" && this.currentComponent.radioGroupID
+        && this.currentComponent.value === false){
+        /**Это групповой чекбокс нужно остальные погасить*/
+        let checkList = this.currentDocument.docAttrib.checkGroupList.find(crg => crg.id === Number(this.currentComponent.radioGroupID)).checkList
+        if(checkList){
+          checkList
+            .filter(value => value.id != this.currentComponent.componentID)
+            .forEach(checkButton => {
+              this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === checkButton.id).value = false
+            })
+          this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === this.currentComponent.componentID).value = true
+          this.resizeWindow()
+        }
+      }
     })
+
     this.changeValue$ = this.componentService.changeValue$.pipe(
       filter(item => !!item.componentId),
       filter(item => item.value != "NaN"),
-      debounceTime(500)
+      debounceTime(this.currentDebounce)
     ).subscribe(item => {
+       if(this.currentDebounce != this.defaultDebounce)
+         this.currentDebounce = this.defaultDebounce
+
       let currentComponent = this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === item.componentId)
       if (!currentComponent) return
+
 
       if (currentComponent.value != item.value) {
         currentComponent.value = item.value
         this.currentDocument.changed = true
       }
-
 
       if (currentComponent.componentType === "upload") {//Если идет изменение загруженных файлов нужно сразу сохранять
         this.saveDoc(this.currentDocument.status, 0)
@@ -380,23 +404,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         this.eventService.launchEvent(EventObject.ON_COMPONENT_CHANGE_VALUE, this.currentDocument, currentComponent.componentEvent, item.value)
       else
         this.eventService.isWorkerResize = false
-
-
-      if(currentComponent.componentType === IceComponentType.INPUT && currentComponent.inputType === "checkbox" && currentComponent.radioGroupID && item.value === true){
-        /**Это групповой чекбокс нужно остальные погасить*/
-        let checkList = this.currentDocument.docAttrib.checkGroupList.find(crg => crg.id === Number(currentComponent.radioGroupID)).checkList
-        if(checkList){
-          checkList
-            .filter(value => value.id != currentComponent.componentID)
-            .forEach(checkButton => {
-              //this.componentService.setComponentValue({componentId: checkButton.id,value: false})
-              this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === checkButton.id).value = false
-            })
-          this.resizeWindow()
-        }
-      }
-
-
     })
 
     this.cellColl = cellColl
@@ -491,14 +498,12 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       if (comp.componentType === IceComponentType.INPUT || comp.componentType === IceComponentType.AREA)
         this.setFirstComponent();
 
-      /**Создаем событие установка значения копонента*/
+      /**Создаем событие установка значения компонента*/
       if (!this.eventService.isWorkerResize && comp.value) {
         this.eventService.launchEvent(EventObject.ON_COMPONENT_SET_VALUE, this.currentDocument, comp.componentEvent, comp.value)
       } else
         this.eventService.isWorkerResize = false
     })
-
-
     this.setFocusToFirstElement()
     this.changeDetection.detectChanges()
   }
