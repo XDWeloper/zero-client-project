@@ -12,7 +12,14 @@ import {
   ViewChild,
   ViewContainerRef
 } from '@angular/core';
-import {ComponentMaket, IceComponent, IceDocument, IceStepMaket, OpenDocType} from "../../../../interfaces/interfaces";
+import {
+  ComponentMaket,
+  EventObject,
+  IceComponent,
+  IceDocument,
+  IceStepMaket,
+  OpenDocType
+} from "../../../../interfaces/interfaces";
 import {
   cellColl,
   cellRow,
@@ -56,6 +63,7 @@ import {StatusReasonComponent} from "../../../../component/status-reason/status-
 //import {AnketaScriptRule} from "../../../../data/anketaScriptRule";
 import {TableComponent} from "../../../../component/dinamicComponent/tables/table/table.component";
 import {TimeService} from "../../../../services/time.service";
+import {EventService} from "../../../../services/event.service";
 
 @Component({
   selector: 'app-document-editor',
@@ -110,6 +118,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   @ViewChild('watch_field', {read: ViewContainerRef})
   private itemsField: ViewContainerRef | undefined
 
+
   private componentRef: ComponentRef<IceComponent>
   private firstComponentRef: ComponentRef<IceComponent> = undefined
   dialogCorrectX: number = 0
@@ -140,6 +149,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
               private tabService: TabService,
               private changeDetection: ChangeDetectorRef,
               public dialog: MatDialog,
+              private eventService: EventService,
               private stepService: StepService,
               private timeService: TimeService
   ) {
@@ -274,9 +284,34 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   ngOnInit(): void {
     this.componentSelected$ = this.componentService.selectedDocumentComponent$.subscribe(component => {
+
+      /**Создаем событие клик компонента*/
+      if (!this.eventService.isWorkerResize)
+        this.eventService.launchEvent(EventObject.ON_COMPONENT_CLICK, this.currentDocument, component.componentEvent, null)
+      else
+        this.eventService.isWorkerResize = false
+
+
       this.currentComponent = component
       this.commentText = component.notification
       this.setValidationText(component)
+
+      /**Работа с группами чекбоксов*/
+      if(this.currentComponent.componentType === IceComponentType.INPUT && this.currentComponent.inputType === "checkbox" && this.currentComponent.radioGroupID
+        && this.currentComponent.value === false){
+        /**Это групповой чекбокс нужно остальные погасить*/
+        let checkList = this.currentDocument.docAttrib.checkGroupList.find(crg => crg.id === Number(this.currentComponent.radioGroupID)).checkList
+        if(checkList){
+          checkList
+            .filter(value => value.id != this.currentComponent.componentID)
+            .forEach(checkButton => {
+              this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === checkButton.id).value = false
+            })
+          this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === this.currentComponent.componentID).value = true
+          this.resizeWindow()
+        }
+      }
+
     })
     this.changeValue$ = this.componentService.changeValue$.pipe(
       filter(item => !!item.componentId),
@@ -301,6 +336,13 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         checkedText: currentComponent.checkedText
       })
       this.changeDetection.detectChanges()
+
+      /**Создаем событие значение компонента*/
+      if (!this.eventService.isWorkerResize)
+        this.eventService.launchEvent(EventObject.ON_COMPONENT_CHANGE_VALUE, this.currentDocument, currentComponent.componentEvent, item.value)
+      else
+        this.eventService.isWorkerResize = false
+
     })
 
     this.cellColl = cellColl

@@ -79,7 +79,6 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy, OnInit
     }
 
   ngAfterViewInit(): void {
-
     let header = document.getElementsByClassName('mat-mdc-tab-header')
     if(header[0])
       header[0].setAttribute("style", "display:none")
@@ -87,7 +86,6 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy, OnInit
   }
 
   openDoc(doc: {"rowId": number, "openType": OpenDocType}) {
-
     this.openDocType = doc.openType
     this.changeDocId = doc.rowId
     this.loadDocumentForEdit(doc.rowId)

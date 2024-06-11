@@ -31,7 +31,7 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
 
   constructor(private messageService: MessageService,
               private backService: BackendService,
-              tabService: TabService,
+              private tabService: TabService,
               private router: Router,
               private timeService: TimeService,
               private keycloakService: KeycloakService) {
@@ -58,6 +58,10 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
     }
 
   ngAfterViewInit(): void {
+    let header = document.getElementsByClassName('mat-mdc-tab-header')
+    if(header[0])
+      header[0].setAttribute("style", "display:none")
+
   }
 
   openDoc(doc: {"rowId": number, "openType": OpenDocType}) {
@@ -90,8 +94,19 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
   }
 
   exit() {
+    /**Нужно сохранить документ если были изменения*/
+    if(DocumentEditorComponent.instance.currentDocument && DocumentEditorComponent.instance.currentDocument.changed)
+      DocumentEditorComponent.instance.saveControl()
+
     this.keycloakService.logoutAction().subscribe({
       complete:(() => this.router.navigate(["/"]))
     })
+  }
+
+  openDocList() {
+    /**Нужно сохранить документ если были изменения*/
+    if(DocumentEditorComponent.instance.currentDocument.changed)
+      DocumentEditorComponent.instance.saveControl()
+    this.tabService.openTab(TAB_DOCUMENT_LIST)
   }
 }

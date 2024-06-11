@@ -348,7 +348,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       this.commentText = component.notification
       this.setValidationText(component)
 
-      //console.log("this.currentComponent",this.currentComponent)
       /**Работа с группами чекбоксов*/
       if(this.currentComponent.componentType === IceComponentType.INPUT && this.currentComponent.inputType === "checkbox" && this.currentComponent.radioGroupID
         && this.currentComponent.value === false){

@@ -17,7 +17,7 @@ import {
   DOCUMENT_NAME_LOAD_ERROR,
   DOCUMENT_REMOVE_ERROR,
   ERROR,
-  TAB_DOCUMENT_LIST
+  TAB_DOCUMENT_LIST, TAB_DOCUMENT_SHOW
 } from "../../../../constants";
 import {MessageService} from "../../../../services/message.service";
 import {TabService} from "../../../../services/tab.service";
@@ -206,5 +206,9 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
   openHistoryDialog(id: number) {
     let componentRef = this.openDialog(HistoryDialogComponent,dialogOpenAnimationDuration, dialogCloseAnimationDuration, id)
     componentRef.componentInstance.documentRef = id
+  }
+
+  openDocEditor() {
+    this.tabService.openTab(TAB_DOCUMENT_SHOW)
   }
 }

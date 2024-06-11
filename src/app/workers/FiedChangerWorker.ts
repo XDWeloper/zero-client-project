@@ -289,6 +289,7 @@ export class FieldWorker extends IceWorker {
       })
       this.enabledAndSetFieldValue(fieldAction.fieldName, object, dataForOptionList)
     } else {
+      //this.enabledAndSetFieldValue(fieldAction.fieldName, object, {data: value, value: value})
       this.enabledAndSetFieldValue(fieldAction.fieldName, object, [{data: value, value: value}])
     }
   }
