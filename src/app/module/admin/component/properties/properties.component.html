@@ -30,8 +30,8 @@
       <option value="button">кнопка</option>
     </select>
 
-    <div class="col-span-12 w-full grid grid-cols-12">
-      <p *ngIf="currentComponent.componentType === 'input' && currentComponent.inputType === 'checkbox'" class="col-span-4">Группа</p>
+    <div class="col-span-12 w-full grid grid-cols-12" *ngIf="currentComponent.componentType === 'input' && currentComponent.inputType === 'checkbox'">
+      <p class="col-span-4">Группа</p>
       <select *ngIf="currentComponent.componentType === 'input' && currentComponent.inputType === 'checkbox'"
               class="col-span-7 w-[90%] text-center rounded-md dark:bg-slate-700 bg-white h-[20px]"
               [ngModel]="currentComponent.radioGroupID" (ngModelChange)="setRadioGroupID($event)">

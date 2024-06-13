@@ -52,7 +52,7 @@ import {
 import {
   InformationCompanyParticipantsTableComponent
 } from "../../../../component/dinamicComponent/tables/information-company-participants-table/information-company-participants-table.component";
-import {debounceTime, filter, interval, Observable, Subscription} from "rxjs";
+import {BehaviorSubject, debounceTime, filter, interval, Observable, Subject, Subscription} from "rxjs";
 import {ComponentService} from "../../../../services/component.service";
 import {BackendService} from "../../../../services/backend.service";
 import {MessageService} from "../../../../services/message.service";
@@ -91,6 +91,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   private isResize = false
   reportProcessUID: string | undefined = undefined
   reportInterval$: Subscription
+  savedIsDone$ =   new Subject<boolean>()
+  isSavedForPrint = false
 
   @Input() maketId: number | undefined
 
@@ -209,12 +211,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       this.tabChange$.unsubscribe()
     if (this.reportInterval$)
       this.reportInterval$.unsubscribe()
-  }
-
-  updateCurrentPage() {
-    let cs = this._currentStepIndex
-    if (cs)
-      this.currentStepIndex = cs
   }
 
   get currentDocument(): IceDocument | undefined {
@@ -415,6 +411,38 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         this.changeDetection.detectChanges()
       }
     })
+
+    /**Слушаем печать*/
+    this.savedIsDone$.subscribe({
+      next: value => {
+        if(value === true && this.isSavedForPrint === true){
+          this.isSavedForPrint = false
+          this.backService.createReport(1, "PDF", [this.currentDocument.id]).subscribe({
+              next: value => {
+                if (value.status === "ERROR") {
+                  this.messageService.show(value.message, value.message, ERROR)
+                }
+                if (value.status === "DONE" && value.reportFile.length > 0) {
+                  window.open("assets/report/" + value.reportFile, "_blank");
+                }
+                if (value.status === "PROCESS" && value.uuid.length > 0) {
+                  this.reportProcessUID = value.uuid
+                  this.messageService.show(MESSAGE_REPORT_IN_PROCESS, "", INFO).subscribe({
+                    next: value1 => {
+                      this.startReportTimer()
+                    }
+                  })
+                }
+
+              },
+              error: err => {
+                this.messageService.show(err, err, ERROR)
+              }
+            }
+          )
+        }
+      }
+    })
   }
 
   checkRequiredOnCurrentStep() {
@@ -575,6 +603,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         next: (res => {
           if (res && this.currentDocument) {
             this.currentDocument.id = res.id
+            this.savedIsDone$.next(true)
           }
         }),
         error: (err => this.messageService.show(DRAFT_SAVE_ERROR, err.error.message, ERROR))
@@ -584,6 +613,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         this.updateDocument$ = this.backService.updateDocument(this.currentDocument).subscribe({
           //this.updateDocument$ = this.backService.updateOnlyDate(this.currentDocument).subscribe({
           next: (res => {
+            this.savedIsDone$.next(true)
           }),
           error: (err => {
             this.messageService.show(DOCUMENT_SAVE_ERROR, err.error.message, ERROR)
@@ -593,6 +623,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         this.updateDocument$ = this.backService.updateDocument(this.currentDocument).subscribe({
           next: (res => {
             this.docSaved(docStatus === "DRAFT" ? DOCUMENT_DRAFT_SAVED : DOCUMENT_SEND, "")
+            this.savedIsDone$.next(true)
           }),
           error: (err => {
             this.messageService.show(DOCUMENT_SAVE_ERROR, err.error.message, ERROR)
@@ -740,47 +771,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   print() {
-    this.backService.createReport(1, "PDF", [this.currentDocument.id]).subscribe({
-        next: value => {
-          if (value.status === "ERROR") {
-            this.messageService.show(value.message, value.message, ERROR)
-          }
-          if (value.status === "DONE" && value.reportFile.length > 0) {
-            window.open("assets/report/" + value.reportFile, "_blank");
-          }
-          if (value.status === "PROCESS" && value.uuid.length > 0) {
-            this.reportProcessUID = value.uuid
-            this.messageService.show(MESSAGE_REPORT_IN_PROCESS, "", INFO).subscribe({
-              next: value1 => {
-                this.startReportTimer()
-              }
-            })
-            console.log(value)
-          }
-
-        },
-        error: err => {
-          this.messageService.show(err, err, ERROR)
-        }
-      }
-    )
-    // let docData = this.getDataForPdf()
-    // if (docData && docData.length > 0) {
-    //   this.printService.createPDF(docData)
-    // }
+    this.isSavedForPrint = true
+    this.saveDoc(this.currentDocument.status, 0)
   }
-
-  // private getDataForPdf(): PDFDocObject[] {
-  //
-  //   let resultList: PDFDocObject[]
-  //   let asr = new AnketaScriptRule(this.currentDocument.docStep
-  //     .filter(item => item.visible === true)
-  //     .flatMap(value => value.componentMaket)
-  //     .filter(p => p.printRule.isPrint)
-  //     .sort((a, b) => a.printRule.order < b.printRule.order ? -1 : 1))
-  //   resultList = asr.getPrintRules()
-  //   return resultList
-  // }
 
   isToolBarShow() {
     if (this.currentDocument && this.currentDocument.docStep.filter(item => item.visible === true)[this.currentStepIndex])
@@ -790,6 +783,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
 
   startReportTimer() {
+    console.log("startReportTimer")
     this.reportInterval$ = interval(5000).subscribe(() => {
       if (this.reportProcessUID) {
         this.timeService.isBlocked = true

@@ -48,7 +48,7 @@ import {
 import {
   InformationCompanyParticipantsTableComponent
 } from "../../../../component/dinamicComponent/tables/information-company-participants-table/information-company-participants-table.component";
-import {debounceTime, filter, interval, Subscription} from "rxjs";
+import {debounceTime, filter, interval, Subject, Subscription} from "rxjs";
 import {ComponentService} from "../../../../services/component.service";
 import {BackendService} from "../../../../services/backend.service";
 import {MessageService} from "../../../../services/message.service";
@@ -81,6 +81,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   private _openType: OpenDocType = "EDIT"
   reportProcessUID: string | undefined = undefined
   reportInterval$: Subscription
+  savedIsDone$ =   new Subject<boolean>()
+  isSavedForPrint = false
 
   @Input() set currentDocument(value: IceDocument | undefined) {
     this._currentDocument = value;
@@ -203,8 +205,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     this.checkedText = ""
     this.validatonTextClear()
 
-    if (this._currentStepIndex != value && this.openType === "EDIT")
-      this.saveControl()
+    // if (this._currentStepIndex != value && this.openType === "EDIT")
+    //   this.saveControl()
 
     this._currentStepIndex = value;
 
@@ -320,7 +322,12 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     ).subscribe(item => {
       let currentComponent = this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === item.componentId)
       if(!currentComponent) return
-      currentComponent.value = item.value
+
+      if (currentComponent.value != item.value) {
+        currentComponent.value = item.value
+        this.currentDocument.changed = true
+      }
+
       if (currentComponent.componentType === "upload") {//Если идет изменение загруженных файлов нужно сразу сохранять
         this.saveControl()
       }
@@ -354,6 +361,38 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       next: value => {
         this.disabledStep = value
         this.changeDetection.detectChanges()
+      }
+    })
+
+    /**Слушаем печать*/
+    this.savedIsDone$.subscribe({
+      next: value => {
+        if(value === true && this.isSavedForPrint === true){
+          this.isSavedForPrint = false
+          this.backService.createReport(1, "PDF", [this.currentDocument.id]).subscribe({
+              next: value => {
+                if (value.status === "ERROR") {
+                  this.messageService.show(value.message, value.message, ERROR)
+                }
+                if (value.status === "DONE" && value.reportFile.length > 0) {
+                  window.open("assets/report/" + value.reportFile, "_blank");
+                }
+                if (value.status === "PROCESS" && value.uuid.length > 0) {
+                  this.reportProcessUID = value.uuid
+                  this.messageService.show(MESSAGE_REPORT_IN_PROCESS, "", INFO).subscribe({
+                    next: value1 => {
+                      this.startReportTimer()
+                    }
+                  })
+                }
+
+              },
+              error: err => {
+                this.messageService.show(err, err, ERROR)
+              }
+            }
+          )
+        }
       }
     })
   }
@@ -479,6 +518,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   updateDoc(docStatus: DocStat) {
+    console.log("this.currentDocument.status",this.currentDocument.status)
     if (!this.currentDocument || (this.currentDocument && this.currentDocument.status != 'CONTROL')) return
     //this.currentDocument.status = docStatus
     this.updateDocument$ = this.backService.updateDocument(this.currentDocument).subscribe({
@@ -488,6 +528,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
           this.changeStatus(docStatus, "Отправлено клиенту на согласование")
           this.docSaved(CHANGE_STATUS_TO_AGREE, CHANGE_STATUS_TO_AGREE)
         }
+        this.savedIsDone$.next(true)
       }),
       error: (err => {
         this.messageService.show(DOCUMENT_SAVE_ERROR, err.error.message, ERROR)
@@ -614,35 +655,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   print() {
-    this.backService.createReport(1, "PDF", [this.currentDocument.id]).subscribe({
-        next: value => {
-          if (value.status === "ERROR") {
-            this.messageService.show(value.message, value.message, ERROR)
-          }
-          if (value.status === "DONE" && value.reportFile.length > 0) {
-            window.open("assets/report/" + value.reportFile, "_blank");
-          }
-          if (value.status === "PROCESS" && value.uuid.length > 0) {
-            this.reportProcessUID = value.uuid
-            this.messageService.show(MESSAGE_REPORT_IN_PROCESS, "", INFO).subscribe({
-              next: value1 => {
-                this.startReportTimer()
-              }
-            })
-            console.log(value)
-          }
-
-        },
-        error: err => {
-          this.messageService.show(err, err, ERROR)
-        }
-      }
-    )
-
-    // let docData = this.getDataForPdf()
-    // if (docData && docData.length > 0) {
-    //   this.printService.createPDF(docData)
-    // }
+    this.isSavedForPrint = true
+    this.updateDoc(this.currentDocument.status)
   }
 
   // private getDataForPdf(): PDFDocObject[] {
