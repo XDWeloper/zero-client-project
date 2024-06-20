@@ -364,6 +364,7 @@ export class DocumentComponent implements OnInit {
               docStep: res.docStep,
               isLoaded: true,
               docAttrib: res.docAttrib,
+              reportId: res.reportId
             }
           )
           //this.normalizeComponentId() //Если в друг произошло за двоение ид компонентов(чего быть не должно!!!) можно это запустить для нормализации идешек.!!!

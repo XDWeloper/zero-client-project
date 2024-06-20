@@ -378,7 +378,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         this.currentDocument.changed = true
       }
 
-      if (currentComponent.componentType === "upload") {//Если идет изменение загруженных файлов нужно сразу сохранять
+      if (currentComponent.componentType === "upload" && this.currentDocument.id === undefined) {//Если идет изменение загруженных файлов нужно сразу сохранять
         this.saveDoc(this.currentDocument.status, 0)
       }
 
@@ -415,9 +415,11 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     /**Слушаем печать*/
     this.savedIsDone$.subscribe({
       next: value => {
-        if(value === true && this.isSavedForPrint === true){
+        if(value === true && this.isSavedForPrint === true && this.currentDocument.reportId){
           this.isSavedForPrint = false
-          this.backService.createReport(1, "PDF", [this.currentDocument.id]).subscribe({
+
+
+          this.backService.createReport(this.currentDocument.reportId, "PDF", [this.currentDocument.id]).subscribe({
               next: value => {
                 if (value.status === "ERROR") {
                   this.messageService.show(value.message, value.message, ERROR)
@@ -522,7 +524,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       if (this.openType !== "EDIT")
         compInstance.enabled = false
 
-      if (comp.componentType === IceComponentType.INPUT || comp.componentType === IceComponentType.AREA)
+      if ((comp.componentType === IceComponentType.INPUT || comp.componentType === IceComponentType.AREA) && comp.visible === true && comp.enabled === true)
         this.setFirstComponent();
 
       /**Создаем событие установка значения компонента*/
@@ -548,8 +550,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   private setFirstComponent() {
-    if (!this.firstComponentRef && this.componentRef.instance.inputType != "checkbox")
+    if (!this.firstComponentRef && this.componentRef.instance.inputType != "checkbox") {
       this.firstComponentRef = this.componentRef
+    }
   }
 
   loadDocMaket(maketId: number) {
@@ -562,6 +565,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
           docStep: res.docStep,
           status: "DRAFT",
           docAttrib: res.docAttrib,
+          reportId: res.reportId
         }
         this.openType = "EDIT"
 
@@ -636,17 +640,23 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   private setCurrentAttrib() {
     let rezObj: Object = {}
+
     this.currentDocument.docStep
       .map(item => item.componentMaket)
       .flat()
-      .filter(item => item.customAttribName)
+      .filter(item => item.customAttribName && item.value)
       .map(item => {
+        console.log(item.customAttribName + " = " + item.value)
+
         Object.defineProperty(rezObj, item.customAttribName, {
           value: item.value,
           writable: true,
           enumerable: true,
           configurable: true
         })
+
+        console.log(item.customAttribName + "_column_name" + " = " + item.customAttribColumnName)
+
         Object.defineProperty(rezObj, item.customAttribName + "_column_name", {
           value: item.customAttribColumnName,
           writable: true,
@@ -654,6 +664,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
           configurable: true
         })
       })
+
+    console.log("customAttrib",rezObj)
     this.currentDocument.customAttrib = rezObj
   }
 
@@ -684,7 +696,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       value = ""
     /**В начале проверяем заполнение обязательных полей*/
     if (currentComponent.componentType === IceComponentType.PLACE) {
-      if (currentComponent.required && (!value || (value && value.placeString.length < 1)))
+      if (currentComponent.required && (!value || (value && value.placeString &&  value.placeString.length < 1)))
         errorStr = "Не заполнено обязательное поле."
     } else {
       if (currentComponent.required && (!value || (value && value.length < 1)))
@@ -783,7 +795,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
 
   startReportTimer() {
-    console.log("startReportTimer")
     this.reportInterval$ = interval(5000).subscribe(() => {
       if (this.reportProcessUID) {
         this.timeService.isBlocked = true

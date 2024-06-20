@@ -18,7 +18,9 @@
     </button>
 
     <div class="flex-auto flex justify-end">
-      <button (click)="print()" matTooltip="печать" class="toolBar-button-style ">
+      <button (click)="print()" matTooltip="печать" class="toolBar-button-style"
+              [disabled]="reportProcessUID != undefined"
+              *ngIf="currentDocument && currentDocument.reportId != undefined">
         <mat-icon class="text-lime-300 font-bold">print</mat-icon>
         <span class="ml-1">Печать</span>
       </button>

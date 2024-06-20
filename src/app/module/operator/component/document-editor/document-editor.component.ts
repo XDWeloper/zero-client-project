@@ -367,9 +367,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     /**Слушаем печать*/
     this.savedIsDone$.subscribe({
       next: value => {
-        if(value === true && this.isSavedForPrint === true){
+        if(value === true && this.isSavedForPrint === true && this.currentDocument.reportId){
           this.isSavedForPrint = false
-          this.backService.createReport(1, "PDF", [this.currentDocument.id]).subscribe({
+          this.backService.createReport(this.currentDocument.reportId, "PDF", [this.currentDocument.id]).subscribe({
               next: value => {
                 if (value.status === "ERROR") {
                   this.messageService.show(value.message, value.message, ERROR)
@@ -474,7 +474,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       if (this.openType !== "EDIT")
         compInstance.enabled = false
 
-      if (comp.componentType === IceComponentType.INPUT || comp.componentType === IceComponentType.AREA)
+      if ((comp.componentType === IceComponentType.INPUT || comp.componentType === IceComponentType.AREA) && comp.visible === true && comp.enabled === true)
         this.setFirstComponent();
     })
 
@@ -508,7 +508,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
           docName: res.docName,
           docStep: res.docStep,
           status: "DRAFT",
-          docAttrib: res.docAttrib
+          docAttrib: res.docAttrib,
+          reportId: res.reportId
         }
         this.openType = "EDIT"
         this.saveControl()

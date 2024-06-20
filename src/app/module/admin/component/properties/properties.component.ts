@@ -68,12 +68,11 @@ export class PropertiesComponent implements OnInit, OnDestroy {
       if (c === undefined)
         this.currentComponent = undefined
       else {
-        this.currentComponent = <IceMaketComponent>this.componentService.getComponent(c)
-        this.componentService.setModified(true)
-
-        if(this.currentComponent.printRule === undefined){
-          this.currentComponent.printRule = {isPrint: this.currentComponent.componentType != IceComponentType.TEXT,newLine: true}
-        }
+          this.currentComponent = <IceMaketComponent>this.componentService.getComponent(c)
+          this.componentService.setModified(true)
+        // if(this.currentComponent.printRule === undefined){
+        //   this.currentComponent.printRule = {isPrint: this.currentComponent.componentType != IceComponentType.TEXT,newLine: true}
+        // }
       }
     })
 
@@ -127,11 +126,18 @@ export class PropertiesComponent implements OnInit, OnDestroy {
     }
   }
 
-  checkComponentName() {
+  checkComponentName(): boolean {
+    /*
+    if(this.currentComponent === undefined)
+      return true
     if(!this.documentService.getComponentByName(this.currentDocId, this.currentComponent))
-      return
-    this.messageService.show(SET_COMPONENT_NAME_DUPLICATE,"","ERROR").subscribe(value =>
-      this.currentComponent.componentName = undefined)
+      return true
+    this.messageService.show(SET_COMPONENT_NAME_DUPLICATE,"","ERROR").subscribe(value=> {
+      //this.currentComponent.componentName = this.currentComponent.componentName
+      }
+    )
+    */
+    return false;
   }
 
   getRadioGroupList(): CheckRadioGroup[]{

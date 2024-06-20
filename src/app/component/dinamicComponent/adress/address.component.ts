@@ -158,7 +158,8 @@ export class AddressComponent implements IceComponent, OnDestroy {
   set value(value: { placeList: PlaceObject[], placeString: string }) {
     if (!value) return
     this._stringValue = value.placeString ? value.placeString : ""
-    if (this._stringValue.length < 1) {
+
+    if (this._stringValue.length < 1 && Array.isArray(value.placeList)) {
       value.placeList.forEach(place => {
         let typeName = place.typeName ? place.typeName : ''
         if (typeName.length > 0 && place.clevel != 1)

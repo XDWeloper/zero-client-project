@@ -228,7 +228,7 @@ export class FieldWorker extends IceWorker {
     if ((object as ComponentMaket).componentType === IceComponentType.PLACE) {
       if (fieldAction.isDisabledAfterFill && visualValue === undefined)
         this.tmpFieldDisabled = false
-      visualValue = {placeList: {}, placeString: visualValue ? visualValue.replaceAll("\\", "") : "Данные не найдены"}
+      visualValue = {placeList: {}, placeString: visualValue ? visualValue.replaceAll("\\", "") : undefined}
     }
 
     if((typeof visualValue) === 'string')
@@ -236,7 +236,8 @@ export class FieldWorker extends IceWorker {
 
     //console.log("visualValue", visualValue)
 
-    this.enabledAndSetFieldValue(fieldAction.fieldName, object, (typeof visualValue) != 'object' ? visualValue : visualValue)
+    if (visualValue)
+      this.enabledAndSetFieldValue(fieldAction.fieldName, object, (typeof visualValue) != 'object' ? visualValue : visualValue)
   }
 
   private setValueForTable(value: any, object: ComponentMaket | IceDocument | IceStepMaket, fieldAction: {
@@ -287,9 +288,14 @@ export class FieldWorker extends IceWorker {
         }
         return {data: item.value, value: ((val ?? "") as string).replaceAll("\\", "")}
       })
-      this.enabledAndSetFieldValue(fieldAction.fieldName, object, dataForOptionList)
+
+      if(fieldAction.fieldName === "value" && dataForOptionList.length > 0) {
+        this.enabledAndSetFieldValue(fieldAction.fieldName, object, dataForOptionList[0])
+      }
+      else {
+        this.enabledAndSetFieldValue(fieldAction.fieldName, object, dataForOptionList)
+      }
     } else {
-      //this.enabledAndSetFieldValue(fieldAction.fieldName, object, {data: value, value: value})
       this.enabledAndSetFieldValue(fieldAction.fieldName, object, [{data: value, value: value}])
     }
   }

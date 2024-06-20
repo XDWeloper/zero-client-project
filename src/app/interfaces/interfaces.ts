@@ -104,7 +104,20 @@ export interface IceDocument{
   docAttrib: IceDocAttrib
   customAttrib?: any
   changed?: boolean
+  reportId ?: number
 }
+
+export interface IceDocumentMaket{
+  docId: number
+  docName: string
+  isActive?: boolean,
+  isLoaded?: boolean,
+  docStep: IceStepMaket[]
+  docAttrib?: IceDocAttrib
+  customAttrib?: any
+  reportId ?: number
+}
+
 
 export type Role = "ROLE_user" | "ROLE_admin" | "ROLE_operator"
 
@@ -265,17 +278,6 @@ export interface IceStepMaket {
   visible?: boolean
   isToolBar?: boolean
   stepEvent?: IceEvent[]
-}
-
-
-export interface IceDocumentMaket{
-  docId: number
-  docName: string
-  isActive?: boolean,
-  isLoaded?: boolean,
-  docStep: IceStepMaket[]
-  docAttrib?: IceDocAttrib
-  customAttrib?: any
 }
 
 

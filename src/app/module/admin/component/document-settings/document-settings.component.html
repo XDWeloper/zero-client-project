@@ -35,9 +35,13 @@
       </ng-template>
       <div class="w-full h-full p-2 border">
         <div class="w-[30%]">
-          <div class="flex items-baseline justify-between">
+          <div class="flex items-baseline justify-between p-1">
             <div>Активность документа</div>
             <mat-slide-toggle class="flex-none" matTooltip="Активность документа" [(ngModel)]="currentMaket.isActive"></mat-slide-toggle>
+          </div>
+          <div class="flex items-baseline justify-between p-1">
+            <div>Идентификатор отчета</div>
+            <input class="flex-none border border-primary-base"  matTooltip="Идентификатор отчета" type="number" [(ngModel)]="currentMaket.reportId">
           </div>
         </div>
       </div>
