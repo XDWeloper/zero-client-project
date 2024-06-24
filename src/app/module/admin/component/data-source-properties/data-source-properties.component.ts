@@ -208,6 +208,13 @@ export class DataSourcePropertiesComponent implements OnInit, OnDestroy {
       this.editVariable.value = "[" + this.tempComponentName + "]"
       return
     }
+    if(this.localDataSource.dynamicBodyVariables && this.localDataSource.dynamicBodyVariables.length > 0){
+      this.localDataSource.dynamicBodyVariables.splice(0,this.localDataSource.dynamicBodyVariables.length)
+    }
+    if(this.localDataSource.dynamicPathVariables && this.localDataSource.dynamicPathVariables.length > 0){
+      this.localDataSource.dynamicPathVariables.splice(0,this.localDataSource.dynamicPathVariables.length)
+    }
+
   }
 
   changeComponentForRelation(component: ComponentMaket) {

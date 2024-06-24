@@ -151,7 +151,7 @@ export class BackendService {
       return maket
       let componentValueList: IIceComponentValue[] = maket.docStep.map(value => value.componentMaket)
       .flat()
-        .filter(value => value.componentType != IceComponentType.TEXT && value.inputType != "button")
+        .filter(value => value.componentType != IceComponentType.TEXT && value.inputType != "button" && value.value)
       .map(value => new IceComponentValue(
         value.componentName,
         value.value,

@@ -1,10 +1,6 @@
 import {environment} from "../../environments/environment";
-import {DataSourceMap, DataSourceService} from "../services/data-source.service";
-import {ComponentMaket, ComponentModifyField, IceDocument} from "../interfaces/interfaces";
-import {IceComponentType, REQUEST_TEST_ERROR} from "../constants";
-import {IceWorker, IDataSource, IVariablesMap, Method, Position, WorkerType} from "./workerModel";
-import {MessageService} from "../services/message.service";
-import {Subject} from "rxjs";
+import {ComponentMaket, IceDocument} from "../interfaces/interfaces";
+import {IDataSource, IVariablesMap, Method, Position} from "./workerModel";
 
 export class IceDataSource implements IDataSource {
   id: number;
@@ -23,7 +19,7 @@ export class IceDataSource implements IDataSource {
 
 
   constructor(id: number, name: string, url?: string, method?: Method, pathVariables?: IVariablesMap[], bodyVariables?: IVariablesMap[],
-              event?: string, isNativeSource?: boolean, position?: Position,dynamicPathVariables?: IVariablesMap[],dynamicBodyVariables?: IVariablesMap[]) {
+              event?: string, isNativeSource?: boolean, position?: Position, dynamicPathVariables?: IVariablesMap[], dynamicBodyVariables?: IVariablesMap[]) {
     let isN = isNativeSource === undefined ? true : isNativeSource;
     this.id = id;
     this.name = name;
@@ -65,8 +61,7 @@ export class IceDataSource implements IDataSource {
       if (varMap.isAutoFill && varMap.value && varMap.key) {
         if (this.dynamicPathVariables && this.dynamicPathVariables.length > 0) {
           varMap.realValue = this.dynamicPathVariables.find(item => item.key === varMap.key).value
-        }
-        else {
+        } else {
           let componentName = varMap.value.toString().replace("[", "").replace("]", "")
           varMap.realValue = this.getComponentFromName(currentDocument, componentName).value
         }
@@ -76,8 +71,12 @@ export class IceDataSource implements IDataSource {
     })
 
     this.pathVariables.map(value => `&${value.key}=${value.realValue}`).forEach(value => result += value)
-    if(result.length === 0)
+    if (result.length === 0)
       return ""
+
+    /**Очистить тестовые переменные*/
+    this.pathVariables.map(value => value.realValue).fill(undefined)
+
     return `?${result.slice(1, result.length)}`
   }
 
