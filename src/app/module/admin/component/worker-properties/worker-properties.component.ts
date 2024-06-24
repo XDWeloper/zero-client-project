@@ -134,10 +134,10 @@ export class WorkerPropertiesComponent implements OnInit, AfterViewInit{
 
   SaveAndClose() {
 
-    if(this.localDataSource.dynamicBodyVariables && this.localDataSource.dynamicBodyVariables.length > 0){
+    if(this.localDataSource && this.localDataSource.dynamicBodyVariables && this.localDataSource.dynamicBodyVariables.length > 0){
       this.localDataSource.dynamicBodyVariables.splice(0,this.localDataSource.dynamicBodyVariables.length)
     }
-    if(this.localDataSource.dynamicPathVariables && this.localDataSource.dynamicPathVariables.length > 0){
+    if(this.localDataSource && this.localDataSource.dynamicPathVariables && this.localDataSource.dynamicPathVariables.length > 0){
       this.localDataSource.dynamicPathVariables.splice(0,this.localDataSource.dynamicPathVariables.length)
     }
 

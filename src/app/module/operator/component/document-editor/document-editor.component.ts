@@ -320,6 +320,11 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       filter(item => item.value != "NaN"),
       debounceTime(500),
     ).subscribe(item => {
+
+      if(this.currentStepIndex === undefined)
+        return;
+
+
       let currentComponent = this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === item.componentId)
       if(!currentComponent) return
 

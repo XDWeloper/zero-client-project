@@ -369,6 +369,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
        if(this.currentDebounce != this.defaultDebounce)
          this.currentDebounce = this.defaultDebounce
 
+      if(this.currentStepIndex === undefined)
+        return;
+
       let currentComponent = this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === item.componentId)
       if (!currentComponent) return
 
