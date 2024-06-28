@@ -1,14 +1,43 @@
 <div class="absolute bg-white border border-solid border-primary-light py-4 px-4 rounded-2xl z-20" [ngStyle]="{'left.px': x, 'top.px': y}">
+  <div *ngIf="CompType != undefined">
   <ul class="list-group">
-    <li class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-md w-full"
+    <li class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-md w-full p-1"
+        (click)="click('copy')">
+      <mat-icon class="text-gray-500">file_copy</mat-icon>
+      <span class="ml-2">Копировать</span>
+    </li>
+    <li class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-md w-full p-1"
+        (click)="click('cut')">
+      <svg class="h-8 w-8 text-warning-base"  width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">  <path stroke="none" d="M0 0h24v24H0z"/>  <circle cx="7" cy="17" r="3" />  <circle cx="17" cy="17" r="3" />  <line x1="9.15" y1="14.85" x2="18" y2="4" />  <line x1="6" y1="4" x2="14.85" y2="14.85" /></svg>
+      <span class="ml-2">Вырезать</span>
+    </li>
+
+    <li class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-md w-full p-1"
         (click)="click('delete')">
-      <mat-icon class="text-error-base">clear</mat-icon>
+      <mat-icon class="text-error-base">delete_outline</mat-icon>
       <span class="ml-2">Удалить</span>
     </li>
-    <li class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-md w-full"
+    <li class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-md w-full p-1"
         (click)="click('edit')" *ngIf="CompType === 'text' || CompType === 'table'">
       <mat-icon class="text-primary-base">mode_edit</mat-icon>
       <span class="ml-2">Редактировать</span>
     </li>
   </ul>
+  </div>
+  <div *ngIf="CompType === undefined">
+    <ul class="list-group">
+      <li class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-md w-full p-1"
+          (click)="click('paste')">
+        <mat-icon class="text-gray-500">filter_none</mat-icon>
+        <span class="ml-2">Вставить</span>
+      </li>
+      <li class="flex items-center text-black hover:bg-primary-light hover:text-white mt-1 cursor-pointer rounded-md w-full p-1"
+          (click)="click('clear')">
+        <mat-icon class="text-error-base ">clear</mat-icon>
+        <span class="ml-2">Очистить лист</span>
+      </li>
+    </ul>
+
+  </div>
 </div>
+

@@ -72,7 +72,7 @@ export class FieldWorker extends IceWorker {
 
   startWorker() {
 
-    console.log("startWorker()")
+    //console.log("startWorker()")
     this.isRunning = false
     this.actionGroupList.forEach(actionGroup => {
       this.runActionGroup(actionGroup)
@@ -88,7 +88,7 @@ export class FieldWorker extends IceWorker {
       window.dispatchEvent(new Event('resize'))
     }
 
-    console.log("worker  " + this.name + "  is finished  "  +  this.id)
+    //console.log("worker  " + this.name + "  is finished  "  +  this.id)
     //console.log("localCurrentDocument", {...this.localCurrentDocument})
     WorkerService.instance.isWorkerStarted$.next(false)
 
@@ -98,7 +98,7 @@ export class FieldWorker extends IceWorker {
     if (!this.checkCondition(actionGroup))
       return
     this.isRunning = true
-    console.log("-------- runAction!!!!!!!!!!!!!!")
+    //console.log("-------- runAction!!!!!!!!!!!!!!")
     if(actionGroup.action)
     actionGroup.action.forEach(action => {
       this.runAction(action)

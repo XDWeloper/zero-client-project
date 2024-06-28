@@ -20,6 +20,15 @@ export class CellService {
 
   constructor() { }
 
+  getCellNumberFromCoord(positon: {x: number, y:number}): number | undefined{
+    let index = undefined
+    this.cellList.forEach(value => {
+      let cellBound = value.getBounds()
+      if(cellBound.x <= positon.x && positon.x <  cellBound.right &&  cellBound.y <= positon.y && positon.y <  cellBound.bottom)
+        index = value.index
+    })
+    return index
+  }
 
   public addCell(cell: CellComponent){
     this.cellList.push(cell)

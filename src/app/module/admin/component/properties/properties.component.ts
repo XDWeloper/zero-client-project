@@ -64,15 +64,13 @@ export class PropertiesComponent implements OnInit, OnDestroy {
 
 
   ngOnInit(): void {
-    this.selectedComponent$ = this.componentService.selectedComponent$.subscribe(c => {
-      if (c === undefined)
-        this.currentComponent = undefined
+    this.selectedComponent$ = this.componentService.selectedComponent$.subscribe(selectedComponentList => {
+      if (selectedComponentList && selectedComponentList.length === 1) {
+        this.currentComponent = <IceMaketComponent>this.componentService.getComponent(selectedComponentList[0])
+        this.componentService.setModified(true)
+      }
       else {
-          this.currentComponent = <IceMaketComponent>this.componentService.getComponent(c)
-          this.componentService.setModified(true)
-        // if(this.currentComponent.printRule === undefined){
-        //   this.currentComponent.printRule = {isPrint: this.currentComponent.componentType != IceComponentType.TEXT,newLine: true}
-        // }
+        this.currentComponent = undefined
       }
     })
 

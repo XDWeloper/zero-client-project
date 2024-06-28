@@ -17,12 +17,12 @@ import {MatStepperModule} from "@angular/material/stepper";
 import {TextComponent} from "./component/dinamicComponent/text/text.component";
 import {AreaComponent} from "./component/dinamicComponent/area/area.component";
 import {InputComponent} from "./component/dinamicComponent/input/input.component";
-import {
-  InformationCompanyParticipantsTableComponent
-} from "./component/dinamicComponent/tables/information-company-participants-table/information-company-participants-table.component";
-import {
-  InformationMainCounterpartiesTableComponent
-} from "./component/dinamicComponent/tables/information-main-counterparties-table/information-main-counterparties-table.component";
+// import {
+//   InformationCompanyParticipantsTableComponent
+// } from "./component/dinamicComponent/tables/information-company-participants-table/information-company-participants-table.component";
+// import {
+//   InformationMainCounterpartiesTableComponent
+// } from "./component/dinamicComponent/tables/information-main-counterparties-table/information-main-counterparties-table.component";
 import {ClientModule} from "./module/client/client.module";
 import {LoginComponent} from "./oauth2/login/login.component";
 import {SpinnerInterceptor} from "./oauth2/interceptor/spinner-interceptor.service";
@@ -52,8 +52,8 @@ import { SelectComponent } from './component/dinamicComponent/select/select.comp
     TextComponent,
     AreaComponent,
     InputComponent,
-    InformationCompanyParticipantsTableComponent,
-    InformationMainCounterpartiesTableComponent,
+    // InformationCompanyParticipantsTableComponent,
+    // InformationMainCounterpartiesTableComponent,
     MessageDialogComponent,
     UploadComponent,
     ChangePlaceDialogComponent,

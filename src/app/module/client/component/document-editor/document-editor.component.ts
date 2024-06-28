@@ -46,12 +46,15 @@ import {
 import {TextComponent} from "../../../../component/dinamicComponent/text/text.component";
 import {InputComponent} from "../../../../component/dinamicComponent/input/input.component";
 import {AreaComponent} from "../../../../component/dinamicComponent/area/area.component";
+/*
 import {
   InformationMainCounterpartiesTableComponent
 } from "../../../../component/dinamicComponent/tables/information-main-counterparties-table/information-main-counterparties-table.component";
 import {
   InformationCompanyParticipantsTableComponent
 } from "../../../../component/dinamicComponent/tables/information-company-participants-table/information-company-participants-table.component";
+
+ */
 import {BehaviorSubject, debounceTime, filter, interval, Observable, Subject, Subscription} from "rxjs";
 import {ComponentService} from "../../../../services/component.service";
 import {BackendService} from "../../../../services/backend.service";
@@ -427,6 +430,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
                 if (value.status === "ERROR") {
                   this.messageService.show(value.message, value.message, ERROR)
                 }
+
+                console.log("report is create!!")
                 if (value.status === "DONE" && value.reportFile.length > 0) {
                   window.open("assets/report/" + value.reportFile, "_blank");
                 }
@@ -441,7 +446,8 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
               },
               error: err => {
-                this.messageService.show(err, err, ERROR)
+                console.log(err)
+                this.messageService.show(err.error.message,err.error.error, ERROR)
               }
             }
           )
@@ -480,12 +486,12 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         this.componentRef = this.itemsField.createComponent(AreaComponent);
       if (comp.componentType === IceComponentType.TABLE) {
         switch (comp.tableType) {
-          case 1:
-            this.componentRef = this.itemsField.createComponent(InformationMainCounterpartiesTableComponent);
-            break;
-          case 2:
-            this.componentRef = this.itemsField.createComponent(InformationCompanyParticipantsTableComponent);
-            break;
+          // case 1:
+          //   this.componentRef = this.itemsField.createComponent(InformationMainCounterpartiesTableComponent);
+          //   break;
+          // case 2:
+          //   this.componentRef = this.itemsField.createComponent(InformationCompanyParticipantsTableComponent);
+          //   break;
           default:
             this.componentRef = this.itemsField.createComponent(TableComponent);
         }
@@ -610,6 +616,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         next: (res => {
           if (res && this.currentDocument) {
             this.currentDocument.id = res.id
+            this.currentDocument.changed = false
             this.savedIsDone$.next(true)
           }
         }),
@@ -621,6 +628,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
           //this.updateDocument$ = this.backService.updateOnlyDate(this.currentDocument).subscribe({
           next: (res => {
             this.savedIsDone$.next(true)
+            this.currentDocument.changed = false
           }),
           error: (err => {
             this.messageService.show(DOCUMENT_SAVE_ERROR, err.error.message, ERROR)
@@ -631,6 +639,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
           next: (res => {
             this.docSaved(docStatus === "DRAFT" ? DOCUMENT_DRAFT_SAVED : DOCUMENT_SEND, "")
             this.savedIsDone$.next(true)
+            this.currentDocument.changed = false
           }),
           error: (err => {
             this.messageService.show(DOCUMENT_SAVE_ERROR, err.error.message, ERROR)
@@ -649,17 +658,12 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       .flat()
       .filter(item => item.customAttribName && item.value)
       .map(item => {
-        console.log(item.customAttribName + " = " + item.value)
-
         Object.defineProperty(rezObj, item.customAttribName, {
           value: item.value,
           writable: true,
           enumerable: true,
           configurable: true
         })
-
-        console.log(item.customAttribName + "_column_name" + " = " + item.customAttribColumnName)
-
         Object.defineProperty(rezObj, item.customAttribName + "_column_name", {
           value: item.customAttribColumnName,
           writable: true,
@@ -668,7 +672,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         })
       })
 
-    console.log("customAttrib",rezObj)
     this.currentDocument.customAttrib = rezObj
   }
 

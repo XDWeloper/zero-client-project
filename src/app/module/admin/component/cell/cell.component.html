@@ -1,4 +1,5 @@
 <div class="h-{{ cellHeight }} z-0 " #cell (mouseup)="click($event)"
+     (contextmenu)="rightClick($event)"
 [ngClass]="cellType === 'client' ? 'border-none' : 'cell-border-style'"
 ></div>
 

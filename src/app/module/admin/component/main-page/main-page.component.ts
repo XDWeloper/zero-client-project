@@ -1,5 +1,6 @@
 import {
-  ChangeDetectionStrategy, ChangeDetectorRef,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
   ComponentRef,
   ElementRef,
@@ -69,7 +70,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
   currentStep: StepTreeTempl
   currentTemplate: IceDocumentMaket
   workerMenuOpen = false
-  workerMenuPosition: {x: number, y: number}
+  workerMenuPosition: { x: number, y: number }
 
 
   @ViewChild('field', {read: ViewContainerRef})
@@ -89,7 +90,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
   user: User
   private _modify: boolean = false
   isBlock: boolean = false;
-  currentWorker : IWorker;
+  currentWorker: IWorker;
 
   constructor(private cellService: CellService,
               private router: Router,
@@ -100,7 +101,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
               private timeService: TimeService,
               private keycloakService: KeycloakService,
               private messageService: MessageService,
-              private modifiedService:ModifiedService,
+              private modifiedService: ModifiedService,
               private changeDetection: ChangeDetectorRef) {
 
     /**Разрешить обновление токенов*/
@@ -237,14 +238,14 @@ export class MainPageComponent implements OnInit, OnDestroy {
       this._modify = true
     }
 
-    this.componentRef.instance.printRule = (compMaket && compMaket.printRule) ? compMaket.printRule : {
-      isPrint: componentType != IceComponentType.TEXT,
-      newLine: true,
-      order: this.documentService.getLastOrder(this.currentDoc.id)
-    }
+    // this.componentRef.instance.printRule = (compMaket && compMaket.printRule) ? compMaket.printRule : {
+    //   isPrint: componentType != IceComponentType.TEXT,
+    //   newLine: true,
+    //   order: this.documentService.getLastOrder(this.currentDoc.id)
+    // }
     this.componentService.addComponent(this.componentRef);
 
-    if(this.componentRef.instance) {
+    if (this.componentRef.instance) {
       (this.componentRef.instance as MaketComponent).setBound(this.mainContainer.nativeElement.getBoundingClientRect());
       (this.componentRef.instance as MaketComponent).currentCell = this.cellService.getCellBound((this.componentRef.instance as MaketComponent).cellNumber)
     }
@@ -274,6 +275,28 @@ export class MainPageComponent implements OnInit, OnDestroy {
     this.transEnd()
   }
 
+  @HostListener('window:keydown', ['$event'])
+  handleKeyDown(event: KeyboardEvent) {
+    if (event.ctrlKey === true && event.key === "v") {
+      this.paste()
+    }
+    if (event.ctrlKey === true && event.key === "c") {
+      this.copy()
+    }
+    if (event.ctrlKey === true && event.key === "x") {
+      this.cut()
+    }
+    if (event.ctrlKey === true && event.key === "z") {
+      console.log("Back")
+    }
+    if (event.key === "Delete") {
+      this.delete()
+    }
+    if (event.key === "Enter") {
+      this.edit()
+    }
+  }
+
   transEnd() {
     let bound = this.mainContainer.nativeElement.getBoundingClientRect()
     this.cellService.tableResize$.next(bound)
@@ -281,28 +304,82 @@ export class MainPageComponent implements OnInit, OnDestroy {
   }
 
   selectMenu($event: string) {
-    if ($event === 'delete') {
-      this.isMenuHidden = true
-      this.componentService.removeComponent(this.currentComponentID)
-      this.documentService.removeComponent(this.currentComponentID)
-      this.componentService.selectedComponent$.next(undefined)
-      this._modify = true
-    }
-    if ($event === 'edit') {
+    if ($event === 'delete')
+      this.delete()
+    if ($event === 'edit')
+      this.edit()
+    if ($event === 'copy')
+      this.copy()
+    if ($event === 'cut')
+      this.cut()
+    if ($event === 'paste')
+      this.paste()
+    if ($event === 'clear')
+      this.clearPage()
+
+    this.isMenuHidden = true
+    this._modify = true
+  }
+
+  private clearPage(){
+    this.componentService.clearComponentList();
+    this.modify = true
+
+  }
+
+  private edit() {
+    if (this.componentService.selectedComponentsId.length === 1) {
+      this.currentComponentID = this.componentService.selectedComponentsId[0]
+      this.currCompType = this.componentService.getComponent(this.currentComponentID).componentType
       if (this.currCompType === IceComponentType.TABLE)
         this.openTablePropDialog(this.componentService.getComponent(this.currentComponentID))
-      else
+      if (this.currCompType === IceComponentType.TEXT)
         this.openEditTextDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration)
     }
+  }
+
+  private paste() {
+    if (this.componentService.copyBufferMaketList.length > 0) {
+      let list = this.componentService.copyBufferMaketList
+      list.forEach(item => {
+        if (this.documentService.isComponentIdPresent(this.currentDoc.id, item.componentID) === true) {
+          this.documentService.calculateComponentId(this.currentDoc.id)
+          item.componentID = this.documentService.lastComponentIndex + 1
+        }
+        this.restoreComponents([item])
+        this.pushCurrentPage()
+       })
+    }
+  }
+
+  private copy() {
+    this.componentService.clearCopyBuffer()
+    this.componentService.copyBufferMaketList.push(...this.documentService.getComponentListFromSellected(this.currentDoc.id))
+    this.componentService.clearSelectedComponentList()
+  }
+
+  private cut() {
+    this.componentService.removeSelectedComponent()
+    this.componentService.clearCopyBuffer()
+    this.componentService.copyBufferMaketList.push(...this.documentService.getComponentListFromSellected(this.currentDoc.id))
+//    this.componentService.moveComponentToCopyBuffer()
+    this.documentService.removeSelectedComponents()
+    this.componentService.clearSelectedComponentList()
+  }
+
+  private delete() {
+    this.documentService.removeSelectedComponents()
+    this.componentService.removeSelectedComponent()
+    this.componentService.clearSelectedComponentList()
 
   }
 
   toolBarButtonClick($event: string) {
     switch ($event) {
-      case 'clear' :
-        this.componentService.clearComponentList();
-        this.modify = true
-        break;
+      // case 'clear' :
+      //   this.componentService.clearComponentList();
+      //   this.modify = true
+      //   break;
       case 'changed' :
         this.pushCurrentPage();
         //this.documentService.saveTemplate() ;
@@ -370,7 +447,8 @@ export class MainPageComponent implements OnInit, OnDestroy {
   }
 
   setCurrentDocAndStep(docAndStep: any) {
-    this.componentService.selectedComponent$.next(undefined)
+    //this.componentService.selectedComponent$.next(undefined)
+    this.componentService.clearSelectedComponentList()
     this.pushCurrentPage();
 
     this.componentService.clearComponentList()
@@ -384,12 +462,12 @@ export class MainPageComponent implements OnInit, OnDestroy {
       this.restoreComponents(this.documentService.getComponentCollections(this.currentDoc, this.currentStep))
       this.currentStep.visible = this.documentService.getTemplateByDocId(this.currentDoc.id).docStep.find(s => s.stepNum === this.currentStep.num).visible
     }
-    if(this.currentDoc)
+    if (this.currentDoc)
       this.currentTemplate = this.documentService.getTemplateByDocId(this.currentDoc.id)
 
-    if(!this.currentTemplate.docAttrib){
-        this.currentTemplate.docAttrib = {workerList: [],documentEventList: []}
-      }
+    if (!this.currentTemplate.docAttrib) {
+      this.currentTemplate.docAttrib = {workerList: [], documentEventList: []}
+    }
   }
 
   private restoreComponents(componentCollections: ComponentMaket[]) {
@@ -400,12 +478,12 @@ export class MainPageComponent implements OnInit, OnDestroy {
   }
 
   exit() {
-    if(this.modifiedService.getModified()){
-      this.messageService.show(MAKET_CLOSE_NOT_SAVE,MAKET_CLOSE_NOT_SAVE_FULL_MESSAGE,"INFO",["YES","NO"])
+    if (this.modifiedService.getModified()) {
+      this.messageService.show(MAKET_CLOSE_NOT_SAVE, MAKET_CLOSE_NOT_SAVE_FULL_MESSAGE, "INFO", ["YES", "NO"])
         .subscribe(value => {
-          if(value === "YES"){
+          if (value === "YES") {
             this.modifiedService.modify$.next(true)
-          } else{
+          } else {
             this.logoutAndExit()
           }
         })
@@ -414,7 +492,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
     }
   }
 
-  logoutAndExit(){
+  logoutAndExit() {
     this.keycloakService.logoutAction().subscribe({
       complete: (() => this.router.navigate(["/"]))
     })
@@ -431,13 +509,13 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
   private openTablePropDialog(currentTableComponent: IceMaketComponent) {
     this.isBlock = true
-    let componentRef = openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration,TablePropComponent, this.dialog)
+    let componentRef = openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration, TablePropComponent, this.dialog)
 
     this.currentComponentID = currentTableComponent.componentID
     componentRef.componentInstance.currentTableComponent = currentTableComponent
     componentRef.afterClosed().subscribe(value => {
         this.isBlock = false
-        if(value === -1 && currentTableComponent.tableProp === undefined){
+        if (value === -1 && currentTableComponent.tableProp === undefined) {
           this.selectMenu("delete")
         }
         this.changeDetection.detectChanges()
@@ -447,19 +525,21 @@ export class MainPageComponent implements OnInit, OnDestroy {
   }
 
   private openDataSourceDialog() {
-    let componentRef = openDialog<DataSourceDialogComponent>(dialogOpenAnimationDuration, dialogCloseAnimationDuration,DataSourceDialogComponent, this.dialog)
+    let componentRef = openDialog<DataSourceDialogComponent>(dialogOpenAnimationDuration, dialogCloseAnimationDuration, DataSourceDialogComponent, this.dialog)
     componentRef.componentInstance.currentTemplate = this.currentTemplate
     componentRef.afterClosed().subscribe({next: res => this.modify = res === 1})
   }
 
   private openWorkerDialog() {
-    if(WorkerDialogComponent.isOpen === true) return
+    if (WorkerDialogComponent.isOpen === true) return
 
-    let componentRef = openDialog<WorkerDialogComponent>(dialogOpenAnimationDuration, dialogCloseAnimationDuration,WorkerDialogComponent, this.dialog)
+    let componentRef = openDialog<WorkerDialogComponent>(dialogOpenAnimationDuration, dialogCloseAnimationDuration, WorkerDialogComponent, this.dialog)
     componentRef.componentInstance.currentTemplate = this.currentTemplate
-    componentRef.afterClosed().subscribe({next: res => {
+    componentRef.afterClosed().subscribe({
+      next: res => {
         this.modify = res === 1
         WorkerDialogComponent.isOpen = false
-      }})
+      }
+    })
   }
 }

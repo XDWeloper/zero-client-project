@@ -1,4 +1,4 @@
-import {ComponentRef, Injectable} from '@angular/core';
+import {ComponentRef, inject, Injectable} from '@angular/core';
 import {
   ComponentMaket, DocStatus,
   DocumentTreeTempl,
@@ -9,6 +9,7 @@ import {
 import {IceMaketComponent} from "../module/admin/classes/icecomponentmaket";
 import {IceComponentType} from "../constants";
 import {saveAs} from "file-saver";
+import {ComponentService} from "./component.service";
 
 @Injectable({
   providedIn: 'root'
@@ -19,6 +20,8 @@ export class DocumentService {
   lastComponentIndex = 0
   statusList:{status: string , name: string}[] = []
 
+  private componentService = inject(ComponentService)
+
   constructor() {
     //this.statusList.push({status: "", name: ""})
     Object.keys(DocStatus).forEach((status, index) => {
@@ -27,11 +30,26 @@ export class DocumentService {
   }
 
   removeComponent(componentID: number){
-    let index = this.templateList.map(item => item.docStep.map(item => item.componentMaket).flat()).flat().findIndex(item => item.componentID === componentID)
-    if(index != -1){
-      this.templateList.map(item => item.docStep.map(item => item.componentMaket).flat()).flat().splice(index, 1)
-    }
+    //let index = this.templateList.map(item => item.docStep.map(item => item.componentMaket).flat()).flat().findIndex(item => item.componentID === componentID)
 
+    this.templateList.map(item => item.docStep).flat().forEach(page => {
+      let index = page.componentMaket.map(item => item.componentID).findIndex(v => v === componentID)
+      if(index != -1){
+        page.componentMaket.splice(index, 1)
+      }
+
+    })
+  }
+
+  removeSelectedComponents(){
+    this.componentService.selectedComponentsId.forEach(id => this.removeComponent(id))
+  }
+
+  isComponentIdPresent(docId: number,id: number): boolean{
+    return this.templateList
+      .find(doc => doc.docId === docId)
+      .docStep.map(step => step.componentMaket)
+      .flat().map(c => c.componentID).includes(id)
   }
 
   getComponentByName(docId: number, component: IceMaketComponent):ComponentMaket | undefined {
@@ -39,6 +57,15 @@ export class DocumentService {
       .find(doc => doc.docId === docId)
       .docStep.map(step => step.componentMaket)
       .flat().find(comp => comp.componentName === component.componentName && comp.componentID != component.componentID)
+  }
+
+  getComponentListFromSellected(docId: number):ComponentMaket[] | undefined {
+    let sellectedArray = this.componentService.selectedComponentsId;
+    return this.templateList
+      .find(doc => doc.docId === docId)
+      .docStep.map(step => step.componentMaket)
+      .flat()
+      .filter(comp => sellectedArray.includes(comp.componentID))
   }
 
   getMaxComponentID(id: number): number{
@@ -50,10 +77,6 @@ export class DocumentService {
   }
 
   calculateComponentId(docId: number) {
-    // this.lastComponentIndex = this.templateList
-    //   .map(item => item.docStep.map(i => i.componentMaket.length)
-    //   .reduce((r, i) => r += i, 0))
-    //   .reduce((r, i) => r += i, 0)
     let nextId = 0
     this.getTemplateByDocId(docId).docStep.map(s => s.componentMaket).flat().forEach(c => nextId = c.componentID > nextId ? c.componentID : nextId)
     this.lastComponentIndex = nextId

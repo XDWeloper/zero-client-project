@@ -42,12 +42,15 @@ import {
 import {TextComponent} from "../../../../component/dinamicComponent/text/text.component";
 import {InputComponent} from "../../../../component/dinamicComponent/input/input.component";
 import {AreaComponent} from "../../../../component/dinamicComponent/area/area.component";
+/*
 import {
   InformationMainCounterpartiesTableComponent
 } from "../../../../component/dinamicComponent/tables/information-main-counterparties-table/information-main-counterparties-table.component";
 import {
   InformationCompanyParticipantsTableComponent
 } from "../../../../component/dinamicComponent/tables/information-company-participants-table/information-company-participants-table.component";
+
+ */
 import {debounceTime, filter, interval, Subject, Subscription} from "rxjs";
 import {ComponentService} from "../../../../services/component.service";
 import {BackendService} from "../../../../services/backend.service";
@@ -432,12 +435,12 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       if (comp.componentType === IceComponentType.TABLE) {
         console.log("comp.tableType ",comp.tableType)
         switch (comp.tableType) {
-          case 1:
-            this.componentRef = this.itemsField.createComponent(InformationMainCounterpartiesTableComponent);
-            break;
-          case 2:
-            this.componentRef = this.itemsField.createComponent(InformationCompanyParticipantsTableComponent);
-            break;
+          // case 1:
+          //   this.componentRef = this.itemsField.createComponent(InformationMainCounterpartiesTableComponent);
+          //   break;
+          // case 2:
+          //   this.componentRef = this.itemsField.createComponent(InformationCompanyParticipantsTableComponent);
+          //   break;
           default:
             this.componentRef = this.itemsField.createComponent(TableComponent);
         }

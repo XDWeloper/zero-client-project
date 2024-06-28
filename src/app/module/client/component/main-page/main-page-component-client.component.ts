@@ -144,9 +144,17 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy, OnInit
 
   openDocList() {
     /**Нужно сохранить документ если были изменения*/
-    if(DocumentEditorComponent.instance.currentDocument.changed)
-      DocumentEditorComponent.instance.saveDoc(undefined,0)
-    this.tabService.openTab(TAB_DOCUMENT_LIST)
+    if(DocumentEditorComponent.instance.currentDocument.changed) {
+      DocumentEditorComponent.instance.saveDoc(undefined, 0)
+      let subs = DocumentEditorComponent.instance.savedIsDone$.subscribe(value => {
+        console.log("save is done ", value)
+        if(value === true)
+          this.tabService.openTab(TAB_DOCUMENT_LIST)
+        subs.unsubscribe()
+      })
+    } else{
+      this.tabService.openTab(TAB_DOCUMENT_LIST)
+    }
   }
 
 }

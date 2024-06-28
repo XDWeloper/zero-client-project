@@ -8,12 +8,14 @@ import {MatStepper} from "@angular/material/stepper";
 import {TextComponent} from "../../../../component/dinamicComponent/text/text.component";
 import {InputComponent} from "../../../../component/dinamicComponent/input/input.component";
 import {AreaComponent} from "../../../../component/dinamicComponent/area/area.component";
+/*
 import {
   InformationMainCounterpartiesTableComponent
 } from "../../../../component/dinamicComponent/tables/information-main-counterparties-table/information-main-counterparties-table.component";
 import {
   InformationCompanyParticipantsTableComponent
 } from "../../../../component/dinamicComponent/tables/information-company-participants-table/information-company-participants-table.component";
+*/
 import {UploadComponent} from "../../../../component/dinamicComponent/upload/upload.component";
 import {AddressComponent} from "../../../../component/dinamicComponent/adress/address.component";
 import {SelectComponent} from "../../../../component/dinamicComponent/select/select.component";
@@ -101,8 +103,8 @@ export class WatchTemplateComponent implements OnInit,AfterViewInit {
         this.componentRef = this.itemsField.createComponent(UploadComponent);
       if (comp.componentType === IceComponentType.TABLE) {
         switch (comp.tableType){
-          case 1: this.componentRef = this.itemsField.createComponent(InformationMainCounterpartiesTableComponent); break;
-          case 2: this.componentRef = this.itemsField.createComponent(InformationCompanyParticipantsTableComponent); break;
+          // case 1: this.componentRef = this.itemsField.createComponent(InformationMainCounterpartiesTableComponent); break;
+          // case 2: this.componentRef = this.itemsField.createComponent(InformationCompanyParticipantsTableComponent); break;
           default: this.componentRef = this.itemsField.createComponent(TableComponent);
         }
       }
