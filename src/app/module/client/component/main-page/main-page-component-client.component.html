@@ -23,7 +23,7 @@
     <mat-tab-group [(selectedIndex)]="currentTabNum" (animationDone)="tabChangeDone()">
       <mat-tab>
         <app-document-table (openDocId)="openDoc($event)" [isOpenedTab]=!tabDone
-                            [isMaketExist]="maketId != undefined"></app-document-table>
+                            [isMaketExist]="activeMaketCount > 0 "></app-document-table>
       </mat-tab>
       <mat-tab>
         <app-document-editor [currentDocument]="openedDocument" [openType]="openDocType" [isOpenedTab]=tabDone

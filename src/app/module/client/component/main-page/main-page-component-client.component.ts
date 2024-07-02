@@ -30,6 +30,7 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy, OnInit
   getDocumentFull$: Subscription
   openDocType: OpenDocType = undefined
   protected maketId: number | undefined = undefined
+  activeMaketCount: number = 0
 
 
   @ViewChild(DocumentEditorComponent) editorComponent: DocumentEditorComponent;
@@ -59,6 +60,8 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy, OnInit
 
     this.backendService.getMaketNameList().subscribe(res => {
       let respTree = (res.content as ResponseTree[]).filter(value => value.isActive)
+      this.activeMaketCount = respTree.length
+      console.log("respTree",respTree)
        if(respTree.length === 1)
         this.maketId = respTree[0].id
       else

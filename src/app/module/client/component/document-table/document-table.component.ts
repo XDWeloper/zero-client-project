@@ -77,6 +77,7 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
     this._isOpenedTab = value
   }
   @Input() set isMaketExist(value: boolean){
+    console.log("isMaketExist", value)
     this._isMaketExist = value
   }
 

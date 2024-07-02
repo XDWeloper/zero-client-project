@@ -110,9 +110,9 @@
           [ngClass]="{'bg-cyan-100/50':row.status === 'CONTROL', 'bg-yellow-100/50':row.status === 'AGREE','bg-error-base/50': (row.status === 'REJECTED' || row.status === 'INCORRECT')}"
           mat-cell *matCellDef="let row">
         <div class="flex justify-between items-center w-full">
-          <span class="w-[90%]">{{ row.status | docStatus }}</span>
+          <span class="">{{ row.status | docStatus }}</span>
           <mat-icon *ngIf="row.statusText" (click)="onInfoClick(row.statusText)"
-                    class="text-yellow-300 cursor-pointer w-[10%]">info
+                    class="text-yellow-300 cursor-pointer ">info
           </mat-icon>
         </div>
       </td>
@@ -138,24 +138,24 @@
       </th>
       <td class="w-[10%]" mat-cell *matCellDef="let row">
         <div class="grid grid-cols-4 gap-0.5">
-          <div class="w-1/4">
+          <div class="">
             <mat-icon class="text-primary-dark cursor-pointer" matTooltip="Просмотр" (click)="showDoc(row)">
               remove_red_eye
             </mat-icon>
           </div>
-          <div class="w-1/4">
+          <div class="">
             <mat-icon *ngIf="row.status === 'CONTROL'" class="text-green-500 cursor-pointer" matTooltip="Редактировать"
                       (click)="editDoc(row)">edit
             </mat-icon>
           </div>
-          <div class="w-1/4">
-            <mat-icon *ngIf="false" class=" text-error-base cursor-pointer" matTooltip="Удалить"
-                      (click)="removeDoc(row.id)">delete
-            </mat-icon>
-          </div>
-          <div class="w-1/4">
+          <div class="">
             <mat-icon class=" text-error-base cursor-pointer" matTooltip="История статусов"
                       (click)="openHistoryDialog(row.id)">history
+            </mat-icon>
+          </div>
+          <div class="">
+            <mat-icon *ngIf="row.reportId" class=" text-info-base cursor-pointer" matTooltip="Печать"
+                      (click)="printDoc(row)">print
             </mat-icon>
           </div>
         </div>

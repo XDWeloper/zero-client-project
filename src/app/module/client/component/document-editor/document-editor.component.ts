@@ -6,6 +6,7 @@ import {
   ComponentRef,
   ElementRef,
   HostListener,
+  inject,
   Input,
   OnDestroy,
   OnInit,
@@ -39,23 +40,13 @@ import {
   IceComponentType,
   INFO,
   MAKET_LOAD_ERROR,
-  MESSAGE_REPORT_IN_PROCESS,
   MESSAGE_REPORT_IS_DONE,
   TAB_DOCUMENT_LIST
 } from "../../../../constants";
 import {TextComponent} from "../../../../component/dinamicComponent/text/text.component";
 import {InputComponent} from "../../../../component/dinamicComponent/input/input.component";
 import {AreaComponent} from "../../../../component/dinamicComponent/area/area.component";
-/*
-import {
-  InformationMainCounterpartiesTableComponent
-} from "../../../../component/dinamicComponent/tables/information-main-counterparties-table/information-main-counterparties-table.component";
-import {
-  InformationCompanyParticipantsTableComponent
-} from "../../../../component/dinamicComponent/tables/information-company-participants-table/information-company-participants-table.component";
-
- */
-import {BehaviorSubject, debounceTime, filter, interval, Observable, Subject, Subscription} from "rxjs";
+import {debounceTime, filter, interval, Observable, Subject, Subscription} from "rxjs";
 import {ComponentService} from "../../../../services/component.service";
 import {BackendService} from "../../../../services/backend.service";
 import {MessageService} from "../../../../services/message.service";
@@ -66,13 +57,12 @@ import {SelectComponent} from "../../../../component/dinamicComponent/select/sel
 import {StepService} from "../../../../services/step.service";
 import {StatusReasonComponent} from "../../../../component/status-reason/status-reason.component";
 import {MatDialog} from "@angular/material/dialog";
-//import {PDFDocObject, PrintService} from "../../../../services/print.service";
-//import {AnketaScriptRule} from "../../../../data/anketaScriptRule";
 import {TableComponent} from "../../../../component/dinamicComponent/tables/table/table.component";
 import {EventService} from "../../../../services/event.service";
 import {WorkerService} from "../../../../services/worker.service";
 import {DataSourceService} from "../../../../services/data-source.service";
 import {TimeService} from "../../../../services/time.service";
+import {ReportService} from "../../../../services/report.service";
 
 @Component({
   selector: 'app-document-editor',
@@ -80,6 +70,9 @@ import {TimeService} from "../../../../services/time.service";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnInit {
+  reportService = inject(ReportService)
+
+
   steps: IceStepMaket[] = new Array()
   private _editDocId: number
   private _currentDocument: IceDocument
@@ -94,7 +87,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   private isResize = false
   reportProcessUID: string | undefined = undefined
   reportInterval$: Subscription
-  savedIsDone$ =   new Subject<boolean>()
+  savedIsDone$ = new Subject<boolean>()
   isSavedForPrint = false
 
   @Input() maketId: number | undefined
@@ -348,11 +341,11 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       this.setValidationText(component)
 
       /**Работа с группами чекбоксов*/
-      if(this.currentComponent.componentType === IceComponentType.INPUT && this.currentComponent.inputType === "checkbox" && this.currentComponent.radioGroupID
-        && this.currentComponent.value === false){
+      if (this.currentComponent.componentType === IceComponentType.INPUT && this.currentComponent.inputType === "checkbox" && this.currentComponent.radioGroupID
+        && this.currentComponent.value === false) {
         /**Это групповой чекбокс нужно остальные погасить*/
         let checkList = this.currentDocument.docAttrib.checkGroupList.find(crg => crg.id === Number(this.currentComponent.radioGroupID)).checkList
-        if(checkList){
+        if (checkList) {
           checkList
             .filter(value => value.id != this.currentComponent.componentID)
             .forEach(checkButton => {
@@ -369,10 +362,10 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       filter(item => item.value != "NaN"),
       debounceTime(this.currentDebounce)
     ).subscribe(item => {
-       if(this.currentDebounce != this.defaultDebounce)
-         this.currentDebounce = this.defaultDebounce
+      if (this.currentDebounce != this.defaultDebounce)
+        this.currentDebounce = this.defaultDebounce
 
-      if(this.currentStepIndex === undefined)
+      if (this.currentStepIndex === undefined)
         return;
 
       let currentComponent = this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === item.componentId)
@@ -421,36 +414,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     /**Слушаем печать*/
     this.savedIsDone$.subscribe({
       next: value => {
-        if(value === true && this.isSavedForPrint === true && this.currentDocument.reportId){
+        if (value === true && this.isSavedForPrint === true && this.currentDocument.reportId) {
           this.isSavedForPrint = false
-
-
-          this.backService.createReport(this.currentDocument.reportId, "PDF", [this.currentDocument.id]).subscribe({
-              next: value => {
-                if (value.status === "ERROR") {
-                  this.messageService.show(value.message, value.message, ERROR)
-                }
-
-                console.log("report is create!!")
-                if (value.status === "DONE" && value.reportFile.length > 0) {
-                  window.open("assets/report/" + value.reportFile, "_blank");
-                }
-                if (value.status === "PROCESS" && value.uuid.length > 0) {
-                  this.reportProcessUID = value.uuid
-                  this.messageService.show(MESSAGE_REPORT_IN_PROCESS, "", INFO).subscribe({
-                    next: value1 => {
-                      this.startReportTimer()
-                    }
-                  })
-                }
-
-              },
-              error: err => {
-                console.log(err)
-                this.messageService.show(err.error.message,err.error.error, ERROR)
-              }
-            }
-          )
+          this.reportService.print(this.currentDocument.reportId, this.currentDocument.id)
         }
       }
     })
@@ -702,7 +668,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       value = ""
     /**В начале проверяем заполнение обязательных полей*/
     if (currentComponent.componentType === IceComponentType.PLACE) {
-      if (currentComponent.required && (!value || (value && value.placeString &&  value.placeString.length < 1)))
+      if (currentComponent.required && (!value || (value && value.placeString && value.placeString.length < 1)))
         errorStr = "Не заполнено обязательное поле."
     } else {
       if (currentComponent.required && (!value || (value && value.length < 1)))
@@ -790,53 +756,16 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   print() {
     this.isSavedForPrint = true
-    this.saveDoc(this.currentDocument.status, 0)
+    if(this.currentDocument.status === "DRAFT")
+      this.saveDoc(this.currentDocument.status, 0)
+    else
+      this.reportService.print(this.currentDocument.reportId, this.currentDocument.id)
   }
 
   isToolBarShow() {
     if (this.currentDocument && this.currentDocument.docStep.filter(item => item.visible === true)[this.currentStepIndex])
       return this.currentDocument.docStep.filter(item => item.visible === true)[this.currentStepIndex].isToolBar
     return false
-  }
-
-
-  startReportTimer() {
-    this.reportInterval$ = interval(5000).subscribe(() => {
-      if (this.reportProcessUID) {
-        this.timeService.isBlocked = true
-        this.backService.getReportStatus(this.reportProcessUID).subscribe({
-          next: value => {
-            if (value.status === "ERROR") {
-              this.reportProcessUID = undefined
-              this.reportInterval$.unsubscribe()
-              this.messageService.show(value.message, value.message, ERROR)
-            }
-            if (value.status === "DONE" && value.reportFile.length > 0) {
-              this.reportProcessUID = undefined
-              this.reportInterval$.unsubscribe()
-              this.messageService.show(MESSAGE_REPORT_IS_DONE, "", INFO,["YES","NO"]).subscribe({
-                next: button => {
-                  if (button === "YES") {
-                    window.open("assets/report/" + value.reportFile, "_blank");
-                  }
-                }
-              })
-
-            }
-            if (value.status === "PROCESS" && value.uuid.length > 0) {
-              console.log(value)
-            }
-          },
-          error: err => {
-            this.messageService.show(err, err, ERROR)
-          },
-          complete: () => {
-            this.timeService.isBlocked = false
-          }
-        })
-      }
-    })
-
   }
 
 }

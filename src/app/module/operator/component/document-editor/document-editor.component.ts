@@ -5,7 +5,7 @@ import {
   Component,
   ComponentRef,
   ElementRef,
-  HostListener,
+  HostListener, inject,
   Input,
   OnDestroy,
   OnInit,
@@ -36,21 +36,14 @@ import {
   ERROR,
   IceComponentType,
   INFO,
-  MAKET_LOAD_ERROR, MESSAGE_REPORT_IN_PROCESS, MESSAGE_REPORT_IS_DONE,
+  MAKET_LOAD_ERROR,
+  MESSAGE_REPORT_IN_PROCESS,
+  MESSAGE_REPORT_IS_DONE,
   TAB_DOCUMENT_LIST
 } from "../../../../constants";
 import {TextComponent} from "../../../../component/dinamicComponent/text/text.component";
 import {InputComponent} from "../../../../component/dinamicComponent/input/input.component";
 import {AreaComponent} from "../../../../component/dinamicComponent/area/area.component";
-/*
-import {
-  InformationMainCounterpartiesTableComponent
-} from "../../../../component/dinamicComponent/tables/information-main-counterparties-table/information-main-counterparties-table.component";
-import {
-  InformationCompanyParticipantsTableComponent
-} from "../../../../component/dinamicComponent/tables/information-company-participants-table/information-company-participants-table.component";
-
- */
 import {debounceTime, filter, interval, Subject, Subscription} from "rxjs";
 import {ComponentService} from "../../../../services/component.service";
 import {BackendService} from "../../../../services/backend.service";
@@ -62,11 +55,10 @@ import {SelectComponent} from "../../../../component/dinamicComponent/select/sel
 import {StepService} from "../../../../services/step.service";
 import {MatDialog} from "@angular/material/dialog";
 import {StatusReasonComponent} from "../../../../component/status-reason/status-reason.component";
-//import {PDFDocObject, PrintService} from "../../../../services/print.service";
-//import {AnketaScriptRule} from "../../../../data/anketaScriptRule";
 import {TableComponent} from "../../../../component/dinamicComponent/tables/table/table.component";
 import {TimeService} from "../../../../services/time.service";
 import {EventService} from "../../../../services/event.service";
+import {ReportService} from "../../../../services/report.service";
 
 @Component({
   selector: 'app-document-editor',
@@ -74,6 +66,8 @@ import {EventService} from "../../../../services/event.service";
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnInit {
+  reportService = inject(ReportService)
+
   steps: IceStepMaket[] = new Array()
   private _editDocId: number
   private _currentDocument: IceDocument
@@ -84,7 +78,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   private _openType: OpenDocType = "EDIT"
   reportProcessUID: string | undefined = undefined
   reportInterval$: Subscription
-  savedIsDone$ =   new Subject<boolean>()
+  savedIsDone$ = new Subject<boolean>()
   isSavedForPrint = false
 
   @Input() set currentDocument(value: IceDocument | undefined) {
@@ -302,11 +296,11 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       this.setValidationText(component)
 
       /**Работа с группами чекбоксов*/
-      if(this.currentComponent.componentType === IceComponentType.INPUT && this.currentComponent.inputType === "checkbox" && this.currentComponent.radioGroupID
-        && this.currentComponent.value === false){
+      if (this.currentComponent.componentType === IceComponentType.INPUT && this.currentComponent.inputType === "checkbox" && this.currentComponent.radioGroupID
+        && this.currentComponent.value === false) {
         /**Это групповой чекбокс нужно остальные погасить*/
         let checkList = this.currentDocument.docAttrib.checkGroupList.find(crg => crg.id === Number(this.currentComponent.radioGroupID)).checkList
-        if(checkList){
+        if (checkList) {
           checkList
             .filter(value => value.id != this.currentComponent.componentID)
             .forEach(checkButton => {
@@ -324,12 +318,12 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       debounceTime(500),
     ).subscribe(item => {
 
-      if(this.currentStepIndex === undefined)
+      if (this.currentStepIndex === undefined)
         return;
 
 
       let currentComponent = this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === item.componentId)
-      if(!currentComponent) return
+      if (!currentComponent) return
 
       if (currentComponent.value != item.value) {
         currentComponent.value = item.value
@@ -375,31 +369,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     /**Слушаем печать*/
     this.savedIsDone$.subscribe({
       next: value => {
-        if(value === true && this.isSavedForPrint === true && this.currentDocument.reportId){
+        if (value === true && this.isSavedForPrint === true && this.currentDocument.reportId) {
           this.isSavedForPrint = false
-          this.backService.createReport(this.currentDocument.reportId, "PDF", [this.currentDocument.id]).subscribe({
-              next: value => {
-                if (value.status === "ERROR") {
-                  this.messageService.show(value.message, value.message, ERROR)
-                }
-                if (value.status === "DONE" && value.reportFile.length > 0) {
-                  window.open("assets/report/" + value.reportFile, "_blank");
-                }
-                if (value.status === "PROCESS" && value.uuid.length > 0) {
-                  this.reportProcessUID = value.uuid
-                  this.messageService.show(MESSAGE_REPORT_IN_PROCESS, "", INFO).subscribe({
-                    next: value1 => {
-                      this.startReportTimer()
-                    }
-                  })
-                }
-
-              },
-              error: err => {
-                this.messageService.show(err, err, ERROR)
-              }
-            }
-          )
+          this.reportService.print(this.currentDocument.reportId, this.currentDocument.id)
         }
       }
     })
@@ -412,7 +384,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
 
   showComponentOnCurrentStep(stepNum: number) {
     this.firstComponentRef = undefined;
-    if(!this.steps[stepNum - 1]) return
+    if (!this.steps[stepNum - 1]) return
 
     let stepComponentList = this.steps[stepNum - 1].componentMaket
     stepComponentList.forEach(comp => {
@@ -433,7 +405,7 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       if (comp.componentType === IceComponentType.AREA)
         this.componentRef = this.itemsField.createComponent(AreaComponent);
       if (comp.componentType === IceComponentType.TABLE) {
-        console.log("comp.tableType ",comp.tableType)
+        console.log("comp.tableType ", comp.tableType)
         switch (comp.tableType) {
           // case 1:
           //   this.componentRef = this.itemsField.createComponent(InformationMainCounterpartiesTableComponent);
@@ -527,11 +499,13 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   updateDoc(docStatus: DocStat) {
-    console.log("this.currentDocument.status",this.currentDocument.status)
     if (!this.currentDocument || (this.currentDocument && this.currentDocument.status != 'CONTROL')) return
-    //this.currentDocument.status = docStatus
+
+    /**нужно залить доп атрибуты*/
+    this.setCurrentAttrib()
+
     this.updateDocument$ = this.backService.updateDocument(this.currentDocument).subscribe({
-    //this.updateDocument$ = this.backService.updateOnlyDate(this.currentDocument).subscribe({
+      //this.updateDocument$ = this.backService.updateOnlyDate(this.currentDocument).subscribe({
       next: (res => {
         if (docStatus === 'AGREE') {
           this.changeStatus(docStatus, "Отправлено клиенту на согласование")
@@ -617,14 +591,14 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   private docSaved(message: string, message2: string) {
-    if(this.tabChange$)
+    if (this.tabChange$)
       this.tabChange$.unsubscribe()
 
     this.tabChange$ = this.messageService.show(message, message2, INFO).subscribe(
       res => {
-      this.tabService.openTab(TAB_DOCUMENT_LIST)
-      this.currentDocument = undefined
-    })
+        this.tabService.openTab(TAB_DOCUMENT_LIST)
+        this.currentDocument = undefined
+      })
   }
 
   changeStatusWithReason(status: string) {
@@ -668,55 +642,28 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     this.updateDoc(this.currentDocument.status)
   }
 
-  // private getDataForPdf(): PDFDocObject[] {
-  //
-  //   let resultList: PDFDocObject[]
-  //   let asr = new AnketaScriptRule(this.currentDocument.docStep
-  //     .filter(item => item.visible === true)
-  //     .flatMap(value => value.componentMaket)
-  //     .filter(p => p.printRule.isPrint)
-  //     .sort((a, b) => a.printRule.order < b.printRule.order ? -1 : 1))
-  //   resultList = asr.getPrintRules()
-  //   return resultList
-  // }
+  private setCurrentAttrib() {
+    let rezObj: Object = {}
 
-  startReportTimer() {
-    this.reportInterval$ = interval(5000).subscribe(() => {
-      if (this.reportProcessUID) {
-        this.timeService.isBlocked = true
-        this.backService.getReportStatus(this.reportProcessUID).subscribe({
-          next: value => {
-            if (value.status === "ERROR") {
-              this.reportProcessUID = undefined
-              this.reportInterval$.unsubscribe()
-              this.messageService.show(value.message, value.message, ERROR)
-            }
-            if (value.status === "DONE" && value.reportFile.length > 0) {
-              this.reportProcessUID = undefined
-              this.reportInterval$.unsubscribe()
-              this.messageService.show(MESSAGE_REPORT_IS_DONE, "", INFO,["YES","NO"]).subscribe({
-                next: button => {
-                  if (button === "YES") {
-                    window.open("assets/report/" + value.reportFile, "_blank");
-                  }
-                }
-              })
-
-            }
-            if (value.status === "PROCESS" && value.uuid.length > 0) {
-              console.log(value)
-            }
-          },
-          error: err => {
-            this.messageService.show(err, err, ERROR)
-          },
-          complete: () => {
-            this.timeService.isBlocked = false
-          }
+    this.currentDocument.docStep
+      .map(item => item.componentMaket)
+      .flat()
+      .filter(item => item.customAttribName && item.value)
+      .map(item => {
+        Object.defineProperty(rezObj, item.customAttribName, {
+          value: item.value,
+          writable: true,
+          enumerable: true,
+          configurable: true
         })
-      }
-    })
+        Object.defineProperty(rezObj, item.customAttribName + "_column_name", {
+          value: item.customAttribColumnName,
+          writable: true,
+          enumerable: true,
+          configurable: true
+        })
+      })
 
+    this.currentDocument.customAttrib = rezObj
   }
-
 }

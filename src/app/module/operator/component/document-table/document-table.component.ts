@@ -1,8 +1,9 @@
 import {
   AfterViewInit,
-  ChangeDetectionStrategy, ChangeDetectorRef,
+  ChangeDetectionStrategy,
+  ChangeDetectorRef,
   Component,
-  EventEmitter,
+  EventEmitter, inject,
   OnInit,
   Output,
   ViewChild
@@ -17,18 +18,20 @@ import {
   DOCUMENT_NAME_LOAD_ERROR,
   DOCUMENT_REMOVE_ERROR,
   ERROR,
-  TAB_DOCUMENT_LIST, TAB_DOCUMENT_SHOW
+  TAB_DOCUMENT_LIST,
+  TAB_DOCUMENT_SHOW
 } from "../../../../constants";
 import {MessageService} from "../../../../services/message.service";
 import {TabService} from "../../../../services/tab.service";
-import {merge, of as observableOf} from 'rxjs';
-import {catchError, map, startWith, switchMap} from 'rxjs/operators';
+import {merge} from 'rxjs';
+import {map, startWith, switchMap} from 'rxjs/operators';
 import {animate, style, transition, trigger} from "@angular/animations";
 import {BankDocumentListComponent} from "../bank-document-list/bank-document-list.component";
 import {MatDialog, MatDialogRef} from "@angular/material/dialog";
 import {ComponentType} from "@angular/cdk/overlay";
 import {HistoryDialogComponent} from "../../../../component/history-dialog/history-dialog.component";
 import {DocumentService} from "../../../../services/document.service";
+import {ReportService} from "../../../../services/report.service";
 
 @Component({
   selector: 'app-document-table',
@@ -48,18 +51,20 @@ import {DocumentService} from "../../../../services/document.service";
   ]
 })
 export class DocumentTableComponent implements AfterViewInit, OnInit {
-  displayedColumns: string[] = ['id', 'docName','orgName','inn', 'createDate', 'statusDate','status', 'document', 'operation'];
+  reportService = inject(ReportService)
+
+  displayedColumns: string[] = ['id', 'docName', 'orgName', 'inn', 'createDate', 'statusDate', 'status', 'document', 'operation'];
   data: IceDocument[] = []
   length = 50;
   pageSize = 10;
   pageSizeOptions = [10, 25, 50];
-  statusList:{status: string , name: string}[] = []
+  statusList: { status: string, name: string }[] = []
 
   @ViewChild(MatPaginator) paginator: MatPaginator;
   @ViewChild(MatSort) sort: MatSort;
 
   @Output()
-  openDocId = new EventEmitter<{"rowId": number, "openType": OpenDocType}>()
+  openDocId = new EventEmitter<{ "rowId": number, "openType": OpenDocType }>()
   step: number;
   filterExpanded = false
   docName: string
@@ -81,8 +86,8 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
   ngOnInit(): void {
     this.statusList = this.documentService.getStatusListForSelect()
     this.tabService.onTabChanged().subscribe(tabNum => {
-       if (tabNum === TAB_DOCUMENT_LIST)
-         this.refreshData()
+      if (tabNum === TAB_DOCUMENT_LIST)
+        this.refreshData()
     })
   }
 
@@ -132,7 +137,7 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
   }
 
   editDoc(row: IceDocument) {
-    this.openDocId.next({rowId: row.id,openType: "EDIT"})
+    this.openDocId.next({rowId: row.id, openType: "EDIT"})
   }
 
   onInfoClick(statusText: string) {
@@ -183,14 +188,14 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
   }
 
   showDownloadedFile(id: number) {
-    let componentRef = this.openDialog(BankDocumentListComponent,dialogOpenAnimationDuration, dialogCloseAnimationDuration, id)
+    let componentRef = this.openDialog(BankDocumentListComponent, dialogOpenAnimationDuration, dialogCloseAnimationDuration, id)
     componentRef.componentInstance.documentRef = id
     componentRef.componentInstance.init()
 
   }
 
   openDialog<T>(component: ComponentType<T>, enterAnimationDuration: string, exitAnimationDuration: string, documentRef: number): MatDialogRef<T> {
-    return  this.dialog.open(component, {
+    return this.dialog.open(component, {
       width: '' + (window.innerWidth * 0.8) + 'px',
       height: '' + (window.innerHeight * 0.8) + 'px',
       enterAnimationDuration,
@@ -200,15 +205,20 @@ export class DocumentTableComponent implements AfterViewInit, OnInit {
 
 
   showDoc(row: IceDocument) {
-    this.openDocId.next({rowId: row.id,openType: "VIEW"})
+    this.openDocId.next({rowId: row.id, openType: "VIEW"})
   }
 
   openHistoryDialog(id: number) {
-    let componentRef = this.openDialog(HistoryDialogComponent,dialogOpenAnimationDuration, dialogCloseAnimationDuration, id)
+    let componentRef = this.openDialog(HistoryDialogComponent, dialogOpenAnimationDuration, dialogCloseAnimationDuration, id)
     componentRef.componentInstance.documentRef = id
   }
 
   openDocEditor() {
     this.tabService.openTab(TAB_DOCUMENT_SHOW)
+  }
+
+  printDoc(doc: IceDocument) {
+    console.log(doc)
+    this.reportService.print(doc.reportId, doc.id)
   }
 }
