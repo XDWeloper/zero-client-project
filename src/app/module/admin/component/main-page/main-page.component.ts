@@ -69,8 +69,16 @@ export class MainPageComponent implements OnInit, OnDestroy {
   currentDoc: DocumentTreeTempl
   currentStep: StepTreeTempl
   currentTemplate: IceDocumentMaket
-  workerMenuOpen = false
-  workerMenuPosition: { x: number, y: number }
+  // workerMenuOpen = false
+  // workerMenuPosition: { x: number, y: number }
+  isStretchRect = false
+  startStretchX: number = 0
+  startStretchY: number = 0
+  top: number = 0
+  left: number = 0
+  width: number = 0
+  height: number = 0
+
 
 
   @ViewChild('field', {read: ViewContainerRef})
@@ -368,9 +376,12 @@ export class MainPageComponent implements OnInit, OnDestroy {
   }
 
   private delete() {
+    console.log(...this.componentService.selectedComponentsId)
     this.documentService.removeSelectedComponents()
     this.componentService.removeSelectedComponent()
     this.componentService.clearSelectedComponentList()
+
+    console.log(...this.componentService.selectedComponentsId)
 
   }
 
@@ -542,4 +553,41 @@ export class MainPageComponent implements OnInit, OnDestroy {
       }
     })
   }
+
+  mouseMove($event: MouseEvent) {
+    if($event.buttons === 1 && this.componentService.dragOrResize === false) {
+      this.isStretchRect = true
+      this.width = $event.x - this.startStretchX
+      this.height = $event.y - this.startStretchY
+
+      if(this.width >= 0){
+        this.left = this.startStretchX
+      } else{
+        this.left = $event.x
+        this.width = -1 * this.width
+      }
+      if(this.height >= 0){
+        this.top = this.startStretchY
+      } else{
+        this.top = $event.y
+        this.height = -1 * this.height
+      }
+      this.componentService.stretchRect$.next({top: this.top,left: this.left,width: this.width, height: this.height})
+      this.componentService.isStretchRect = true
+
+    }
+  }
+
+  mouseDown($event: MouseEvent) {
+    if($event.buttons === 1) {
+      this.startStretchX = $event.x
+      this.startStretchY = $event.y
+    }
+  }
+
+   mouseUp($event: MouseEvent) {
+     this.isStretchRect = false
+     this.componentService.isStretchRect = false
+   }
+
 }

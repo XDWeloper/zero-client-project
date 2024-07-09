@@ -15,6 +15,7 @@ export class CellComponent implements OnInit{
   @Input()
   cellType: CellType
 
+
   @ViewChild('cell')
   private  cell: ElementRef | undefined
 
@@ -39,6 +40,7 @@ export class CellComponent implements OnInit{
     let bound = this.cell?.nativeElement.getBoundingClientRect()
     //if(event.x >= bound.left && event.x < bound.right &&  event.y >= bound.top && event.y < bound.bottom){
       this.cellService.cellSubject$.next({bound:bound, number: this.index, refresh: false})
+    console.log("from cell")
     this.componentService.clearSelectedComponentList()
     //}
 //    this.componentService.selectedComponent$.next(undefined)

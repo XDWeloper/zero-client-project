@@ -31,8 +31,8 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   defaultDragPosition = {x: 0, y: 0};
   width: number
   height: number
-  isResized = false
-  isDragged = false
+  private _isResized = false
+  private _isDragged = false
   private _isHover = false
 
 
@@ -45,6 +45,9 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   private tableResize$: Subscription
   private tableResizer$: Subscription
   private numObserv$: Subscription
+  private moveComponent$: Subscription
+  private stretchRect$: Subscription
+
   private resizeStartX: number
   private resizeStartY: number
   private isRightClicked = false
@@ -64,17 +67,45 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
   }
 
 
+  get isResized(): boolean {
+    return this._isResized;
+  }
+
+  set isResized(value: boolean) {
+    this._isResized = value;
+    this.componentService.dragOrResize = value
+  }
+
+  get isDragged(): boolean {
+    return this._isDragged;
+  }
+
+  set isDragged(value: boolean) {
+    this._isDragged = value;
+    this.componentService.dragOrResize = value
+  }
+
   ngAfterContentInit(): void {
     this.initObservables()
   }
 
   ngOnDestroy(): void {
-    // this.cellSubject$.unsubscribe()
-    // this.selectedComponent$.unsubscribe()
-    // this.tableResize$.unsubscribe()
-    // this.tableResizer$.unsubscribe()
-    // this.numObserv$.unsubscribe()
-  }
+    console.log("ngOnDestroy "+ this.componentID)
+  //   if(this.cellSubject$)
+  //     this.cellSubject$.unsubscribe()
+  //   if(this.selectedComponent$)
+  //     this.selectedComponent$.unsubscribe()
+  //   if(this.tableResize$)
+  //     this.tableResize$.unsubscribe()
+  //   if(this.tableResizer$)
+  //     this.tableResizer$.unsubscribe()
+  //   if(this.numObserv$)
+  //     this.numObserv$.unsubscribe()
+  //   if(this.moveComponent$)
+  //     this.moveComponent$.unsubscribe()
+  //   if(this.stretchRect$)
+  //     this.stretchRect$.unsubscribe()
+   }
 
   ngOnInit(): void {
     this.setSize()
@@ -87,6 +118,23 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
         this.dragPosition = {x: this.defaultDragPosition.x + value.deltaX, y: this.defaultDragPosition.y + value.deltaY};
       }
     })
+    this.componentService.stretchRect$.subscribe(value => {
+      let localX = value.left - this.tableCorrectX
+      let localY = value.top - this.tableCorrectY
+      if(localX < 0 || localY < 0) return
+      if(this.intersects({x:localX,y: localY, x1: localX + value.width,y1:localY + value.height},
+        {x:this.dragPosition.x,y: this.dragPosition.y, x1: this.dragPosition.x + this.width, y1:this.dragPosition.y + this.height}) === false) {
+        if(this.isSelected === false)
+          this.componentService.addComponentToSelectedList(this.componentID)
+      } else{
+         if(this.isSelected === true)
+           this.componentService.removeComponentFromSelectedList(this.componentID)
+      }
+    })
+  }
+
+  intersects( a: {x: number, y: number, x1: number, y1: number } , b: {x: number, y: number, x1: number, y1: number } ) {
+    return ( a.y > b.y1 || a.y1 < b.y || a.x1 < b.x || a.x > b.x1 );
   }
 
   setBound(val: DOMRect) {
@@ -175,7 +223,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
 
   @HostListener('window:mousemove', ['$event'])
   drag($event: MouseEvent) {
-    if (this.isResized === true) {
+    if (this._isResized === true) {
       this.width += $event.x - this.resizeStartX
       this.resizeStartX = $event.x
       if (this.componentType !== IceComponentType.INPUT && this.componentType !== IceComponentType.SELECT) {
@@ -199,7 +247,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
 
   @HostListener('window:mouseup', ['$event'])
   windowMouseUp() {
-    if (this.isResized === true) {
+    if (this._isResized === true) {
       this.isResized = false
       let hScale = this.height / this.cellService.getCellHeight()
       let wScale = this.width / this.cellService.getCellWidth()
@@ -240,21 +288,21 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
     })
 
     this.numObserv$ = this.numberObserve$.subscribe(v => {
-      if ((!this.isHover && !this.isDragged && !this.isSelected) || this.isHover) {
+      if ((!this.isHover && !this._isDragged && !this.isSelected) || this.isHover) {
         this.setDragPosition();
       }
     })
-
 
     this.tableResize$ = this.cellService.tableResize$.subscribe(val => {
       if (val !== null) {
         this.setBound(val)
       }
-    })
-
-    this.tableResizer$ = this.cellService.tableResizer$.subscribe(() => {
       this.correctToCellBound()
     })
+
+    // this.tableResizer$ = this.cellService.tableResizer$.subscribe(() => {
+    //   this.correctToCellBound()
+    // })
   }
 
   private setDragPosition() {
@@ -270,7 +318,7 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
     this.cellSubject$ = this.cellService.cellSubject$.subscribe(val => {
       if (val === null) return
 
-      if ((this.isSelected && !this.isResized && !this.isRightClicked)) {
+      if ((this.isSelected && !this._isResized && !this.isRightClicked)) {
         if(this.isHover) {
           this.currentCell = this.cellService.getCellBound(val.number)
           this.cellNumber = val.number
@@ -302,7 +350,6 @@ export class MaketComponent extends IceMaketComponent implements OnInit, OnDestr
     if (this.componentType !== IceComponentType.TEXT)
       this.value = undefined
   }
-
 
   dragEnd() {
     this.draggedPrepare = false

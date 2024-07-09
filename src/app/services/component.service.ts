@@ -10,16 +10,19 @@ import {ComponentChangeValue, ComponentMaket, IceComponent} from "../interfaces/
 })
 export class ComponentService {
 
+  dragOrResize = false
   private _componentCollection: ComponentRef<IceMaketComponent>[] = new Array()
   private _selectedComponentsId: number[] = []
   private _copyBufferMaket: ComponentMaket[] = []
 
   selectedComponent$ = new Subject<number[]>()
+  stretchRect$ = new Subject<{top: number, left: number, width: number, height: number}>()
   moveComponent$ = new Subject<{id: number, deltaX: number, deltaY: number}>()
   rightClick$ = new Subject<any>()
   selectedDocumentComponent$ = new Subject<IceComponent>()
   changeValue$ = new ReplaySubject<ComponentChangeValue>(undefined)
   isModifyed$ = new Subject<boolean>()
+  isStretchRect: boolean = false;
 
   constructor() {
   }
@@ -34,12 +37,22 @@ export class ComponentService {
   }
 
   addComponentToSelectedList(id: number){
+    console.log("addComponentToSelectedList = " + id)
     if(this._selectedComponentsId.includes(id)) return
     this._selectedComponentsId.push(id)
     this.selectedComponent$.next(this._selectedComponentsId)
   }
 
+  removeComponentFromSelectedList(id: number){
+    if(!this._selectedComponentsId.includes(id)) return
+    this._selectedComponentsId.splice(this._selectedComponentsId.findIndex(item => item === id),1)
+    this.selectedComponent$.next(this._selectedComponentsId)
+  }
+
+
+
   clearSelectedComponentList(){
+    if(this.isStretchRect === true) return
     this._selectedComponentsId.splice(0, this._selectedComponentsId.length)
     this.selectedComponent$.next(this._selectedComponentsId)
   }
@@ -74,7 +87,8 @@ export class ComponentService {
     let comp = this._componentCollection.find(c => c.instance.componentID === componentID)
     let index = this._componentCollection.findIndex(c => c.instance.componentID === componentID)
     this._componentCollection.splice(index, 1)
-    comp.destroy()
+    if(comp)
+      comp.destroy()
   }
 
   removeSelectedComponent(){
@@ -83,7 +97,8 @@ export class ComponentService {
 
   getComponent(componentID: number): IceMaketComponent | undefined{
     if(componentID === undefined) return undefined
-    return  this._componentCollection.find(c => c.instance.componentID === componentID).instance
+    let x = this._componentCollection.find(c => c.instance.componentID === componentID)
+    return x ? x.instance : undefined
   }
 
   getComponentListSize(): number {

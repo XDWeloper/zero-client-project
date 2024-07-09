@@ -65,7 +65,8 @@
           </div>
 
           <!--            это поле элементов-->
-          <div class="border border-primary-base w-[90%] m-auto mt-0 boundary"
+          <div class="border border-primary-base w-[90%] m-auto mt-0 boundary relative"
+               (mousemove)="mouseMove($event)" (mousedown)="mouseDown($event)" (mouseup)="mouseUp($event)"
                #splitMainContainer id="mainContainer">
             <ng-template #field></ng-template>
             <div class="w-full grid grid-cols-12 gap-y-0.5">
@@ -76,6 +77,13 @@
               </div>
             </div>
           </div>
+
+          <div class="absolute opacity-30 bg-info-base z-50"
+               *ngIf="isStretchRect === true"
+               [style.top.px]="top" [style.left.px]="left" [style.width.px]="width" [style.height.px]="height"
+          ></div>
+
+
         </div>
         <app-right-click-menu *ngIf="!isMenuHidden"
                               [x]="xPosTabMenu"
@@ -112,5 +120,6 @@
 
 
 <div *ngIf="isBlock" class="absolute top-0  left-0 w-screen h-screen z-100000 bg-gray-400 opacity-50"></div>
+
 
 
