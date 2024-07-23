@@ -40,6 +40,7 @@ export const CHANGE_STATUS_TO_REJECT = "Документ отвергнут"
 export const GET_DOCUMENT_STATUS_HISTORY_ERROR = "Ошибка получения истории изменения статусов"
 
 export const SET_COMPONENT_NAME_DUPLICATE = "Данное имя компонента уже используется"
+export const ERROR_COMPONENT_NAME_DUPLICATE = "Внимание!!! Найдены одинаковые имена компонентов.Это может привести к нестабильной работе приложения. Продолжить сохранение?"
 export const MAKET_CLOSE_NOT_SAVE = "Не сохраненные данные будут утеряны. Хотите сохранить?"
 export const MAKET_CLOSE_NOT_SAVE_FULL_MESSAGE = "Если хотите сохранить изменения нажмите кнопку ДА."
 export const MESSAGE_NO_DOCUMENT = "Здравствуйте уважаемый клиент! <br> У вас еще не создано ни одного документа.<br> Для продолжения работы нажмите на кнопку 'Создать документ'"

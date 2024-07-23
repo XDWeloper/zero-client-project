@@ -14,10 +14,10 @@ import {MessageService} from "../../../../services/message.service";
 import {
   dialogCloseAnimationDuration,
   dialogOpenAnimationDuration,
-  ERROR,
+  ERROR, ERROR_COMPONENT_NAME_DUPLICATE,
   INFO,
   MAKET_DELETE_ERROR,
-  MAKET_NAME_LOAD_ERROR
+  MAKET_NAME_LOAD_ERROR, SET_COMPONENT_NAME_DUPLICATE
 } from "../../../../constants";
 import {ComponentService} from "../../../../services/component.service";
 import {ComponentType} from "@angular/cdk/overlay";
@@ -380,6 +380,28 @@ export class DocumentComponent implements OnInit {
       this.documentService.addTemplate(this.currentDocument, this.currentStep, this.componentService.componentCollection)
     }
 
+    if (this.currentDocument) {
+      /**проверить наличие дубликатов имен*/
+      let duplicateList = this.documentService.findDuplicate(this.currentDocument.id)
+      if (duplicateList.length > 0) {
+        let resString = duplicateList.map(item => "Страница: " + item.page + " - компонент: " + item.componentName).join("<br>")
+        this.messageService.show(ERROR_COMPONENT_NAME_DUPLICATE, resString, "ERROR", ["YES", "NO"])
+          .subscribe(value => {
+            if (value === "NO")
+              return
+            else
+              this.save()
+          })
+      } else{
+        this.save()
+      }
+    } else{
+      this.save()
+    }
+
+  }
+
+  save(){
     this.documentService.getDocumentMaketList().filter(p => p.isModified).forEach(m => {
       let modifyedMaket = this.documentService.getTemplateByDocId(m.id)
       if (modifyedMaket.docId < 0) {
@@ -408,7 +430,6 @@ export class DocumentComponent implements OnInit {
         })
       }
     })
-
   }
 
   uploadCurrentMaket() {

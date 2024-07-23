@@ -1,9 +1,11 @@
 import {ComponentRef, inject, Injectable} from '@angular/core';
 import {
-  ComponentMaket, DocStatus,
+  ComponentMaket,
+  DocStatus,
   DocumentTreeTempl,
   IceDocumentMaket,
-  IceStepMaket, StepControl,
+  IceStepMaket,
+  StepControl,
   StepTreeTempl
 } from "../interfaces/interfaces";
 import {IceMaketComponent} from "../module/admin/classes/icecomponentmaket";
@@ -11,14 +13,18 @@ import {IceComponentType} from "../constants";
 import {saveAs} from "file-saver";
 import {ComponentService} from "./component.service";
 
+type Duplicate = {page: string, componentName: string}
+
 @Injectable({
   providedIn: 'root'
 })
+
 export class DocumentService {
   docTree: DocumentTreeTempl[] = []
   templateList: Array<IceDocumentMaket> = []
   lastComponentIndex = 0
   statusList:{status: string , name: string}[] = []
+
 
   private componentService = inject(ComponentService)
 
@@ -183,6 +189,44 @@ export class DocumentService {
         isStepPresent.isToolBar = step.isToolBar
       }
     }
+  }
+
+  findDuplicate(docId: number): Array<Duplicate> {
+    let res: Array<Duplicate>  = new Array<Duplicate>()
+    let duplicateList: string[] = []
+    let maket:IceDocumentMaket = this.templateList.find(p => p.docId === docId)
+
+    console.log("maket",maket)
+
+
+    if(maket){
+      let componentNameCollection = maket.docStep
+        .map(item => item.componentMaket)
+        .flat()
+        .filter(item => item.componentType != IceComponentType.TEXT)
+        .map(item => item.componentName)
+      console.log("componentNameCollection", componentNameCollection)
+      componentNameCollection.forEach(item => {
+        if(componentNameCollection.filter(name => name === item).length > 1 && !duplicateList.includes(item)) {
+          console.log("push duplicate ", item)
+          duplicateList.push(item)
+        }
+      })
+      console.log("duplicateList",duplicateList)
+      if(duplicateList.length > 0){
+        duplicateList.forEach(duplicateName =>{
+          maket.docStep.forEach(page => {
+            page.componentMaket.forEach(c => {
+              if(c.componentName === duplicateName){
+                res.push({page: page.stepName, componentName: duplicateName})
+              }
+            })
+          })
+        })
+        console.log("res",res)
+      }
+      }
+    return res
   }
 
   getTemplateByDocId(docId: number): IceDocumentMaket {
