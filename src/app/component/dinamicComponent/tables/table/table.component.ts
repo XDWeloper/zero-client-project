@@ -1,5 +1,5 @@
 import {AfterViewInit, ChangeDetectionStrategy, ChangeDetectorRef, Component} from '@angular/core';
-import {CommonModule} from '@angular/common';
+import {CommonModule, DatePipe} from '@angular/common';
 import {MatIconModule} from "@angular/material/icon";
 import {
   ComponentBound,
@@ -190,4 +190,13 @@ export class TableComponent implements IceComponent, AfterViewInit{
   update(): void {
   }
 
+  protected readonly Date = Date;
+
+  // getDate(tableDatumElement: any): Date {
+  //   console.log(tableDatumElement)
+  //   DatePipe.transform(tableDatumElement, "yyyy-MM-dd")
+  //   let res = new Date(tableDatumElement)
+  //   console.log(res)
+  //   return res
+  // }
 }

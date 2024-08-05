@@ -250,7 +250,7 @@ export class SubHeader {
 }
 
 export class TableColumn {
-  columnType?: "area" | "input"
+  columnType?: "area" | "input" | "date"
   columnMask?: string
   defaultValue?: string
 }

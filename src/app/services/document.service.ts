@@ -196,7 +196,7 @@ export class DocumentService {
     let duplicateList: string[] = []
     let maket:IceDocumentMaket = this.templateList.find(p => p.docId === docId)
 
-    console.log("maket",maket)
+    //console.log("maket",maket)
 
 
     if(maket){
@@ -205,14 +205,14 @@ export class DocumentService {
         .flat()
         .filter(item => item.componentType != IceComponentType.TEXT)
         .map(item => item.componentName)
-      console.log("componentNameCollection", componentNameCollection)
+      //console.log("componentNameCollection", componentNameCollection)
       componentNameCollection.forEach(item => {
         if(componentNameCollection.filter(name => name === item).length > 1 && !duplicateList.includes(item)) {
-          console.log("push duplicate ", item)
+          //console.log("push duplicate ", item)
           duplicateList.push(item)
         }
       })
-      console.log("duplicateList",duplicateList)
+      //console.log("duplicateList",duplicateList)
       if(duplicateList.length > 0){
         duplicateList.forEach(duplicateName =>{
           maket.docStep.forEach(page => {
@@ -223,7 +223,7 @@ export class DocumentService {
             })
           })
         })
-        console.log("res",res)
+        //console.log("res",res)
       }
       }
     return res

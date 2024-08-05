@@ -1,7 +1,8 @@
 <!--[ngClass]="{'border':frameColor}"-->
-<div class="absolute z-10 flex flex-col border mt-2"
+<div class="absolute z-10 flex flex-col border mt-1 ml-1"
      [ngStyle]="{'height.px':height,'width.px':width}"
-     [style.top.px]="top" [style.left.px]="left" [style.border-color]="frameColor">
+     [style.top.px]="top" [style.left.px]="left" [style.border-color]="frameColor"
+     xmlns:date="http://www.w3.org/1999/xhtml" xmlns:date="http://www.w3.org/1999/xhtml">
 
   <div class="flex-1 overflow-auto"> <!--  таблица-->
     <ng-container [ngTemplateOutlet]="TableTemplate"></ng-container>
@@ -9,7 +10,8 @@
 
   <!--  Кнопки управления-->
 
-  <div class="flex-none  flex justify-start items-center border bg-primary-dark" [style.border-color]="frameColor" *ngIf="enabled">
+  <div class="flex-none  flex justify-start items-center border bg-primary-dark" [style.border-color]="frameColor"
+       *ngIf="enabled">
     <mat-icon class="text-green-500 cursor-pointer" matTooltip="Добавить строку" (click)="addRow()">add</mat-icon>
     <mat-icon class="text-error-base cursor-pointer" matTooltip="Удалить строку" (click)="removeRow()">remove</mat-icon>
     <mat-icon class="text-error-base cursor-pointer" matTooltip="Очистить таблицу" (click)="clearTable()">close
@@ -35,7 +37,8 @@
            'min-height': headerMaxHeight + 'px'}"></div>
       <div class="flex">
         <div class=""
-             [ngClass]="subHeader.width ?  '': 'flex-1'" [ngStyle]="{'width': (subHeader.width ? subHeader.width : '100') + '%'}"
+             [ngClass]="subHeader.width ?  '': 'flex-1'"
+             [ngStyle]="{'width': (subHeader.width ? subHeader.width : '100') + '%'}"
              *ngFor="let subHeader of header.subHeader; let i = index">
           <div class="text-center border-b border-b-black subHeadClass text-balance"
                [ngClass]="{'border-r border-r-black': header.subHeader.length > (i + 1)  }"
@@ -48,19 +51,23 @@
            'font-size': subHeader.fontSize + 'px',
            'min-height': subHeaderMaxHeight + 'px'}"></div>
 
-          <div class="overflow-auto">
-            <div *ngFor="let row of tableData; let rowIndex = index">
-              <div [ngSwitch]="subHeader.column.columnType" class=""
-                   [ngClass]="{'border-r border-r-black': header.subHeader.length > (i + 1)  }">
-                <ng-template ngSwitchCase="area"><textarea class="w-full h-full border"
+          <div class="">
+            <div *ngFor="let row of tableData; let rowIndex = index" class="w-full h-20 border">
+              <div [ngSwitch]="subHeader.column.columnType" class="w-full h-full"
+                   [ngClass]="{'border-r border-r-black': header.subHeader.length > (i + 1)}">
+                <ng-template ngSwitchCase="area"><textarea class="w-full h-full"
                                                            style="resize: none"
                                                            [value]="subHeader.column.defaultValue"
                                                            [mask]="subHeader.column.columnMask"
                                                            [(ngModel)]="tableData[rowIndex][subHeader.order]"
                                                            (change)="setValue()"></textarea></ng-template>
-                <ng-template ngSwitchCase="input"><input class="w-full h-full border"
+                <ng-template ngSwitchCase="input" ><input class="w-full h-full"
                                                          [value]="subHeader.column.defaultValue"
                                                          [mask]="subHeader.column.columnMask"
+                                                         [(ngModel)]="tableData[rowIndex][subHeader.order]"
+                                                         (change)="setValue()"/></ng-template>
+                <ng-template ngSwitchCase="date" ><input class="w-full h-full"
+                                                         type="date"
                                                          [(ngModel)]="tableData[rowIndex][subHeader.order]"
                                                          (change)="setValue()"/></ng-template>
               </div>
