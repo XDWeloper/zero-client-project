@@ -5,6 +5,7 @@ import {RouterModule} from "@angular/router";
 import {FormsModule} from "@angular/forms";
 import {NgxMaskDirective} from "ngx-mask";
 import {IceInputComponent} from "../share-component/ice-input/ice-input.component";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 
 
@@ -20,6 +21,7 @@ import {IceInputComponent} from "../share-component/ice-input/ice-input.componen
         FormsModule,
         NgxMaskDirective,
         IceInputComponent,
+        MatTooltipModule,
     ]
 })
 export class LossPassModule { }

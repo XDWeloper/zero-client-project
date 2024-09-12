@@ -12,14 +12,13 @@ import {
 import {CellService} from "../../../services/cell.service";
 import {ComponentService} from "../../../services/component.service";
 import {
-  AlertColor,
   dialogCloseAnimationDuration,
   dialogOpenAnimationDuration,
   IceComponentType
 } from "../../../constants";
 import {Subscription} from "rxjs";
 import {MatDialog} from "@angular/material/dialog";
-import {ChangePlaceDialogComponent, LevelClass} from "../../change-place-dialog/change-place-dialog.component";
+import {ChangePlaceDialogComponent } from "../../change-place-dialog/change-place-dialog.component";
 
 @Component({
   selector: 'app-address',
@@ -199,5 +198,4 @@ export class AddressComponent implements IceComponent, OnDestroy {
     this.changeDetection.detectChanges()
   }
 
-  protected readonly AlertColor = AlertColor;
 }

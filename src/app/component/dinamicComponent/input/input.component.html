@@ -10,7 +10,7 @@
     [maxlength]="maxLength" [minlength]="minLength" [max]="maxVal" [min]="minVal" [matTooltip]="checkedText"
     *ngIf="inputType !== 'checkbox' && inputType !== 'number' && inputType !== 'summ'"
     [id]="componentID"
-    [disabled]="!enabled"
+    [disabled]="!enabled" autocomplete="off"
     type="{{inputType}}" placeholder="{{placeHolder}}" [(ngModel)]="value" (click)="select($event)" [mask]="regExp">
 
   <input
@@ -19,6 +19,7 @@
     *ngIf="inputType === 'summ'"
     [id]="componentID"
     [disabled]="!enabled"
+    autocomplete="off"
     thousandSeparator=" "
     decimalMarker=","
   type="text" placeholder="{{placeHolder}}" [(ngModel)]="value" (click)="select($event)" [mask]="'separator.2'" >
@@ -29,6 +30,7 @@
     *ngIf="inputType === 'number'"
     [id]="componentID"
     [disabled]="!enabled"
+    autocomplete="off"
     thousandSeparator=" "
     decimalMarker=","
   type="text" placeholder="{{placeHolder}}" [(ngModel)]="value" (click)="select($event)" [mask]="'separator.0'" >

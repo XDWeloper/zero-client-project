@@ -7,22 +7,24 @@ import {FormsModule, ReactiveFormsModule} from "@angular/forms";
 import {NgxMaskDirective} from "ngx-mask";
 import {IceInputComponent} from "../share-component/ice-input/ice-input.component";
 import {MatSlideToggleModule} from "@angular/material/slide-toggle";
+import {MatTooltipModule} from "@angular/material/tooltip";
 
 @NgModule({
     declarations: [
         RegisterComponent,
     ],
-  imports: [
-    CommonModule,
-    RouterModule.forChild([
-      {path: '', component: RegisterComponent}
-    ]),
-    MatInputModule,
-    FormsModule,
-    NgxMaskDirective,
-    ReactiveFormsModule,
-    IceInputComponent,
-    MatSlideToggleModule,
-  ]
+    imports: [
+        CommonModule,
+        RouterModule.forChild([
+            {path: '', component: RegisterComponent}
+        ]),
+        MatInputModule,
+        FormsModule,
+        NgxMaskDirective,
+        ReactiveFormsModule,
+        IceInputComponent,
+        MatSlideToggleModule,
+        MatTooltipModule,
+    ]
 })
 export class RegisterModule { }

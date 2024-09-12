@@ -5,6 +5,7 @@
          [ngClass] = "{'border':localBorderColor}" *ngIf="visible"
          [matTooltip]="placeHolder">
   <textarea
+    autocomplete="off"
     [id]="componentID"  [disabled] ="!enabled" [matTooltip]="checkedText"
     class="h-full w-full bg-white hover:border hover:border-primary-base resize-none dark:bg-slate-700 dark:text-white p-2 rounded-lg"
     placeholder="{{placeHolder}}" [(ngModel)]="value" (click)="changeComponent()" [maxlength]="maxLength" [minlength]="minLength"></textarea>

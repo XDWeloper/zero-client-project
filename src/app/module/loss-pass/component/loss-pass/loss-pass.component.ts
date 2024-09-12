@@ -227,4 +227,7 @@ export class LossPassComponent implements OnDestroy{
 
   }
 
+  exit() {
+    this.router.navigate([''])
+  }
 }

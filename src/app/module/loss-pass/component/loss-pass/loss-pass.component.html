@@ -1,6 +1,13 @@
 <div class="w-screen h-screen bg-gray-200 flex justify-center items-center dark:bg-dark-background ">
   <div *ngIf="pinResult === undefined"
-    class="bg-white dark:bg-slate-900 border border-primary-light p-2 w-[30%] rounded-lg shadow-gray-500 shadow-2xl min-w-fit">
+    class="bg-white dark:bg-slate-900 border border-primary-light p-2 w-[30%] rounded-lg shadow-gray-500 shadow-2xl min-w-fit relative">
+
+    <p class="absolute left-2 top-1 cursor-pointer text-error-base " (click)="exit()" [matTooltip]="'Отмена'">
+      <svg class="h-8 w-8 text-error-base"  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"/>
+      </svg>
+    </p>
+
     <p class="text-center text-lg dark:text-white w-full"><span class="text-error-base">&#10008;</span> Сброс пароля</p>
     <app-ice-input  label="Телефон" (value)="phone = $event" [inputType]="'phone'" [errorText]="phone_error"
                     [toolTip]="loginPasswordProperties ? loginPasswordProperties.loginValidatorHint : ''"></app-ice-input>

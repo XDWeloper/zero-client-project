@@ -237,4 +237,8 @@ export class RegisterComponent implements OnDestroy {
       return false;
     }
   }
+
+  exit() {
+    this.router.navigate([''])
+  }
 }
