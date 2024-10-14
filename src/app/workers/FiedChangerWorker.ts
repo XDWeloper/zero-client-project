@@ -2,7 +2,7 @@ import {ComponentMaket, DialogType, IceDocument, IceStepMaket} from "../interfac
 import {Action, ActionObjectType, IActionGroup, IceWorker, WorkerType} from "./workerModel";
 import {DataSourceMap, DataSourceService} from "../services/data-source.service";
 import {MessageService} from "../services/message.service";
-import {functionNameAndDescription, IceComponentType} from "../constants";
+import {functionNameAndDescription, IceComponentType, MESSAGE_DATA_SOURCE_ERROR} from "../constants";
 import {DocumentEditorComponent} from "../module/client/component/document-editor/document-editor.component";
 import {WorkerService} from "../services/worker.service";
 import {computeStartOfLinePositions} from "@angular/compiler-cli/src/ngtsc/sourcemaps/src/source_file";
@@ -64,7 +64,7 @@ export class FieldWorker extends IceWorker {
         WorkerService.instance.isWorkerStarted$.next(false)
         console.log(error)
         let messageType:DialogType = error.error.status === 500 ? "ERROR" : "INFO"
-        MessageService.instance.show(`${error.error.message}`, error.error.message, messageType)
+        MessageService.instance.show(MESSAGE_DATA_SOURCE_ERROR, error.error.message, messageType)
       }),
     })
 

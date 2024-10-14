@@ -48,6 +48,8 @@ export const MESSAGE_NO_DOCUMENT = "Здравствуйте уважаемый 
 export const MESSAGE_REPORT_IN_PROCESS = "Продолжается формирование отчета. По окончании вы получите уведомление."
 export const MESSAGE_REPORT_IS_DONE = "Отчет сформирован. Открыть?"
 
+export const MESSAGE_DATA_SOURCE_ERROR = "Сервис временно недоступен. Перезайдите в Личный кабинет или попробуйте позже."
+
 
 export const ERROR = "ERROR"
 export const INFO = "INFO"
