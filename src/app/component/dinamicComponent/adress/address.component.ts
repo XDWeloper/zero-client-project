@@ -146,7 +146,7 @@ export class AddressComponent implements IceComponent, OnDestroy {
     componentRef.componentInstance.placeList.subscribe({
       next: (val: { placeList: PlaceObject[], placeString: string }) => this.value = val
     })
-    if (this.value)
+    if (this.value && Array.isArray(this.value.placeList))
       componentRef.componentInstance.reCreatedLevels(this.value.placeList.filter((i: PlaceObject) => i))
   }
 

@@ -548,6 +548,11 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
         errorStr = "Не заполнено обязательное поле."
     }
 
+    /**Если поле не обязательно и не заполнено, то проверку на валидность не проводим */
+    if (!currentComponent.required && (!value || (value && value.length < 1)))
+      return errorStr
+
+
     if (currentComponent.componentType === IceComponentType.AREA
       || (currentComponent.componentType === IceComponentType.INPUT && currentComponent.inputType === 'text')) {
       if (currentComponent.maxLength != undefined && value.length > currentComponent.maxLength)

@@ -365,11 +365,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       if (this.currentDebounce != this.defaultDebounce)
         this.currentDebounce = this.defaultDebounce
 
-      if (this.currentStepIndex === undefined)
+      if(this.currentStepIndex === undefined || this.steps === undefined || this.steps.length < 1)
         return;
 
-      if(this.currentStepIndex === undefined)
-        return;
       let currentComponent = this.steps[this.currentStepIndex].componentMaket.find(c => c.componentID === item.componentId)
       if (!currentComponent) return
 
@@ -676,6 +674,11 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
       if (currentComponent.required && (!value || (value && value.length < 1)))
         errorStr = "Не заполнено обязательное поле."
     }
+
+    /**Если поле не обязательно и не заполнено, то проверку на валидность не проводим */
+    if (!currentComponent.required && (!value || (value && value.length < 1)))
+      return errorStr
+
 
     if (currentComponent.componentType === IceComponentType.AREA
       || (currentComponent.componentType === IceComponentType.INPUT && currentComponent.inputType === 'text')) {
