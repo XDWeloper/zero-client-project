@@ -64,7 +64,9 @@ export class FieldWorker extends IceWorker {
         WorkerService.instance.isWorkerStarted$.next(false)
         console.log(error)
         let messageType:DialogType = error.error.status === 500 ? "ERROR" : "INFO"
-        MessageService.instance.show(error.error.status != 428 ?  MESSAGE_DATA_SOURCE_ERROR : error.error.message, error.error.message, messageType)
+        MessageService.instance.show(error.error.status != 428 && error.error.status != 404
+          ?  MESSAGE_DATA_SOURCE_ERROR : error.error.message
+          , error.error.message, messageType)
       }),
     })
 
