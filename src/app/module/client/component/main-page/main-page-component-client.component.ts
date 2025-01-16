@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnDestroy, OnInit, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, HostListener, OnDestroy, OnInit, ViewChild} from '@angular/core';
 import {User} from "../../../../model/User";
 import {DOCUMENT_LOAD_ERROR, ERROR, TAB_DOCUMENT_LIST, TAB_DOCUMENT_SHOW} from "../../../../constants";
 import {MessageService} from "../../../../services/message.service";
@@ -158,6 +158,11 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy, OnInit
     } else{
       this.tabService.openTab(TAB_DOCUMENT_LIST)
     }
+  }
+
+  @HostListener('window:popstate', ['$event'])
+  onPopState() {
+    this.openDocList()
   }
 
 }

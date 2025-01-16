@@ -93,6 +93,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   @Input() maketId: number | undefined
 
   @Input() set isOpenedTab(value: boolean) {
+    // Обнулить историю
+    history.pushState(null, '');
+
     if (value === false)
       this.currentDocument = undefined
 
@@ -111,7 +114,6 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   }
 
   @Input() set currentDocument(value: IceDocument | undefined) {
-    //console.log("set currentDocument: ", value)
     this._currentDocument = value;
     this.commentText = ""
     this.currentComponent = undefined
@@ -240,28 +242,12 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
     this.checkedText = ""
     this.validatonTextClear()
 
-    // if (this._currentStepIndex != value && this.openType === "EDIT" /*&& value != 0*/) {
-    //   this.saveDoc(this.currentDocument.status, 0)
-    // }
-
-
     if (this.itemsField)
       this.itemsField.clear()
     this.showComponentOnCurrentStep(value + 1)
 
     this.checkStepComponent();
     this.checkRequiredOnCurrentStep()
-
-    // /**Создаем событие открытие страницы*/
-    // if(!this.eventService.isWorkerResize && value != this._currentStepIndex) {
-    //   console.log("value",value)
-    //   console.log("_currentStepIndex",this._currentStepIndex)
-    //   console.log("this.steps",this.steps)
-    //   this.eventService.launchEvent(EventObject.ON_STEP_OPEN, this.currentDocument, this.steps[value].stepEvent)
-    // }
-    // else
-    //    this.eventService.isWorkerResize = false
-
     this._currentStepIndex = value;
 
   }

@@ -82,6 +82,9 @@ export class DocumentEditorComponent implements AfterViewChecked, OnDestroy, OnI
   isSavedForPrint = false
 
   @Input() set currentDocument(value: IceDocument | undefined) {
+    // Обнулить историю
+    history.pushState(null, '');
+
     this._currentDocument = value;
     this.commentText = ""
     this.currentComponent = undefined

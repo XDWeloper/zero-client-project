@@ -1,4 +1,4 @@
-import {AfterViewInit, Component, OnDestroy, ViewChild} from '@angular/core';
+import {AfterViewInit, Component, HostListener, OnDestroy, ViewChild} from '@angular/core';
 import {User} from "../../../../model/User";
 import {DOCUMENT_LOAD_ERROR, ERROR, TAB_DOCUMENT_LIST, TAB_DOCUMENT_SHOW} from "../../../../constants";
 import {MessageService} from "../../../../services/message.service";
@@ -117,10 +117,8 @@ export class MainPageComponentClient implements AfterViewInit, OnDestroy {
     }
   }
 
-  // openDocList() {
-  //   /**Нужно сохранить документ если были изменения*/
-  //   if(DocumentEditorComponent.instance.currentDocument.changed)
-  //     DocumentEditorComponent.instance.updateDoc(DocumentEditorComponent.instance.currentDocument.status)
-  //   this.tabService.openTab(TAB_DOCUMENT_LIST)
-  // }
+  @HostListener('window:popstate', ['$event'])
+  onPopState() {
+    this.openDocList()
+  }
 }
