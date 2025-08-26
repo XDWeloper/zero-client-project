@@ -1,28 +1,21 @@
 import {Component, EventEmitter, Input, OnInit, Output} from '@angular/core';
 import {NestedTreeControl} from "@angular/cdk/tree";
 import {MatTreeNestedDataSource} from "@angular/material/tree";
-import {
-  ComponentMaket,
-  DocumentTreeTempl,
-  IceDocumentMaket,
-  ResponseTree,
-  StepTreeTempl
-} from "../../../../interfaces/interfaces";
+import {DocumentTreeTempl, IceDocumentMaket, ResponseTree, StepTreeTempl} from "../../../../interfaces/interfaces";
 import {DocumentService} from "../../../../services/document.service";
 import {BackendService} from "../../../../services/backend.service";
 import {MessageService} from "../../../../services/message.service";
 import {
   dialogCloseAnimationDuration,
   dialogOpenAnimationDuration,
-  ERROR, ERROR_COMPONENT_NAME_DUPLICATE,
+  ERROR,
+  ERROR_COMPONENT_NAME_DUPLICATE,
   INFO,
   MAKET_DELETE_ERROR,
-  MAKET_NAME_LOAD_ERROR, SET_COMPONENT_NAME_DUPLICATE
+  MAKET_NAME_LOAD_ERROR
 } from "../../../../constants";
 import {ComponentService} from "../../../../services/component.service";
-import {ComponentType} from "@angular/cdk/overlay";
-import {MatDialog, MatDialogRef} from "@angular/material/dialog";
-import {BankDocumentListComponent} from "../../../operator/component/bank-document-list/bank-document-list.component";
+import {MatDialog} from "@angular/material/dialog";
 import {DocumentSettingsComponent} from "../document-settings/document-settings.component";
 import {StepSettingsComponent} from "../step-settings/step-settings.component";
 import {ModifiedService} from "../../../../services/modified.service";
@@ -289,6 +282,7 @@ export class DocumentComponent implements OnInit {
       this.refreshTree()
     }
     this.clearEditStepData();
+    this.documentService.getDocById(stepHover.parentId).isModified = true
   }
 
   private clearEditStepData() {
@@ -318,7 +312,28 @@ export class DocumentComponent implements OnInit {
           currentDocumentId: undefined
         })
     }
+  }
 
+  addStepFromStepBefore(stepHover: StepTreeTempl) {
+    this.isModified = true
+
+    let doc = this.documentService.getDocById(stepHover.parentId)
+
+    this.currentEditStep = {
+      num: stepHover.num,
+      name: "Страница доб.",
+      parentId: doc.id,
+      visible: true,
+      isToolBar: true
+    }
+
+    this.documentService.insertStep(this.currentEditStep)
+    this.refreshTree()
+    this.currentDocument = this.documentService.getDocById(doc.id)
+    this.currentDocument.isModified = true
+
+    this.currentEditDoc = undefined
+    this.currentEditStep = undefined
   }
 
   editStep(stepHover: StepTreeTempl) {
@@ -392,16 +407,16 @@ export class DocumentComponent implements OnInit {
             else
               this.save()
           })
-      } else{
+      } else {
         this.save()
       }
-    } else{
+    } else {
       this.save()
     }
 
   }
 
-  save(){
+  save() {
     this.documentService.getDocumentMaketList().filter(p => p.isModified).forEach(m => {
       let modifyedMaket = this.documentService.getTemplateByDocId(m.id)
       if (modifyedMaket.docId < 0) {
@@ -469,7 +484,7 @@ export class DocumentComponent implements OnInit {
   // }
 
   stepSettings(stepNode: StepTreeTempl) {
-    let componentRef = openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration, StepSettingsComponent,this.dialog)
+    let componentRef = openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration, StepSettingsComponent, this.dialog)
     componentRef.componentInstance.currentStep = this.documentService
       .getTemplateByDocId(stepNode.parentId)
       .docStep.find(item => item.stepNum === stepNode.num)
@@ -485,7 +500,7 @@ export class DocumentComponent implements OnInit {
 
   documentSettings(docNode: DocumentTreeTempl) {
     let currentMaket: IceDocumentMaket = this.documentService.getTemplateByDocId(docNode.id)
-    let componentRef = openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration, DocumentSettingsComponent,this.dialog)
+    let componentRef = openDialog(dialogOpenAnimationDuration, dialogCloseAnimationDuration, DocumentSettingsComponent, this.dialog)
     componentRef.componentInstance.currentMaket = currentMaket
     componentRef.afterClosed().subscribe({
       next: value => {
@@ -509,5 +524,6 @@ export class DocumentComponent implements OnInit {
   //     exitAnimationDuration,
   //   })
   // }
+
 
 }

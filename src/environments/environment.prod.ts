@@ -1,5 +1,14 @@
 
 //глобальные константы для боевого режима работы приложения
+export const environment = {
+  production: true,
+  resourceServerURL: 'https://zero  client.cmrbank.ru:8765', // ссылка на корневой URL бэкенда
+  kcClientID: 'ice-cus-client', // из настроек KeyCloak
+  kcBaseURL: 'https://zero.cmrbank.ru/realms/ice-cus/protocol/openid-connect',
+  bffURI: 'https://zeroapp.cmrbank.ru',
+  redirectURI: 'https://zeroapp.cmrbank.ru'
+};
+
 // export const environment = {
 //   production: true,
 //   resourceServerURL: 'https://zeroclient.cmrbank.ru:8765', // ссылка на корневой URL бэкенда
@@ -10,14 +19,14 @@
 // };
 
 //Тест для ЦМРа
-export const environment = {
-  production: true,
-  resourceServerURL: 'https://zeroclienttest.cmrbank.ru:8765', // ссылка на корневой URL бэкенда
-  kcClientID: 'ice-cus-client', // из настроек KeyCloak
-  kcBaseURL: 'https://zerotest.cmrbank.ru/realms/ice-cus/protocol/openid-connect',
-  bffURI: 'https://zeroclienttest.cmrbank.ru',
-  redirectURI: 'https://zeroclienttest.cmrbank.ru'
-};
+// export const environment = {
+//   production: true,
+//   resourceServerURL: 'https://zeroclienttest.cmrbank.ru:8765', // ссылка на корневой URL бэкенда
+//   kcClientID: 'ice-cus-client', // из настроек KeyCloak
+//   kcBaseURL: 'https://zerotest.cmrbank.ru/realms/ice-cus/protocol/openid-connect',
+//   bffURI: 'https://zeroclienttest.cmrbank.ru',
+//   redirectURI: 'https://zeroclienttest.cmrbank.ru'
+// };
 
 // export const environment = {
 //   production: true,

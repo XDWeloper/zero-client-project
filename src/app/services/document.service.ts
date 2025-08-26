@@ -287,6 +287,45 @@ export class DocumentService {
     this.addTemplate(doc, step)
   }
 
+  insertStep(step: StepTreeTempl){
+    let children = this.docTree.find(p => p.id === step.parentId).children
+
+    //console.log(children)
+    let stepIndex = children.findIndex(value => value.num === step.num)
+    children.splice(stepIndex,0,step)
+    let stepMaketList = this.templateList.find(value => value.docId === step.parentId).docStep
+
+    console.log(stepMaketList)
+
+    let newStep: IceStepMaket = {
+      stepNum: step.num,
+      stepName: step.name,
+      componentMaket: new Array<ComponentMaket>(),
+      visible: step.visible,
+      isToolBar: step.isToolBar,
+      stepEvent: step.stepEvent
+    }
+    stepMaketList.splice(stepIndex, 0, newStep)
+
+    this.refreshTreeStepNum(children)
+    this.refreshTemplateStepNum(stepMaketList)
+    this.getDocById(step.parentId).isModified = true
+  }
+
+  refreshTreeStepNum(docTreeStepArray: StepTreeTempl[]){
+    let count = 1;
+    docTreeStepArray.forEach(value => {
+      value.num = count++
+    })
+  }
+  refreshTemplateStepNum(stepMaketList: IceStepMaket[]){
+    let count = 1;
+    stepMaketList.forEach(value => {
+      value.stepNum = count++
+    })
+  }
+
+
   deleteStep(step: StepTreeTempl) {
     let children = this.docTree.find(p => p.id === step.parentId).children
     this.deleteTemplateStep(step.parentId, step.num)

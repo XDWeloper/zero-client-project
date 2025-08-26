@@ -47,6 +47,7 @@ import {ModifiedService} from "../../../../services/modified.service";
 import {openDialog} from "../../util";
 import {DataSourceDialogComponent} from "../data-sourse-dialog/data-source-dialog.component";
 import {WorkerDialogComponent} from "../worker-dialog/worker-dialog.component";
+import {style} from "@angular/animations";
 
 @Component({
   selector: 'app-main-page',
@@ -63,6 +64,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
   docPanelCurrentSize: number = docPanelOpenWidth//тут меняем если нужно открыть/закрыть
   propPanelCurrentSize: number = propPanelOpenWidth//тут меняем если нужно открыть/закрыть
   cellRowList: any;
+  rowList: Array<number>;
   cellInnerList: any;
   cellColl: number
   currentDocAndStep: any
@@ -261,6 +263,7 @@ export class MainPageComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.cellColl = cellColl
+    this.rowList = new Array<number>(cellRow).fill(0).map((x, i) => i)
     this.cellRowList = new Array(collInRow * cellRow).fill(null).map((_, i) => i + 1);
     this.cellInnerList = new Array(cellColl).fill(null).map((_, i) => i + 1);
     new ResizeObserver(v => {
@@ -590,4 +593,15 @@ export class MainPageComponent implements OnInit, OnDestroy {
      this.componentService.isStretchRect = false
    }
 
+  protected readonly collInRow = collInRow;
+  protected readonly cellRow = cellRow;
+  protected readonly style = style;
+
+  downElements(item: number) {
+    console.log("downElements row: ", item)
+  }
+
+  upElements(item: number) {
+    console.log("upElements row: ", item)
+  }
 }

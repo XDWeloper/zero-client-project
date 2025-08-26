@@ -77,6 +77,8 @@
                     matTooltip="Редактировать название">edit</mat-icon>
           <mat-icon class="text-error-base mr-1 hover:scale-125 duration-300 flex-auto" (click)="delStep(stepNode)"
                     matTooltip="Удалить страницу">remove</mat-icon>
+          <mat-icon class="text-green-500 mr-1 hover:scale-125 duration-300 flex-auto" (click)="addStepFromStepBefore(stepNode)"
+                    matTooltip="Добавить страницу перед">add</mat-icon>
           <mat-icon class="text-primary-dark mr-1 hover:scale-125 duration-300 flex-auto" (click)="stepSettings(stepNode)"
                     matTooltip="Параметры страницы">settings</mat-icon>
         </div>

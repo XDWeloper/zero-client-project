@@ -134,7 +134,6 @@ export class LoginComponent implements OnInit {
         console.log("ошибка получения токена",error)
       })
     });
-
   }
 
   // проверяет state ранее сохраненный и полученный от KC

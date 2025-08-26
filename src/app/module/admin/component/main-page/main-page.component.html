@@ -2,7 +2,7 @@
 
   <mat-toolbar class="bg-primary-base dark:bg-dark-background">
     <span
-      class="w-full text-center bg-primary-base dark:bg-dark-background text-white">Консоль администратора ({{user ? user.name : ""}}
+      class="w-full text-center bg-primary-base dark:bg-dark-background text-white">Консоль администратора ({{ user ? user.name : "" }}
       )</span>
     <div class="absolute right-2 mt-2" matTooltip="Выход">
       <h1 class="bg-gray-50 rounded-full h-8 w-8 flex justify-center items-center cursor-pointer">
@@ -20,7 +20,7 @@
                      [size]="docPanelCurrentSize"
                      [minSize]="docPanelCloseWidth"
                      [maxSize]="docPanelOpenWidth">
-<!--                     (transitionend)="transEnd()">-->
+        <!--                     (transitionend)="transEnd()">-->
         <!--панель документов-->
         <app-document [docPanelCurrentSize]="docPanelCurrentSize"
                       [docPanelOpenWidth]="docPanelOpenWidth"
@@ -36,8 +36,9 @@
                             (clickButton)="toolBarButtonClick($event)"></app-admin-tool-bar>
         <div class="h-8">
           <div *ngIf="currentDoc && currentStep"
-               class=" text-center text-black dark:text-white font-mono text-lg">{{currentDoc.name }}
-            - {{ currentStep.name}}</div>
+               class=" text-center text-black dark:text-white font-mono text-lg">{{ currentDoc.name }}
+            - {{ currentStep.name }}
+          </div>
         </div>
         <div class="w-full flex">
           <div class="w-10 text-center" [ngClass]="currentDoc && currentStep ? 'visible' : 'invisible'">
@@ -65,17 +66,29 @@
           </div>
 
           <!--            это поле элементов-->
-          <div class="border border-primary-base w-[90%] m-auto mt-0 boundary relative"
-               (mousemove)="mouseMove($event)" (mousedown)="mouseDown($event)" (mouseup)="mouseUp($event)"
-               #splitMainContainer id="mainContainer">
-            <ng-template #field></ng-template>
-            <div class="w-full grid grid-cols-12 gap-y-0.5">
-              <div *ngFor="let item of cellRowList; let outCell = index " class="flex">
-                <app-cell class="flex-auto " *ngFor="let i of cellInnerList; let innerCell = index"
-                          [cellType]="cellType"
-                          [index]="outCell * cellColl + innerCell"></app-cell>
+          <div class="w-full flex">
+            <div class="border border-primary-base w-[90%] m-auto mt-0 boundary relative"
+                 (mousemove)="mouseMove($event)" (mousedown)="mouseDown($event)" (mouseup)="mouseUp($event)"
+                 #splitMainContainer id="mainContainer">
+              <ng-template #field></ng-template>
+              <div class="w-full grid grid-cols-12 gap-y-0.5">
+                <div *ngFor="let item of cellRowList; let outCell = index " class="flex">
+                  <app-cell class="flex-auto"
+                            *ngFor="let i of cellInnerList; let innerCell = index"
+                            [cellType]="cellType"
+                            [index]="outCell * cellColl + innerCell">
+                  </app-cell>
+                </div>
               </div>
             </div>
+
+            <div class="grid grid-cols-1 mr-4">
+              <div class="flex-none cursor-pointer" *ngFor="let item of rowList" >
+                <mat-icon class="mt-1 h-full text-info-base opacity-0 hover:opacity-100 duration-300 hover:font-bold" (click)="downElements(item)">arrow_downward</mat-icon>
+                <mat-icon class="mt-1 h-full text-error-base opacity-0 hover:opacity-100 duration-300 hover:font-bold" (click)="upElements(item)">arrow_upward</mat-icon>
+              </div>
+            </div>
+
           </div>
 
           <div class="absolute opacity-30 bg-info-base z-50"
@@ -99,7 +112,7 @@
                      [size]="propPanelCurrentSize"
                      [minSize]="propPanelCloseWidth"
                      [maxSize]="propPanelOpenWidth ">
-<!--                     (transitionend)="transEnd()">-->
+        <!--                     (transitionend)="transEnd()">-->
         <div
           class="relative w-full h-10 bg-primary-base dark:bg-dark-background text-center text-white text-lg border border-solid border-primary-base">
           <p *ngIf="propPanelCurrentSize > propPanelOpenWidth / 2"
@@ -116,7 +129,6 @@
     </as-split>
   </div>
 </div>
-
 
 
 <div *ngIf="isBlock" class="absolute top-0  left-0 w-screen h-screen z-100000 bg-gray-400 opacity-50"></div>
